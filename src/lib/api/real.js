@@ -105,6 +105,18 @@ export const api = {
   submitAnswer: (id, choice) => rpc('submit_answer', { p_problem_id: id, p_choice: choice }),
   getLeaderboard: (scope) => rpc('get_leaderboard', { p_scope: scope, p_limit: 50 }),
 
+  // Public (no sign-in needed): landing page and sign-up screen.
+  async getPublicStats() {
+    const { data, error } = await supabase.rpc('get_public_stats');
+    if (error) throw fromSupabase(error);
+    return data;
+  },
+  async getPublicModules() {
+    const { data, error } = await supabase.from('modules').select('id,name,short,level,blurb,sort').order('sort');
+    if (error) throw fromSupabase(error);
+    return data;
+  },
+
   async getPlans() {
     const [tiers, plans] = await Promise.all([
       supabase.from('tiers').select('id,name,rank,weekly_problem_limit,max_level,full_walkthroughs,tutor_daily_limit,tagline,features').order('rank'),

@@ -1,36 +1,46 @@
 import { useEffect, useId } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, animate, motion, useDragControls, useMotionValue, useReducedMotion, useTransform } from 'motion/react';
-import { ChevronLeft, House, LayoutList, Trophy, CircleUserRound, X, CheckCircle2, AlertCircle, Info } from 'lucide-react';
+import { ChevronLeft, X, CheckCircle2, AlertCircle, Info } from 'lucide-react';
 import { useApp } from '../app/AppContext';
+import { useMedia, BREAKPOINT } from '../app/useDevice';
+import { page, item } from '../design/motion';
+import { duration, ease, spring } from '../design/tokens';
 
-const spring = { type: 'spring', stiffness: 420, damping: 38, mass: 0.9 };
-
-/** Screen wrapper: tab screens fade in, pushed screens slide in from the right. */
-export function Page({ children, pushed = false, className = 'screen' }) {
-  const reduce = useReducedMotion();
+/**
+ * Screen wrapper. Enters with a crossfade and a 20px rise, exits with a fade
+ * and a slight shrink (route changes run through AnimatePresence in App), and
+ * staggers any <Item> children by 50ms.
+ */
+export function Page({ children, className = 'screen', wide = false, as = 'main', ...rest }) {
+  const Tag = as === 'div' ? motion.div : motion.main;
   return (
-    <motion.main
-      className={className}
-      initial={reduce ? { opacity: 0 } : pushed ? { opacity: 0, x: 28 } : { opacity: 0, y: 6 }}
-      animate={{ opacity: 1, x: 0, y: 0 }}
-      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-    >
+    <Tag className={`${className} ${wide ? 'screen--wide' : ''}`} variants={page} initial="hidden" animate="show" exit="exit" {...rest}>
       {children}
-    </motion.main>
+    </Tag>
+  );
+}
+
+/** A staggered child of <Page> (or of any parent using the `page`/`group` variants). */
+export function Item({ children, as = 'div', className, style, ...rest }) {
+  const Tag = motion[as] ?? motion.div;
+  return (
+    <Tag variants={item} className={className} style={style} {...rest}>
+      {children}
+    </Tag>
   );
 }
 
 export function LargeTitle({ eyebrow, title, right, children }) {
   return (
-    <header className="top">
-      {eyebrow && <p className="t-foot">{eyebrow}</p>}
+    <Item as="header" className="top">
+      {eyebrow && <p className="t-eyebrow">{eyebrow}</p>}
       <div className="top-line">
-        <h1 className="t-large">{title}</h1>
+        <h1 className="t-h1">{title}</h1>
         {right}
       </div>
       {children}
-    </header>
+    </Item>
   );
 }
 
@@ -46,7 +56,7 @@ export function NavBar({ back = 'Back', to, title, right }) {
       <div className="navbar-inner">
         <div>
           <button type="button" className="nav-back" onClick={goBack}>
-            <ChevronLeft size={24} strokeWidth={2.4} aria-hidden="true" />
+            <ChevronLeft size={22} strokeWidth={2.4} aria-hidden="true" />
             {back}
           </button>
         </div>
@@ -57,39 +67,14 @@ export function NavBar({ back = 'Back', to, title, right }) {
   );
 }
 
-const TABS = [
-  { to: '/', label: 'Home', Icon: House, end: true },
-  { to: '/practice', label: 'Practice', Icon: LayoutList },
-  { to: '/ranking', label: 'Ranking', Icon: Trophy },
-  { to: '/profile', label: 'Profile', Icon: CircleUserRound },
-];
-
-export function TabBar() {
-  return (
-    <nav className="tabbar" aria-label="Main">
-      <div className="tabbar-inner">
-        {TABS.map(({ to, label, Icon, end }) => (
-          <NavLink key={to} to={to} end={end} className="tab">
-            {({ isActive }) => (
-              <>
-                <Icon size={24} strokeWidth={isActive ? 2.4 : 1.8} aria-hidden="true" />
-                {label}
-              </>
-            )}
-          </NavLink>
-        ))}
-      </div>
-    </nav>
-  );
-}
-
-/** iOS-style bottom sheet. Drag down or tap outside to close. */
+/** Bottom sheet on phones (drag down to close), centred dialog on larger screens. */
 export function Sheet({ open, onClose, children, tall = false, label }) {
   const reduce = useReducedMotion();
+  const wide = useMedia(BREAKPOINT.tablet);
   const id = useId();
   const controls = useDragControls();
   useEffect(() => {
-    if (!open) return;
+    if (!open) return undefined;
     const onKey = (e) => e.key === 'Escape' && onClose?.();
     document.addEventListener('keydown', onKey);
     const prev = document.body.style.overflow;
@@ -99,6 +84,12 @@ export function Sheet({ open, onClose, children, tall = false, label }) {
       document.body.style.overflow = prev;
     };
   }, [open, onClose]);
+
+  const motionProps = reduce
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
+    : wide
+      ? { initial: { opacity: 0, y: 24, scale: 0.97 }, animate: { opacity: 1, y: 0, scale: 1 }, exit: { opacity: 0, y: 16, scale: 0.98 } }
+      : { initial: { y: '100%' }, animate: { y: 0 }, exit: { y: '100%' } };
 
   return (
     <AnimatePresence>
@@ -111,7 +102,7 @@ export function Sheet({ open, onClose, children, tall = false, label }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.22 }}
+            transition={{ duration: duration.base }}
           />
           <motion.div
             key="sheet"
@@ -120,11 +111,9 @@ export function Sheet({ open, onClose, children, tall = false, label }) {
             aria-labelledby={label ? undefined : `${id}-t`}
             aria-label={label}
             className={`sheet ${tall ? 'sheet--tall' : ''}`}
-            initial={reduce ? { opacity: 0 } : { y: '100%' }}
-            animate={reduce ? { opacity: 1 } : { y: 0 }}
-            exit={reduce ? { opacity: 0 } : { y: '100%' }}
-            transition={spring}
-            drag={reduce ? false : 'y'}
+            {...motionProps}
+            transition={spring.snappy}
+            drag={reduce || wide ? false : 'y'}
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0, bottom: 0.6 }}
             dragListener={false}
@@ -134,7 +123,7 @@ export function Sheet({ open, onClose, children, tall = false, label }) {
               if (info.offset.y > 120 || info.velocity.y > 600) onClose?.();
             }}
           >
-            <div className="sheet-grab" onPointerDown={(e) => !reduce && controls.start(e)} aria-hidden="true">
+            <div className="sheet-grab" onPointerDown={(e) => !reduce && !wide && controls.start(e)} aria-hidden="true">
               <i />
             </div>
             <button type="button" className="icon-btn sheet-close" onClick={onClose} aria-label="Close">
@@ -158,10 +147,11 @@ export function Toast() {
           <motion.div
             key={toast.id}
             className="toast"
+            data-kind={toast.kind}
             initial={{ opacity: 0, y: -16, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -12, scale: 0.98 }}
-            transition={spring}
+            transition={spring.snappy}
           >
             <Icon size={18} aria-hidden="true" />
             {toast.text}
@@ -178,7 +168,7 @@ export function Segmented({ value, onChange, options, label }) {
     <div className="seg" role="group" aria-label={label}>
       {options.map((o) => (
         <button key={o.value} type="button" aria-pressed={value === o.value} onClick={() => onChange(o.value)}>
-          {value === o.value && <motion.span layoutId={`seg-${id}`} className="seg-thumb" transition={spring} />}
+          {value === o.value && <motion.span layoutId={`seg-${id}`} className="seg-thumb" transition={spring.snappy} />}
           {o.label}
         </button>
       ))}
@@ -187,13 +177,13 @@ export function Segmented({ value, onChange, options, label }) {
 }
 
 /** Number that counts up to `to` (instantly when reduced motion is on). */
-export function CountUp({ to, from = 0, duration = 0.9, className = 'fig' }) {
+export function CountUp({ to, from = 0, duration: d = duration.count, delay = 0, className = 'fig', format }) {
   const reduce = useReducedMotion();
   const mv = useMotionValue(from);
-  const text = useTransform(mv, (v) => Math.round(v).toLocaleString('en-US'));
+  const text = useTransform(mv, (v) => (format ? format(v) : Math.round(v).toLocaleString('en-US')));
   useEffect(() => {
-    const c = animate(mv, to, { duration: reduce ? 0 : duration, ease: [0.22, 1, 0.36, 1] });
+    const c = animate(mv, to ?? 0, { duration: reduce ? 0 : d, delay: reduce ? 0 : delay, ease: ease.out });
     return () => c.stop();
-  }, [to, duration, reduce, mv]);
+  }, [to, d, delay, reduce, mv]);
   return <motion.span className={className}>{text}</motion.span>;
 }

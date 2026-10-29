@@ -1,150 +1,287 @@
 /*
-  Vantaris design tokens
-  Identity carried over from the Valoris prototype: malachite ink and brass on
-  cool stone. Newsreader for display, Hanken Grotesk for interface, JetBrains
-  Mono for every financial figure. Layout follows iOS: large titles, inset
-  grouped lists, a frosted tab bar and bottom sheets.
+  Vantaris design tokens: the only place raw values live.
+  Identity: deep navy and rich black, electric gold for ambition and key
+  figures, cool cyan for data. Inter (with optical sizing) for everything
+  people read, JetBrains Mono with tabular figures for every number.
+
+  Motion values are mirrored in src/design/tokens.js for Framer Motion.
+  Colours are read from here at runtime by the 3D scenes and the share card
+  (see cssVar in tokens.js), so this file stays the single source of truth.
 */
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 
-  /* Surfaces */
-  --bg: #EEF2F0;
-  --surface: #FFFFFF;
-  --surface-2: #E6EBE8;
-  --surface-3: #DCE3DF;
-  --line: rgba(13, 21, 18, 0.09);
-  --line-strong: rgba(13, 21, 18, 0.16);
+  /* ---------- Palette ---------- */
+  --navy-1000: #03050B;
+  --navy-950: #060912;
+  --navy-900: #0A0F1E;
+  --navy-850: #0D1326;
+  --navy-800: #111833;
+  --navy-750: #151D3B;
+  --navy-700: #18213F;
+  --navy-600: #1E2A4D;
+  --navy-500: #2A3866;
+  --plum-900: #160F2E;
+  --plum-700: #2A1A55;
 
-  /* Text */
-  --fg: #0D1512;
-  --fg-2: #4F5C56;
-  --fg-3: #85928B;
+  --gold-300: #F7E3A3;
+  --gold-400: #F1D27A;
+  --gold-500: #D4AF37;
+  --gold-600: #B8931F;
+  --gold-700: #8C6D12;
+  --cyan-300: #7FE9FF;
+  --cyan-500: #00D4FF;
+  --cyan-700: #0092B3;
+  --mint-500: #2EE6A6;
+  --rose-500: #FF6B81;
+  --amber-500: #FFB547;
+  --blue-300: #CFE0FF;
+  --blue-500: #5B9BFF;
+  --blue-800: #1E3F86;
+  --violet-300: #E7DCFF;
+  --violet-500: #A98BFF;
+  --violet-800: #46308F;
+  --platinum-300: #F2F5FA;
+  --platinum-500: #DCE3EE;
+  --platinum-700: #9AA6BA;
+  --silver-300: #F7F9FC;
+  --silver-400: #EEF2F7;
+  --silver-500: #AEB8C6;
+  --silver-600: #7D8899;
+  --silver-700: #6F7A8C;
+  --bronze-300: #F4CFA9;
+  --bronze-400: #F1C39A;
+  --bronze-500: #B5763F;
+  --bronze-600: #7A4522;
+  --bronze-700: #6E3F1E;
 
-  /* Brand */
-  --accent: #0E6B52;
-  --accent-press: #0A5642;
-  --accent-soft: #DDEFE7;
-  --on-accent: #FFFFFF;
-  --brass: #A9863A;
-  --brass-bright: #C9A24E;
-  --brass-soft: #F3ECDB;
-  --brass-ink: #6B5418;
+  /* ---------- Vale (mascot) ---------- */
+  --vale-fur: #3B5290;
+  --vale-fur-light: #5470B5;
+  --vale-fur-dark: #2A3C6E;
+  --vale-ear-inner: #17213F;
+  --vale-mask: #EEF2FA;
+  --vale-mask-shade: #C9D2E6;
+  --vale-brow: #D7DEEE;
+  --vale-eye: #FFB21E;
+  --vale-eye-deep: #E07800;
+  --vale-ink: #0A0F1E;
+  --vale-suit: #131B36;
+  --vale-suit-light: #1C2849;
+  --vale-lapel: #0C1328;
+  --vale-lapel-edge: #34447A;
+  --vale-shirt: #F3F5FB;
+  --vale-tie: #2A1A55;
+  --vale-tie-light: #3B2775;
+  --vale-paper: #F6F7FB;
+  --vale-flame: #FF8A1F;
 
-  /* Deal tombstone card */
-  --ink: #0F1A16;
-  --ink-2: #17241F;
-  --on-ink: #EEF3F0;
-  --on-ink-2: #92A49B;
+  /* ---------- Semantic surfaces ---------- */
+  --bg: var(--navy-900);
+  --bg-deep: var(--navy-950);
+  --surface: var(--navy-800);
+  --surface-2: var(--navy-700);
+  --surface-3: var(--navy-600);
+  --surface-raised: var(--navy-750);
+  --glass: rgba(17, 24, 51, 0.62);
+  --glass-strong: rgba(10, 15, 30, 0.82);
+  --glass-fill: linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.02));
+  --glass-line: rgba(255, 255, 255, 0.08);
+  --glass-line-strong: rgba(255, 255, 255, 0.14);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --line: rgba(174, 182, 204, 0.10);
+  --line-strong: rgba(174, 182, 204, 0.18);
+  --scrim: rgba(3, 5, 11, 0.66);
+  --blur-sm: 10px;
+  --blur-md: 18px;
+  --blur-lg: 28px;
 
-  /* Status */
-  --pos: #0E8F5F;
-  --pos-soft: #DCF2E6;
-  --neg: #C23A40;
-  --neg-soft: #F9E5E5;
-  --warn: #B4610A;
-  --warn-soft: #FBEEDD;
+  /* ---------- Text ---------- */
+  --fg: #F8F8F8;
+  --fg-2: #AEB6CC;
+  --fg-3: #8C95B2;
+  --fg-inverse: var(--navy-900);
 
-  /* Effects */
-  --glass: rgba(238, 242, 240, 0.78);
-  --glass-line: rgba(13, 21, 18, 0.08);
-  --scrim: rgba(9, 16, 13, 0.36);
-  --shadow-card: 0 1px 2px rgba(13, 21, 18, 0.05), 0 2px 8px rgba(13, 21, 18, 0.04);
-  --shadow-float: 0 12px 40px rgba(13, 21, 18, 0.16), 0 2px 8px rgba(13, 21, 18, 0.06);
-  --mascot-stage: #E6EBE8;
+  /* ---------- Brand + status ---------- */
+  --gold: var(--gold-500);
+  --gold-bright: var(--gold-400);
+  --gold-soft: rgba(212, 175, 55, 0.12);
+  --gold-line: rgba(212, 175, 55, 0.34);
+  --cyan: var(--cyan-500);
+  --cyan-soft: rgba(0, 212, 255, 0.12);
+  --cyan-line: rgba(0, 212, 255, 0.32);
+  --pos: var(--mint-500);
+  --pos-soft: rgba(46, 230, 166, 0.12);
+  --pos-line: rgba(46, 230, 166, 0.4);
+  --neg: var(--rose-500);
+  --neg-soft: rgba(255, 107, 129, 0.12);
+  --neg-line: rgba(255, 107, 129, 0.4);
+  --warn: var(--amber-500);
+  --warn-soft: rgba(255, 181, 71, 0.12);
 
-  /* Type */
-  --font-display: 'Newsreader', ui-serif, Georgia, 'Times New Roman', serif;
-  --font-ui: 'Hanken Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-figure: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Career tiers: Analyst blue, Associate purple, VP gold, MD platinum */
+  --tier-analyst: var(--blue-500);
+  --tier-analyst-bg: linear-gradient(150deg, rgba(91, 155, 255, 0.22), rgba(91, 155, 255, 0.04) 60%);
+  --tier-associate: var(--violet-500);
+  --tier-associate-bg: linear-gradient(150deg, rgba(169, 139, 255, 0.24), rgba(169, 139, 255, 0.04) 60%);
+  --tier-vp: var(--gold-500);
+  --tier-vp-bg: linear-gradient(150deg, rgba(212, 175, 55, 0.26), rgba(212, 175, 55, 0.04) 60%);
+  --tier-md: var(--platinum-500);
+  --tier-md-bg: linear-gradient(150deg, rgba(220, 227, 238, 0.24), rgba(154, 166, 186, 0.05) 60%);
 
-  /* Shape */
-  --r-xs: 8px;
-  --r-sm: 11px;
+  /* ---------- Gradients ---------- */
+  --grad-gold: linear-gradient(135deg, var(--gold-300) 0%, var(--gold-500) 45%, var(--gold-600) 100%);
+  --grad-gold-text: linear-gradient(100deg, var(--gold-300), var(--gold-500) 55%, var(--gold-400));
+  --grad-cyan: linear-gradient(135deg, var(--cyan-300), var(--cyan-500));
+  --grad-hero: radial-gradient(120% 80% at 75% 10%, rgba(42, 26, 85, 0.85), transparent 60%),
+    radial-gradient(90% 70% at 10% 30%, rgba(20, 34, 78, 0.9), transparent 65%),
+    linear-gradient(180deg, var(--navy-900) 0%, var(--plum-900) 55%, var(--navy-1000) 100%);
+  --grad-ambient: radial-gradient(60% 50% at 85% -10%, rgba(42, 26, 85, 0.55), transparent 70%),
+    radial-gradient(50% 40% at -10% 10%, rgba(0, 146, 179, 0.12), transparent 70%),
+    radial-gradient(70% 50% at 50% 120%, rgba(212, 175, 55, 0.06), transparent 70%);
+  --grad-platinum: linear-gradient(135deg, var(--platinum-300), var(--platinum-500) 45%, var(--platinum-700));
+  --grad-conic-border: conic-gradient(var(--gold-600), var(--gold-300), var(--cyan-500), var(--gold-500), var(--gold-600));
+
+  /* ---------- Type ---------- */
+  --font-ui: 'Inter Variable', 'SF Pro Display', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-figure: 'JetBrains Mono Variable', 'SF Mono', ui-monospace, Menlo, monospace;
+  --fs-2xs: 11px;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-base: 15px;
+  --fs-md: 16px;
+  --fs-lg: 18px;
+  --fs-xl: 21px;
+  --fs-2xl: 26px;
+  --fs-3xl: 32px;
+  --fs-4xl: 42px;
+  --fs-5xl: 56px;
+  --fs-display: clamp(44px, 7.4vw, 96px);
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-heavy: 800;
+  --fw-black: 900;
+  --lh-tight: 1.05;
+  --lh-snug: 1.25;
+  --lh-body: 1.6;
+  --tracking-tight: -0.02em;
+  --tracking-tighter: -0.035em;
+  --tracking-wide: 0.08em;
+  --tracking-wider: 0.18em;
+
+  /* ---------- Space (4px grid) ---------- */
+  --sp-0: 2px;
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-7: 28px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+  --sp-20: 80px;
+  --sp-24: 96px;
+  --sp-32: 128px;
+
+  /* ---------- Shape ---------- */
+  --r-xs: 6px;
+  --r-sm: 10px;
   --r-md: 14px;
   --r-lg: 20px;
   --r-xl: 28px;
+  --r-2xl: 36px;
+  --r-full: 999px;
+  --hairline: 1px;
+  --ring: 2px;
 
-  /* Layout */
-  --col: 560px;
+  /* ---------- Size ---------- */
+  --tap: 44px;
+  --control-h: 52px;
+  --control-h-sm: 36px;
+  --control-h-md: 44px;
+  --control-h-lg: 58px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --avatar: 40px;
+  --avatar-lg: 88px;
+  --fab: 56px;
+  --chip-h: 26px;
+  --chip-h-sm: 22px;
+  --field-h: 58px;
+  --toggle-w: 50px;
+  --toggle-h: 30px;
+  --toggle-thumb: 24px;
+  --bar-h: 8px;
+  --bar-h-sm: 4px;
+  --dot: 6px;
+
+  /* ---------- Elevation ---------- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.38), 0 2px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.55), 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-hover: 0 18px 44px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(212, 175, 55, 0.22), 0 0 28px rgba(212, 175, 55, 0.08);
+  --glow-gold: 0 0 0 1px rgba(212, 175, 55, 0.45), 0 0 24px rgba(212, 175, 55, 0.28);
+  --glow-gold-strong: 0 0 0 1px rgba(241, 210, 122, 0.7), 0 0 36px rgba(212, 175, 55, 0.45), 0 0 80px rgba(212, 175, 55, 0.18);
+  --glow-cyan: 0 0 0 1px rgba(0, 212, 255, 0.4), 0 0 24px rgba(0, 212, 255, 0.25);
+  --glow-pos: 0 0 0 1px rgba(46, 230, 166, 0.5), 0 0 32px rgba(46, 230, 166, 0.3);
+  --glow-neg: 0 0 0 1px rgba(255, 107, 129, 0.5), 0 0 28px rgba(255, 107, 129, 0.22);
+  --text-glow-gold: 0 0 24px rgba(212, 175, 55, 0.45);
+
+  /* ---------- Motion (mirrored in src/design/tokens.js) ---------- */
+  --dur-instant: 100ms;
+  --dur-fast: 160ms;
+  --dur-base: 240ms;
+  --dur-slow: 420ms;
+  --dur-slower: 700ms;
+  --dur-loop: 3s;
+  --dur-sheen: 2.4s;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --hover-scale: 1.02;
+  --press-scale: 0.98;
+  --lift: -4px;
+  --float: 3px;
+
+  /* ---------- Layout ---------- */
+  --col: 600px;
+  --col-wide: 1180px;
+  --col-narrow: 440px;
+  --sidebar-w: 252px;
+  --tabbar-h: 64px;
+  --navbar-h: 60px;
   --gutter: max(16px, env(safe-area-inset-left, 0px));
   --gutter-r: max(16px, env(safe-area-inset-right, 0px));
-  --tabbar-h: 58px;
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* ---------- Layers ---------- */
+  --z-bg: -1;
+  --z-raised: 1;
+  --z-sticky: 20;
+  --z-dock: 25;
+  --z-nav: 30;
+  --z-fab: 40;
+  --z-sheet: 60;
+  --z-overlay: 80;
+  --z-toast: 90;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    color-scheme: dark;
-    --bg: #050807;
-    --surface: #101815;
-    --surface-2: #18221E;
-    --surface-3: #212D28;
-    --line: rgba(238, 243, 240, 0.08);
-    --line-strong: rgba(238, 243, 240, 0.15);
-    --fg: #EEF3F0;
-    --fg-2: #A3B1AA;
-    --fg-3: #6A7972;
-    --accent: #3FBF94;
-    --accent-press: #33A47E;
-    --accent-soft: #10271E;
-    --on-accent: #03110B;
-    --brass: #D4B062;
-    --brass-bright: #E6C77A;
-    --brass-soft: #2A2312;
-    --brass-ink: #E9CF8E;
-    --ink: #0C1411;
-    --ink-2: #14201B;
-    --on-ink: #EEF3F0;
-    --on-ink-2: #8B9C94;
-    --pos: #3FBF94;
-    --pos-soft: #0F261C;
-    --neg: #EE6A6F;
-    --neg-soft: #2C1416;
-    --warn: #EBA347;
-    --warn-soft: #2A1F10;
-    --glass: rgba(9, 14, 12, 0.74);
-    --glass-line: rgba(238, 243, 240, 0.07);
-    --scrim: rgba(0, 0, 0, 0.58);
-    --shadow-card: 0 0 0 1px rgba(238, 243, 240, 0.04);
-    --shadow-float: 0 16px 48px rgba(0, 0, 0, 0.6);
-    --mascot-stage: #18221E;
+@media (min-width: 768px) {
+  :root {
+    --gutter: max(28px, env(safe-area-inset-left, 0px));
+    --gutter-r: max(28px, env(safe-area-inset-right, 0px));
   }
 }
-
-:root[data-theme='dark'] {
-  color-scheme: dark;
-  --bg: #050807;
-  --surface: #101815;
-  --surface-2: #18221E;
-  --surface-3: #212D28;
-  --line: rgba(238, 243, 240, 0.08);
-  --line-strong: rgba(238, 243, 240, 0.15);
-  --fg: #EEF3F0;
-  --fg-2: #A3B1AA;
-  --fg-3: #6A7972;
-  --accent: #3FBF94;
-  --accent-press: #33A47E;
-  --accent-soft: #10271E;
-  --on-accent: #03110B;
-  --brass: #D4B062;
-  --brass-bright: #E6C77A;
-  --brass-soft: #2A2312;
-  --brass-ink: #E9CF8E;
-  --ink: #0C1411;
-  --ink-2: #14201B;
-  --on-ink: #EEF3F0;
-  --on-ink-2: #8B9C94;
-  --pos: #3FBF94;
-  --pos-soft: #0F261C;
-  --neg: #EE6A6F;
-  --neg-soft: #2C1416;
-  --warn: #EBA347;
-  --warn-soft: #2A1F10;
-  --glass: rgba(9, 14, 12, 0.74);
-  --glass-line: rgba(238, 243, 240, 0.07);
-  --scrim: rgba(0, 0, 0, 0.58);
-  --shadow-card: 0 0 0 1px rgba(238, 243, 240, 0.04);
-  --shadow-float: 0 16px 48px rgba(0, 0, 0, 0.6);
-  --mascot-stage: #18221E;
+@media (min-width: 1100px) {
+  :root {
+    --gutter: 40px;
+    --gutter-r: 40px;
+  }
 }

@@ -1,14 +1,52 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Vantaris app icon: Vale's face, with the muzzle marking as a gold V, on a navy medallion. -->
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#17241F"/><stop offset="1" stop-color="#0B120F"/>
+      <stop offset="0" stop-color="#151D3B"/><stop offset="1" stop-color="#060912"/>
     </linearGradient>
-    <linearGradient id="brass" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#F0D894"/><stop offset=".55" stop-color="#C9A24E"/><stop offset="1" stop-color="#9E7B2E"/>
+    <radialGradient id="disc" cx="0.5" cy="0.38" r="0.6">
+      <stop offset="0" stop-color="#2A3866"/><stop offset="1" stop-color="#0A0F1E"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F7E3A3"/><stop offset=".5" stop-color="#D4AF37"/><stop offset="1" stop-color="#8C6D12"/>
     </linearGradient>
+    <linearGradient id="goldDeep" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#D4AF37"/><stop offset="1" stop-color="#8C6D12"/>
+    </linearGradient>
+    <radialGradient id="iris" cx=".42" cy=".38" r=".7">
+      <stop offset="0" stop-color="#F7E3A3"/><stop offset=".45" stop-color="#FFB21E"/><stop offset="1" stop-color="#E07800"/>
+    </radialGradient>
+    <clipPath id="el"><path d="M80 92 Q92 86 108 98 Q94 104 80 92 Z"/></clipPath>
+    <clipPath id="er"><path d="M160 92 Q148 86 132 98 Q146 104 160 92 Z"/></clipPath>
   </defs>
   <rect width="512" height="512" rx="112" fill="url(#bg)"/>
-  <rect x="34" y="34" width="444" height="444" rx="84" fill="none" stroke="#D4B062" stroke-opacity=".35" stroke-width="5"/>
-  <path d="M136 156 L256 372 L376 156" fill="none" stroke="url(#brass)" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M203 156 L256 252 L309 156" fill="none" stroke="#3FBF94" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="256" cy="256" r="214" fill="url(#disc)"/>
+  <circle cx="256" cy="256" r="214" fill="none" stroke="url(#gold)" stroke-width="7" stroke-opacity=".75"/>
+  <g transform="translate(33.8 112.7) scale(1.8519)">
+    <path d="M68 68 L58 10 L108 46 Z" fill="#3B5290"/>
+    <path d="M73 59 L65 25 L98 46 Z" fill="#17213F"/>
+    <path d="M58 10 L61 27 L73 21 Z" fill="#0A0F1E" opacity=".8"/>
+    <path d="M172 68 L182 10 L132 46 Z" fill="#2A3C6E"/>
+    <path d="M167 59 L175 25 L142 46 Z" fill="#17213F"/>
+    <path d="M182 10 L179 27 L167 21 Z" fill="#0A0F1E" opacity=".8"/>
+    <path d="M120 38 L148 44 L170 60 L182 84 L201 104 L176 114 L162 130 L140 148 L120 158 L100 148 L78 130 L64 114 L39 104 L58 84 L70 60 L92 44 Z" fill="#3B5290"/>
+    <path d="M92 44 L120 38 L148 44 L136 72 L120 80 L104 72 Z" fill="#5470B5"/>
+    <path d="M70 60 L92 44 L104 72 L84 92 L58 84 Z" fill="#5470B5" opacity=".55"/>
+    <path d="M170 60 L148 44 L136 72 L156 92 L182 84 Z" fill="#2A3C6E"/>
+    <path d="M182 84 L201 104 L176 114 L164 98 Z" fill="#2A3C6E"/>
+    <path d="M39 104 L76 98 L102 116 L120 128 L138 116 L164 98 L201 104 L176 114 L162 130 L140 148 L120 158 L100 148 L78 130 L64 114 Z" fill="url(#gold)"/>
+    <path d="M120 128 L138 116 L164 98 L201 104 L176 114 L162 130 L140 148 L120 158 Z" fill="url(#goldDeep)" opacity=".55"/>
+    <path d="M110.5 100 L129.5 100 L125 133 L115 133 Z" fill="#3B5290"/>
+    <path d="M120 100 L129.5 100 L125 133 L120 133 Z" fill="#2A3C6E" opacity=".5"/>
+    <path d="M83 79 L104 84.5" stroke="#D7DEEE" stroke-width="4.2" stroke-linecap="round"/>
+    <path d="M157 75 L136 80.5" stroke="#D7DEEE" stroke-width="4.2" stroke-linecap="round"/>
+    <path d="M80 92 Q92 86 108 98 Q94 104 80 92 Z" fill="#0A0F1E"/>
+    <path d="M160 92 Q148 86 132 98 Q146 104 160 92 Z" fill="#0A0F1E"/>
+    <g clip-path="url(#el)"><circle cx="95" cy="95.5" r="7.2" fill="url(#iris)"/><ellipse cx="95" cy="95.5" rx="2.1" ry="4.9" fill="#0A0F1E"/><circle cx="97.6" cy="92.7" r="1.7" fill="#F7E3A3"/><rect x="74" y="59" width="38" height="30" fill="#3B5290"/></g>
+    <g clip-path="url(#er)"><circle cx="145" cy="95.5" r="7.2" fill="url(#iris)"/><ellipse cx="145" cy="95.5" rx="2.1" ry="4.9" fill="#0A0F1E"/><circle cx="147.6" cy="92.7" r="1.7" fill="#F7E3A3"/><rect x="128" y="59" width="38" height="30" fill="#3B5290"/></g>
+    <path d="M80 92 Q92 86 108 98 Q94 104 80 92 Z" fill="none" stroke="#0A0F1E" stroke-width="1.8"/>
+    <path d="M160 92 Q148 86 132 98 Q146 104 160 92 Z" fill="none" stroke="#0A0F1E" stroke-width="1.8"/>
+    <path d="M110 132 Q120 127 130 132 Q126 140 120 143 Q114 140 110 132 Z" fill="#0A0F1E"/>
+    <path d="M120 143 L120 147 M107 147.5 Q113.5 152 120 147 Q127.5 151.5 135 143.5" fill="none" stroke="#0A0F1E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
 </svg>

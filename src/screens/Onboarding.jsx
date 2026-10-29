@@ -1,39 +1,51 @@
-import { useId, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { BookOpen, Briefcase, ChartLine, Landmark, Check } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { ArrowLeft, ArrowRight, BookOpen, Briefcase, ChartLine, Check, Landmark } from 'lucide-react';
 import { api } from '../lib/api';
 import { timeZone } from '../lib/format';
 import { useApp } from '../app/AppContext';
+import { haptic } from '../app/prefs';
 import { Spinner } from '../components/bits';
+import { FloatingField } from '../components/ui';
+import Logo from '../components/Logo';
 import Mascot from '../components/Mascot';
+import { ConstellationFallback } from '../components/three/Fallbacks';
+import { step as stepVariants } from '../design/motion';
+import { duration, ease, spring } from '../design/tokens';
+import './Onboarding.css';
 
 const GOALS = [
-  { id: 'ib', label: 'Investment banking', detail: 'M&A, valuation, pitch work', Icon: Landmark },
-  { id: 'pe', label: 'Private equity', detail: 'LBOs, returns, deal structuring', Icon: Briefcase },
-  { id: 'consulting', label: 'Consulting or corporate finance', detail: 'Strategy and financial analysis', Icon: ChartLine },
-  { id: 'self', label: 'Learning for myself', detail: 'Understand how deals work', Icon: BookOpen },
+  { id: 'ib', label: 'Investment banking', detail: 'M&A, valuation, pitch work', Icon: Landmark, tier: 'Analyst' },
+  { id: 'pe', label: 'Private equity', detail: 'LBOs, returns, deal structuring', Icon: Briefcase, tier: 'VP' },
+  { id: 'consulting', label: 'Consulting or corporate finance', detail: 'Strategy and financial analysis', Icon: ChartLine, tier: 'Associate' },
+  { id: 'self', label: 'Learning for myself', detail: 'Understand how deals work', Icon: BookOpen, tier: 'MD' },
 ];
 
+const STEPS = 3;
+
 export default function Onboarding() {
-  const id = useId();
   const navigate = useNavigate();
   const { me, setMe, showToast } = useApp();
-  const [step, setStep] = useState(1);
+  const [[step, dir], setStep] = useState([0, 1]);
   const [name, setName] = useState(me?.profile?.display_name && me.profile.display_name !== 'Analyst' ? me.profile.display_name : '');
   const [school, setSchool] = useState(me?.profile?.school ?? '');
   const [goal, setGoal] = useState(me?.profile?.goal ?? null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
 
+  const go = (to) => {
+    setError(null);
+    setStep([to, to > step ? 1 : -1]);
+  };
+
   const finish = async () => {
     setBusy(true);
     setError(null);
     try {
-      const updated = await api.saveProfile({
-        displayName: name.trim(), school: school.trim(), goal, timezone: timeZone(), completeOnboarding: true,
-      });
+      const updated = await api.saveProfile({ displayName: name.trim(), school: school.trim(), goal, timezone: timeZone(), completeOnboarding: true });
       setMe(updated);
+      haptic(18);
       showToast(`Welcome to the desk, ${updated.profile.display_name}`, 'success');
       navigate('/', { replace: true });
     } catch (err) {
@@ -42,80 +54,140 @@ export default function Onboarding() {
     }
   };
 
-  return (
-    <main className="screen screen--bare" style={{ minHeight: '100dvh', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 20px)' }}>
-      <div className="between">
-        <p className="t-foot">Step {step} of 2</p>
-        <div className="row-8" aria-hidden="true">
-          {[1, 2].map((s) => (
-            <span key={s} style={{ width: 28, height: 4, borderRadius: 2, background: s <= step ? 'var(--accent)' : 'var(--surface-3)' }} />
-          ))}
-        </div>
-      </div>
+  const mood = step === 0 ? 'welcome' : step === 1 ? 'idle' : goal ? 'correct' : 'think';
+  const line = [
+    'I’m Vale. I’ll be on your desk for every deal: hints when you’re stuck, the why behind every step.',
+    'Let me start your file. What should the desk call you?',
+    goal ? 'Good choice. I’ll start you on the deals that matter most for it.' : 'Where are you headed? I’ll line up the right deals.',
+  ][step];
 
-      <motion.div key={step} className="stack-16" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-        {step === 1 ? (
-          <>
-            <div className="row" style={{ alignItems: 'flex-end' }}>
-              <h1 className="t-large grow">What should we call you?</h1>
-              <Mascot mood="idle" size={64} />
-            </div>
-            <form
-              className="stack-16"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!name.trim()) return setError('Enter your first name.');
-                setError(null);
-                setStep(2);
-              }}
-            >
-              <div className="field">
-                <label htmlFor={`${id}-n`}>First name</label>
-                <input id={`${id}-n`} className="input" value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" maxLength={40} autoFocus />
-              </div>
-              <div className="field">
-                <label htmlFor={`${id}-s`}>School <span className="c-3" style={{ fontWeight: 500 }}>(optional)</span></label>
-                <input id={`${id}-s`} className="input" value={school} onChange={(e) => setSchool(e.target.value)} autoComplete="organization" maxLength={80} placeholder="e.g. LFIM Mumbai" />
-                <span className="hint">Shown next to your name on the leaderboard.</span>
-              </div>
-              {error && <div className="alert" role="alert">{error}</div>}
-              <button className="btn btn--accent">Continue</button>
-            </form>
-          </>
-        ) : (
-          <>
-            <h1 className="t-large">What are you aiming for?</h1>
-            <p className="t-body" style={{ marginTop: -8 }}>We’ll start you on the problems that matter most for it.</p>
-            <div className="stack-8" role="radiogroup" aria-label="Goal">
-              {GOALS.map(({ id: gid, label, detail, Icon }) => {
-                const on = goal === gid;
-                return (
-                  <button
-                    key={gid} type="button" role="radio" aria-checked={on} onClick={() => setGoal(gid)}
-                    className="option" aria-pressed={on}
-                  >
-                    <span className="option-key" style={{ border: 0, background: on ? 'var(--accent)' : 'var(--surface-2)', color: on ? 'var(--on-accent)' : 'var(--fg-2)', width: 40, height: 40, borderRadius: 12 }}>
-                      <Icon size={20} aria-hidden="true" />
-                    </span>
-                    <span className="grow">
-                      <span className="t-headline" style={{ display: 'block' }}>{label}</span>
-                      <span className="t-foot">{detail}</span>
-                    </span>
-                    {on && <Check size={20} className="c-accent" aria-hidden="true" />}
-                  </button>
-                );
-              })}
-            </div>
-            {error && <div className="alert" role="alert">{error}</div>}
-            <div className="stack-4">
-              <button type="button" className="btn btn--accent" disabled={!goal || busy} onClick={finish}>
-                {busy ? <Spinner /> : 'Start practicing'}
-              </button>
-              <button type="button" className="btn btn--plain" onClick={() => setStep(1)}>Back</button>
-            </div>
-          </>
+  return (
+    <motion.main className="onb" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.98 }} transition={{ duration: duration.slow }}>
+      <div className="onb-bg" aria-hidden="true"><ConstellationFallback count={40} seed={3} /></div>
+      <header className="onb-head">
+        <Logo size={26} />
+        <div className="onb-progress" role="progressbar" aria-valuemin={1} aria-valuemax={STEPS} aria-valuenow={step + 1} aria-label={`Step ${step + 1} of ${STEPS}`}>
+          <motion.i animate={{ scaleX: (step + 1) / STEPS }} transition={{ duration: duration.slower, ease: ease.out }} />
+        </div>
+        <span className="t-foot fig">{step + 1}/{STEPS}</span>
+      </header>
+
+      <div className="onb-body">
+        <aside className="onb-vale">
+          <Mascot mood={mood} size={260} label="Vale" />
+          <AnimatePresence mode="wait">
+            <motion.p key={line} className="onb-bubble" initial={{ opacity: 0, y: 8, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -6 }} transition={spring.snappy}>
+              {line}
+            </motion.p>
+          </AnimatePresence>
+        </aside>
+
+        <section className="onb-card">
+          <AnimatePresence mode="wait" custom={dir} initial={false}>
+            <motion.div key={step} custom={dir} variants={stepVariants} initial="enter" animate="center" exit="exit" className="stack-24">
+              {step === 0 && (
+                <>
+                  <header className="stack-8">
+                    <p className="t-eyebrow">Welcome to Vantaris</p>
+                    <h1 className="t-h1">Your career starts at Analyst.</h1>
+                    <p className="t-body">Solve deals, earn points, get promoted. Four tiers stand between you and MD.</p>
+                  </header>
+                  <ol className="onb-ladder">
+                    {['Analyst', 'Associate', 'VP', 'MD'].map((l, i) => (
+                      <motion.li key={l} data-tier={l} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.08, ...spring.gentle }}>
+                        <span className="tier" data-tier={l}>{l}</span>
+                        <span className="t-cap fig">{[0, 251, 501, 751][i]} pts</span>
+                      </motion.li>
+                    ))}
+                  </ol>
+                  <button type="button" className="btn btn--gold" onClick={() => go(1)}>Let’s go <ArrowRight size={18} aria-hidden="true" /></button>
+                </>
+              )}
+              {step === 1 && (
+                <form
+                  className="stack-24"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!name.trim()) return setError('Enter your first name.');
+                    go(2);
+                  }}
+                >
+                  <header className="stack-8">
+                    <p className="t-eyebrow">Your file</p>
+                    <h1 className="t-h1">What should we call you?</h1>
+                  </header>
+                  <div className="stack-16">
+                    <FloatingField label="First name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" maxLength={40} autoFocus />
+                    <FloatingField label="School (optional)" value={school} onChange={(e) => setSchool(e.target.value)} autoComplete="organization" maxLength={80} hint="Shown next to your name on the leaderboard." />
+                  </div>
+                  {error && <div className="alert" role="alert">{error}</div>}
+                  <div className="onb-actions">
+                    <button type="button" className="btn btn--glass btn--icon" onClick={() => go(0)} aria-label="Back"><ArrowLeft size={18} /></button>
+                    <button className="btn btn--gold">Continue <ArrowRight size={18} aria-hidden="true" /></button>
+                  </div>
+                </form>
+              )}
+              {step === 2 && (
+                <>
+                  <header className="stack-8">
+                    <p className="t-eyebrow">Your goal</p>
+                    <h1 className="t-h1">What are you aiming for?</h1>
+                  </header>
+                  <div className="goal-grid" role="radiogroup" aria-label="Goal">
+                    {GOALS.map((g) => (
+                      <GoalCard key={g.id} g={g} on={goal === g.id} onPick={() => { setGoal(g.id); haptic(10); }} />
+                    ))}
+                  </div>
+                  {error && <div className="alert" role="alert">{error}</div>}
+                  <div className="onb-actions">
+                    <button type="button" className="btn btn--glass btn--icon" onClick={() => go(1)} aria-label="Back"><ArrowLeft size={18} /></button>
+                    <button type="button" className="btn btn--gold" disabled={!goal || busy} onClick={finish}>
+                      {busy ? <Spinner /> : <>Start practicing <ArrowRight size={18} aria-hidden="true" /></>}
+                    </button>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </section>
+      </div>
+    </motion.main>
+  );
+}
+
+function GoalCard({ g, on, onPick }) {
+  const { Icon } = g;
+  return (
+    <motion.button
+      type="button"
+      role="radio"
+      aria-checked={on}
+      className={`goal ${on ? 'goal--on' : ''}`}
+      data-tier={g.tier}
+      onClick={onPick}
+      animate={{ scale: on ? 1.03 : 1 }}
+      whileTap={{ scale: 0.97 }}
+      transition={spring.bouncy}
+    >
+      <span className="goal-art" aria-hidden="true">
+        <svg viewBox="0 0 64 64" className="goal-rings">
+          <circle cx="32" cy="32" r="30" />
+          <circle cx="32" cy="32" r="21" />
+          <circle cx="32" cy="32" r="12" />
+        </svg>
+        <Icon size={26} strokeWidth={1.8} />
+      </span>
+      <span className="goal-text">
+        <span className="t-headline">{g.label}</span>
+        <span className="t-foot">{g.detail}</span>
+      </span>
+      <AnimatePresence>
+        {on && (
+          <motion.span className="goal-check" initial={{ scale: 0, rotate: -45 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0 }} transition={spring.bouncy}>
+            <Check size={14} strokeWidth={3.2} aria-hidden="true" />
+          </motion.span>
         )}
-      </motion.div>
-    </main>
+      </AnimatePresence>
+    </motion.button>
   );
 }

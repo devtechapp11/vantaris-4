@@ -13,4 +13,4 @@ export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? '';
 export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
 
 // Brand colour passed to Razorpay Checkout so the payment sheet matches the app.
-export const CHECKOUT_THEME = '#0E6B52';
+export const CHECKOUT_THEME = '#D4AF37';

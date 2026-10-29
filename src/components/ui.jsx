@@ -1,0 +1,165 @@
+import { useId, useRef, useState } from 'react';
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react';
+import { Eye, EyeOff } from 'lucide-react';
+import { group, inView, item } from '../design/motion';
+import { duration, ease } from '../design/tokens';
+
+/** Text input with a label that floats up on focus or once it has a value. */
+export function FloatingField({ label, id: idProp, action, hint, error, className = '', ...input }) {
+  const auto = useId();
+  const id = idProp ?? auto;
+  return (
+    <div className={`ffield ${action ? 'ffield--action' : ''} ${className}`}>
+      <div className="ffield-box">
+        <input
+          id={id}
+          className="ffield-input"
+          placeholder=" "
+          aria-invalid={error ? 'true' : undefined}
+          aria-describedby={hint ? `${id}-hint` : undefined}
+          {...input}
+        />
+        <label className="ffield-label" htmlFor={id}>{label}</label>
+        {action}
+      </div>
+      {hint && <span id={`${id}-hint`} className="hint">{hint}</span>}
+    </div>
+  );
+}
+
+/** Password field with show/hide and an optional red → gold → green strength meter. */
+export function PasswordField({ value, onChange, label = 'Password', showMeter = false, invalid, ...rest }) {
+  const [show, setShow] = useState(false);
+  const s = strength(value);
+  const words = ['Too short', 'Weak', 'Fair', 'Strong', 'Excellent'];
+  return (
+    <div className="stack-8">
+      <FloatingField
+        label={label}
+        type={show ? 'text' : 'password'}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        maxLength={72}
+        required
+        error={invalid}
+        action={
+          <button type="button" className="ffield-action" onClick={() => setShow((v) => !v)} aria-label={show ? 'Hide password' : 'Show password'}>
+            {show ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        }
+        {...rest}
+      />
+      {showMeter && (
+        <div className="strength">
+          <div className="strength-track" aria-hidden="true">
+            <div className="strength-fill" style={{ '--p': `${value ? Math.max(8, (s / 4) * 100) : 0}%` }} />
+          </div>
+          <div className="between">
+            <span className="t-cap">At least 8 characters with a letter and a number.</span>
+            <span className="t-cap" aria-live="polite" style={{ color: s >= 3 ? 'var(--pos)' : s === 2 ? 'var(--gold-bright)' : value ? 'var(--neg)' : undefined }}>
+              {value ? words[s] : ''}
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function strength(pw = '') {
+  if (pw.length < 8) return 0;
+  let s = 1;
+  if (pw.length >= 12) s++;
+  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) s++;
+  if (/[0-9]/.test(pw) && /[^a-zA-Z0-9]/.test(pw)) s++;
+  return Math.min(4, s);
+}
+
+/** Custom switch (role="switch"). */
+export function Toggle({ checked, onChange, label, id }) {
+  return (
+    <button type="button" id={id} role="switch" aria-checked={checked} aria-label={label} className="toggle" onClick={() => onChange(!checked)}>
+      <span className="toggle-thumb" />
+    </button>
+  );
+}
+
+/** Fades and slides children up as they enter the viewport. Children with `item` variants stagger. */
+export function Reveal({ children, as = 'div', className, style, gap, delay = 0, amount, ...rest }) {
+  const Tag = motion[as] ?? motion.div;
+  const vp = amount ? { ...inView.viewport, amount } : inView.viewport;
+  return (
+    <Tag className={className} style={style} initial="hidden" whileInView="show" viewport={vp} variants={gap != null ? group(gap, delay) : item} {...rest}>
+      {children}
+    </Tag>
+  );
+}
+
+/** Card that tilts toward the pointer in 3D (perspective transform), with a moving sheen. */
+export function TiltCard({ children, className = '', max = 10, glare: showGlare = true, style, ...rest }) {
+  const reduce = useReducedMotion();
+  const ref = useRef(null);
+  const px = useMotionValue(0.5);
+  const py = useMotionValue(0.5);
+  const sx = useSpring(px, { stiffness: 200, damping: 20 });
+  const sy = useSpring(py, { stiffness: 200, damping: 20 });
+  const rotateY = useTransform(sx, [0, 1], [-max, max]);
+  const rotateX = useTransform(sy, [0, 1], [max * 0.8, -max * 0.8]);
+  const glareX = useTransform(sx, [0, 1], ['0%', '100%']);
+  const glareY = useTransform(sy, [0, 1], ['0%', '100%']);
+  const glare = useTransform([glareX, glareY], ([x, y]) => `radial-gradient(420px circle at ${x} ${y}, rgba(212,175,55,0.14), transparent 45%)`);
+
+  const move = (e) => {
+    if (reduce || e.pointerType === 'touch') return;
+    const r = ref.current.getBoundingClientRect();
+    px.set((e.clientX - r.left) / r.width);
+    py.set((e.clientY - r.top) / r.height);
+  };
+  const reset = () => {
+    px.set(0.5);
+    py.set(0.5);
+  };
+  return (
+    <div style={{ perspective: 900, ...style }} {...rest}>
+      <motion.div
+        ref={ref}
+        className={`card tilt ${className}`}
+        onPointerMove={move}
+        onPointerLeave={reset}
+        style={{ rotateX: reduce ? 0 : rotateX, rotateY: reduce ? 0 : rotateY, transformStyle: 'preserve-3d', height: '100%' }}
+      >
+        {showGlare && <motion.span aria-hidden="true" style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', background: glare, pointerEvents: 'none' }} />}
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+
+/** Progress bar that fills from `from` to `value` (0–1), with an optional gold glow. */
+export function ProgressBar({ value, from = 0, glow = false, tone = 'gold', size, label, delay = 0.2 }) {
+  const reduce = useReducedMotion();
+  const v = Math.max(0, Math.min(1, value || 0));
+  return (
+    <div
+      className={`bar ${glow ? 'bar--glow' : ''} ${tone === 'cyan' ? 'bar--cyan' : ''} ${size === 'sm' ? 'bar--sm' : ''}`}
+      role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(v * 100)} aria-label={label}
+    >
+      <motion.i
+        initial={reduce ? false : { scaleX: Math.max(0, Math.min(1, from)) }}
+        animate={{ scaleX: v }}
+        transition={{ duration: duration.slower * 1.6, delay: reduce ? 0 : delay, ease: ease.out }}
+      />
+    </div>
+  );
+}
+
+/** Stat tile: icon, animated value, label. */
+export function StatTile({ icon, label, children, accent, className = '' }) {
+  return (
+    <motion.div variants={item} className={`card stat ${className}`} style={accent ? { '--accent': accent } : undefined}>
+      <div className="stat-icon" aria-hidden="true">{icon}</div>
+      <div className="stat-value">{children}</div>
+      <div className="t-foot">{label}</div>
+    </motion.div>
+  );
+}

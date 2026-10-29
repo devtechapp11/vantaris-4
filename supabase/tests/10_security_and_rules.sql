@@ -172,4 +172,12 @@ select t.ok(not exists (select 1 from public.problem_attempts where user_id = '0
 select t.ok((select user_id from public.payments where razorpay_payment_id = 'pay_TEST0000000001') is null, 'payment record kept, unlinked from deleted user');
 select t.ok((select user_id from public.subscriptions where razorpay_subscription_id = 'sub_TEST0000000001') is null, 'subscription record kept, unlinked');
 
+-- ===================== Public stats (landing page) =====================
+set role anon;
+select t.ok(public.get_public_stats() ?& array['deals_solved', 'players', 'problems', 'modules'], 'anon can read aggregate stats');
+select t.ok((select count(*) from jsonb_object_keys(public.get_public_stats())) = 4, 'public stats expose only the four counts');
+select t.ok((public.get_public_stats() ->> 'problems')::int = 20, 'public stats count published problems');
+select t.expect_error($$select public.get_me()$$, 'permission denied');
+reset role;
+
 select 'ALL TESTS PASSED';

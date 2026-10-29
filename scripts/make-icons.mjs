@@ -9,7 +9,7 @@ for (const [name, size, pad] of [['apple-touch-icon.png', 180, 0], ['icon-192.pn
   await page.setViewportSize({ width: size, height: size });
   const inner = Math.round(size * (1 - pad * 2));
   // Maskable: full-bleed background so Android's mask never shows a corner.
-  await page.setContent(`<html><body style="margin:0;background:${pad ? '#0F1A16' : 'transparent'};display:grid;place-items:center;height:${size}px">
+  await page.setContent(`<html><body style="margin:0;background:${pad ? '#0A0F1E' : 'transparent'};display:grid;place-items:center;height:${size}px">
     <div style="width:${inner}px;height:${inner}px">${svg.replace('<svg ', `<svg width="${inner}" height="${inner}" `)}</div></body></html>`);
   await page.screenshot({ path: new URL(`../public/${name}`, import.meta.url).pathname, omitBackground: !pad });
 }

@@ -862,6 +862,17 @@ begin
   );
 end $$;
 
+-- Aggregate counts for the landing page and sign-up screen (no personal data).
+create or replace function public.get_public_stats()
+returns jsonb language sql stable security definer set search_path = '' as $$
+  select jsonb_build_object(
+    'deals_solved', (select count(*) from public.problem_attempts where correct),
+    'players',      (select count(*) from public.profiles where onboarded),
+    'problems',     (select count(*) from public.problems where published),
+    'modules',      (select count(*) from public.modules)
+  )
+$$;
+
 -- ---------------------------------------------------------------------
 -- 5. Functions only the Edge Functions may call (service role)
 -- ---------------------------------------------------------------------
@@ -1155,6 +1166,7 @@ grant execute on function public.open_problem(text)                             
 grant execute on function public.submit_answer(text, text)                        to authenticated;
 grant execute on function public.save_profile(text, text, text, text, boolean)   to authenticated;
 grant execute on function public.level_for_points(integer)                        to anon, authenticated;
+grant execute on function public.get_public_stats()                                to anon, authenticated;
 
 grant execute on function public.apply_razorpay_subscription(jsonb, boolean, timestamptz, uuid, text, boolean) to service_role;
 grant execute on function public.apply_razorpay_payment(jsonb, boolean, text)     to service_role;

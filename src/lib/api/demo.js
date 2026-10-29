@@ -383,6 +383,15 @@ export const api = {
       players: rows.length,
     };
   },
+  // Sample figures for the preview only. The live app reads real counts from get_public_stats().
+  async getPublicStats() {
+    await wait(120);
+    return { deals_solved: 12847, players: 2341, problems: PROBLEMS.length, modules: MODULES.length };
+  },
+  async getPublicModules() {
+    await wait(100);
+    return MODULES.map(({ id, name, short, level, blurb, sort }) => ({ id, name, short, level, blurb, sort }));
+  },
   async getPlans() {
     await wait(120);
     return { tiers: TIERS, plans: PLANS };

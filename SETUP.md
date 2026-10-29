@@ -16,7 +16,9 @@ src/                     the app (React)
   screens/               Welcome, sign in/up, onboarding, Home, Practice, Problem, Tutor, Ranking, Profile, Plans
   lib/api/real.js        talks to Supabase (live app)
   lib/api/demo.js        in-browser stand-in used only for the shareable preview
-  mascot/manifest.js     where the Higgsfield clips plug in
+  mascot/manifest.js     where the Higgsfield clips plug in (written by `npm run mascot`)
+  content/landing.js     landing page copy, sample deal and testimonials
+  styles/tokens.css      design tokens: every colour, size, shadow and duration
 supabase/
   schema.sql             the whole database: copy-paste into Supabase
   functions/billing/     Razorpay: start checkout, verify payment, cancel, delete account
@@ -202,5 +204,32 @@ Your to-dos:
 
 ```bash
 npm run test:functions   # 14 tests: signatures, webhook replays, tutor rules (needs internet for Deno)
-npm run test:sql         # 93 checks + race tests against a local Postgres (Linux, needs postgresql)
+npm run test:sql         # 96 checks + race tests against a local Postgres (Linux, needs postgresql)
 ```
+
+---
+
+## 10. The redesign: what to check before you deploy it
+
+1. **Re-run `supabase/schema.sql`** (SQL Editor → paste → Run). It adds one
+   read-only function, `get_public_stats()`, which gives the landing page and
+   sign-up screen their live counters (deals solved, players, problems). It
+   returns four totals and nothing personal. Re-running keeps all user data.
+2. **Social proof only shows when it's true.** The "deals solved" and "future
+   analysts" counters, and "Join N future dealmakers", appear only once each
+   number reaches 100 (`SOCIAL_PROOF_MIN` in `src/app/usePublic.js`). Below that
+   the page shows the problem count and the four tiers instead.
+3. **Testimonials.** `src/content/landing.js` ships sample quotes so the preview
+   looks complete. The live build hides the Reviews section while any quote is
+   still marked `sample: true`. Replace them with real quotes you have
+   permission to use, remove the flag, and the section appears.
+4. **Vale's video clips** are optional: the app ships an animated SVG Vale for
+   every expression. To add Higgsfield clips, follow `src/mascot/README.md`
+   (prompts included), drop the exports in `mascot-src/` and run `npm run mascot`.
+5. **3D** (landing sculpture, level-up medal, trophy shelf) loads only on
+   desktops and laptops that can run it, after the page is idle. Phones,
+   low-power devices and anyone with reduced motion get 2D animated versions.
+   Players can also switch 3D, confetti, haptics and motion off in Profile → Settings.
+6. Nothing in `vercel.json` needs to change: everything new is self-hosted and
+   fits the existing Content Security Policy.
+

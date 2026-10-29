@@ -1,0 +1,28 @@
+.practice-bar { display: flex; flex-direction: column; gap: var(--sp-3); position: sticky; top: 0; z-index: var(--z-sticky); padding: var(--sp-3) 0; margin: calc(var(--sp-3) * -1) 0; background: linear-gradient(180deg, var(--bg) 70%, transparent); }
+@media (min-width: 900px) { .practice-bar { flex-direction: row; align-items: center; } .practice-filter { width: 320px; flex: none; } }
+.practice-jump { display: flex; gap: var(--sp-2); overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.practice-jump::-webkit-scrollbar { display: none; }
+.practice-jump .chip { border-color: color-mix(in srgb, var(--tc) 32%, transparent); color: var(--fg-2); cursor: pointer; }
+.practice-jump .chip:hover { color: var(--fg); border-color: var(--tc); }
+
+.pmod {
+  scroll-margin-top: 96px;
+  display: flex; flex-direction: column; gap: var(--sp-4);
+  padding: var(--sp-5); border-radius: var(--r-xl);
+  background: var(--tbg), var(--glass-fill), var(--surface);
+  border: var(--hairline) solid color-mix(in srgb, var(--tc) 22%, transparent);
+}
+.pmod--focus { animation: focus-ring 2s var(--ease-out) 0.5s 1; }
+@keyframes focus-ring { 0%, 100% { box-shadow: 0 0 0 0 transparent; } 30% { box-shadow: 0 0 0 2px var(--tc), 0 0 40px color-mix(in srgb, var(--tc) 40%, transparent); } }
+.pmod-head { display: flex; align-items: flex-start; gap: var(--sp-4); }
+.pmod .mod-icon { width: var(--sp-12); height: var(--sp-12); border-radius: var(--r-md); display: grid; place-items: center; color: var(--tc); background: color-mix(in srgb, var(--tc) 14%, transparent); border: var(--hairline) solid color-mix(in srgb, var(--tc) 30%, transparent); flex: none; }
+
+.pgrid { display: grid; gap: var(--sp-2); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) { .pgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-3); } }
+.prow {
+  display: flex; align-items: center; gap: var(--sp-3); width: 100%; text-align: left; color: var(--fg);
+  padding: var(--sp-3) var(--sp-4); border-radius: var(--r-md);
+  background: rgba(6, 9, 18, 0.45); border: var(--hairline) solid var(--glass-line);
+}
+.prow-meta { align-items: flex-end; flex: none; }
+.prow--locked { opacity: 0.7; }

@@ -1,20 +1,33 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
-import { Check, ShieldCheck, Lock } from 'lucide-react';
+import { Check, Lock, Minus, ShieldCheck } from 'lucide-react';
 import { api } from '../lib/api';
 import { openCheckout } from '../lib/razorpay';
 import { useApp } from '../app/AppContext';
 import { usePlans } from '../app/usePlans';
-import { NavBar, Page, Segmented, Sheet } from '../components/chrome';
-import { Skeleton, Spinner, TIER_LABEL } from '../components/bits';
+import { haptic } from '../app/prefs';
+import { Item, NavBar, Page, Sheet } from '../components/chrome';
+import { Skeleton, TIER_LABEL } from '../components/bits';
+import PlanCard, { BillingToggle, DrawCheck } from '../components/PlanCard';
 import Mascot from '../components/Mascot';
+import { group } from '../design/motion';
+import { spring, stagger } from '../design/tokens';
+import { shower } from '../lib/celebrate';
 import { money } from '../lib/format';
 import { IS_DEMO } from '../lib/config';
+import './Plans.css';
 
-const CYCLES = [
-  { value: 'monthly', label: 'Monthly' },
-  { value: 'yearly', label: 'Yearly · 2 months free' },
+const LEVEL_SCOPE = { Analyst: 'Analyst', Associate: 'Up to Associate', VP: 'Up to VP', MD: 'All four, up to MD' };
+
+// Comparison rows come from the tier rows in the database, so they never drift from what's enforced.
+const ROWS = [
+  ['Deals per week', (t) => (t.weekly_problem_limit == null ? 'Unlimited' : String(t.weekly_problem_limit))],
+  ['Career modules', (t) => LEVEL_SCOPE[t.max_level] ?? t.max_level],
+  ['Full step-by-step solutions', (t) => t.full_walkthroughs],
+  ['Vale, AI tutor', (t) => (t.tutor_daily_limit >= 300 ? 'Unlimited' : t.tutor_daily_limit > 0 ? `${t.tutor_daily_limit} / day` : false)],
+  ['Leaderboard and streaks', () => true],
+  ['Elite member card', (t) => t.id === 'elite'],
 ];
 
 export default function Plans() {
@@ -67,100 +80,87 @@ export default function Plans() {
   };
 
   const tiers = data?.tiers.filter((t) => t.id !== 'free') ?? [];
-  const free = data?.tiers.find((t) => t.id === 'free');
+  const allTiers = data?.tiers ?? [];
 
   return (
     <>
       <NavBar back="Back" />
-      <Page className="screen screen--bare" pushed>
-        <header className="stack-8" style={{ paddingTop: 4 }}>
-          <h1 className="t-large">Choose your plan</h1>
-          <p className="t-body">Cancel anytime. You keep access until the end of the period you paid for.</p>
-        </header>
-        <Segmented value={cycle} onChange={setCycle} options={CYCLES} label="Billing cycle" />
+      <Page wide className="screen screen--bare plans-page">
+        <Item className="plans-hero">
+          <div className="stack-12">
+            <p className="t-eyebrow">Plans</p>
+            <h1 className="t-h1 plans-title">Invest in your career.<br /><span className="text-gold">Cancel anytime.</span></h1>
+            <p className="t-body">You keep access until the end of the period you paid for. Your progress always stays.</p>
+          </div>
+          <Mascot mood="levelup" size={150} className="plans-vale" label="Vale adjusting a tie, ready for the next level" />
+        </Item>
+        <Item className="center"><BillingToggle cycle={cycle} onChange={setCycle} /></Item>
 
         {error && <div className="alert" role="alert">{error.message}</div>}
         {!data ? (
-          <div className="stack-16"><Skeleton height={260} /><Skeleton height={260} /></div>
+          <div className="plans-grid">{[0, 1, 2].map((i) => <Skeleton key={i} height={480} />)}</div>
         ) : (
-          <div className="stack-16" style={{ paddingTop: 6 }}>
+          <Item className="plans-grid">
             {tiers.map((t) => {
               const plan = data.plans.find((p) => p.tier === t.id && p.interval === cycle);
-              if (!plan) return null;
               const monthly = data.plans.find((p) => p.tier === t.id && p.interval === 'monthly');
-              const isCurrent = current === t.id;
+              if (!plan) return null;
               const busy = stage?.planId === plan.id;
-              const featured = t.id === highlight;
               return (
-                <motion.article
+                <PlanCard
                   key={t.id}
-                  layout
-                  className={`plan ${t.id === 'elite' ? 'plan--elite' : featured ? 'plan--featured' : ''}`}
-                  aria-labelledby={`plan-${t.id}`}
-                >
-                  {t.id === 'pro' && <span className="chip chip--accent plan-flag" style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}>Most popular</span>}
-                  {isCurrent && <span className="chip chip--brass plan-flag" style={t.id === 'pro' ? { left: 128 } : undefined}>Current plan</span>}
-                  <div className="between" style={{ alignItems: 'flex-start' }}>
-                    <div>
-                      <h2 id={`plan-${t.id}`} className="t-title-2">{t.name}</h2>
-                      <p className="t-callout">{t.tagline}</p>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div className="price">{money(plan.amount, plan.currency)}</div>
-                      <div className="t-cap" style={{ color: t.id === 'elite' ? 'var(--on-ink-2)' : undefined }}>
-                        {cycle === 'yearly' ? `per year · ${money(Math.round(plan.amount / 12), plan.currency)}/mo` : 'per month'}
-                      </div>
-                      {cycle === 'yearly' && monthly && (
-                        <div className="t-cap" style={{ color: t.id === 'elite' ? 'var(--brass-bright)' : 'var(--pos)', fontWeight: 600 }}>
-                          Save {money(monthly.amount * 12 - plan.amount, plan.currency)}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="stack-8">
-                    {t.features.map((f) => (
-                      <div key={f} className="feat"><Check size={17} strokeWidth={2.6} aria-hidden="true" />{f}</div>
-                    ))}
-                  </div>
-                  <button
-                    type="button"
-                    className={`btn ${t.id === 'elite' ? 'btn--brass' : featured ? 'btn--accent' : 'btn--tonal'}`}
-                    disabled={isCurrent || hasPlan || Boolean(stage)}
-                    onClick={() => start(plan)}
-                  >
-                    {busy ? (
-                      <><Spinner /> {stage.step === 'confirming' ? 'Confirming payment' : 'Opening checkout'}</>
-                    ) : isCurrent ? 'Your current plan' : `Continue with ${t.name}`}
-                  </button>
-                  {hasPlan && !isCurrent && (
-                    <p className="t-cap center" style={{ color: t.id === 'elite' ? 'var(--on-ink-2)' : undefined }}>
-                      To switch, cancel your {TIER_LABEL[current]} plan in Profile first.
-                    </p>
-                  )}
-                </motion.article>
+                  tier={t}
+                  plan={plan}
+                  monthly={monthly}
+                  featured={t.id === highlight}
+                  current={current === t.id}
+                  busy={busy}
+                  busyLabel={stage?.step === 'confirming' ? 'Confirming payment' : 'Opening checkout'}
+                  disabled={hasPlan || Boolean(stage)}
+                  onSelect={() => start(plan)}
+                  note={hasPlan && current !== t.id ? `To switch, cancel your ${TIER_LABEL[current]} plan in Profile first.` : null}
+                />
               );
             })}
-
-            {free && (
-              <div className="group">
-                <div className="cell">
-                  <span className="grow">
-                    <span className="cell-title" style={{ display: 'block' }}>Free</span>
-                    <span className="cell-sub">{free.features.join(' · ')}</span>
-                  </span>
-                  {current === 'free' && <span className="chip">Current</span>}
-                </div>
-              </div>
-            )}
-
-            <div className="stack-8">
-              <p className="t-foot row-8" style={{ justifyContent: 'center' }}>
-                <ShieldCheck size={15} aria-hidden="true" /> Payments are processed securely by Razorpay. We never see your card or UPI details.
-              </p>
-              <p className="t-cap center">Prices in Indian rupees. Renews automatically until you cancel. Unlimited tutor messages are subject to a fair-use limit of 300 a day.</p>
-            </div>
-          </div>
+          </Item>
         )}
+
+        {data && (
+          <Item as="section" className="stack-16" aria-labelledby="compare">
+            <div className="section-head"><h2 id="compare">Compare plans</h2></div>
+            <div className="compare card card--flush" role="table" aria-label="Plan comparison" style={{ '--cols': allTiers.length }}>
+              <div className="compare-row compare-head" role="row">
+                <span role="columnheader" />
+                {allTiers.map((t) => (
+                  <span key={t.id} role="columnheader" className={`compare-tier ${t.id === highlight ? 'is-hl' : ''}`}>
+                    {t.name}
+                    {current === t.id && <span className="t-cap">Current</span>}
+                  </span>
+                ))}
+              </div>
+              {ROWS.map(([label, get], ri) => (
+                <motion.div key={label} className="compare-row" role="row" variants={group(stagger.list, ri * 0.06)} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.6 }}>
+                  <span role="rowheader" className="t-callout c-fg">{label}</span>
+                  {allTiers.map((t) => {
+                    const v = get(t);
+                    return (
+                      <span key={t.id} role="cell" className={`compare-cell ${t.id === highlight ? 'is-hl' : ''}`}>
+                        {v === true ? <DrawCheck size={20} /> : v === false ? <Minus size={16} className="c-3" aria-label="Not included" /> : <span className="t-label c-fg">{v}</span>}
+                      </span>
+                    );
+                  })}
+                </motion.div>
+              ))}
+            </div>
+          </Item>
+        )}
+
+        <Item className="stack-8 center">
+          <p className="t-foot row-8" style={{ justifyContent: 'center' }}>
+            <ShieldCheck size={15} aria-hidden="true" /> Payments are processed securely by Razorpay. We never see your card or UPI details.
+          </p>
+          <p className="t-cap">Prices in Indian rupees. Renews automatically until you cancel. Unlimited tutor messages are subject to a fair-use limit of 300 a day.</p>
+        </Item>
       </Page>
 
       {IS_DEMO && <DemoCheckout
@@ -187,16 +187,16 @@ function DemoCheckout({ checkout, onClose, onPay }) {
     <Sheet open={Boolean(checkout)} onClose={onClose}>
       {(titleId) => checkout && (
         <div className="sheet-body">
-          <span className="chip chip--brass" style={{ alignSelf: 'flex-start' }}><Lock size={12} aria-hidden="true" /> Preview checkout</span>
-          <h2 id={titleId} className="t-title-2">{TIER_LABEL[checkout.plan.tier]}, billed {checkout.plan.interval}</h2>
+          <span className="chip chip--gold" style={{ alignSelf: 'flex-start' }}><Lock size={12} aria-hidden="true" /> Preview checkout</span>
+          <h2 id={titleId} className="t-h3">{TIER_LABEL[checkout.plan.tier]}, billed {checkout.plan.interval}</h2>
           <div className="group">
-            <div className="cell"><span className="grow cell-title">Due today</span><span className="fig">{money(checkout.plan.amount, checkout.plan.currency)}</span></div>
+            <div className="cell"><span className="grow cell-title">Due today</span><span className="fig t-headline">{money(checkout.plan.amount, checkout.plan.currency)}</span></div>
           </div>
           <p className="t-callout">
             This preview has no payment system. In the live app, Razorpay’s secure checkout opens here for card, UPI or net banking, and the payment is verified on the server before the plan unlocks.
           </p>
-          <button type="button" className="btn btn--accent" onClick={onPay}>Simulate a successful payment</button>
-          <button type="button" className="btn btn--plain" onClick={onClose}>Cancel</button>
+          <button type="button" className="btn btn--gold" onClick={onPay}>Simulate a successful payment</button>
+          <button type="button" className="btn btn--ghost" onClick={onClose}>Cancel</button>
         </div>
       )}
     </Sheet>
@@ -205,6 +205,11 @@ function DemoCheckout({ checkout, onClose, onPay }) {
 
 function Success({ plan, tiers, onDone }) {
   const tier = plan && tiers?.find((t) => t.id === plan.tier);
+  useEffect(() => {
+    if (!plan) return;
+    shower();
+    haptic([20, 60, 30]);
+  }, [plan]);
   return (
     <AnimatePresence>
       {plan && (
@@ -212,25 +217,25 @@ function Success({ plan, tiers, onDone }) {
           role="dialog"
           aria-modal="true"
           aria-labelledby="paid-title"
+          className="paid"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          style={{ position: 'fixed', inset: 0, zIndex: 80, background: 'var(--bg)', overflowY: 'auto' }}
         >
-          <div className="screen screen--bare" style={{ minHeight: '100dvh', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
-            <motion.div initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 300, damping: 16, delay: 0.1 }}>
-              <Mascot mood="celebrate" size={150} />
-            </motion.div>
-            <p className="t-foot">Payment confirmed</p>
-            <h1 id="paid-title" className="t-large">Welcome to {tier?.name ?? 'your new plan'}</h1>
-            <div className="card stack-8" style={{ width: '100%', textAlign: 'left' }}>
+          <motion.div className="paid-card stack-16 center-x center" initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }} transition={spring.gentle}>
+            <Mascot mood="levelup" size={170} />
+            <p className="t-eyebrow">Payment confirmed</p>
+            <h1 id="paid-title" className="t-h1">Welcome to {tier?.name ?? 'your new plan'}</h1>
+            <motion.ul className="paid-feats" variants={group(stagger.list, 0.3)} initial="hidden" animate="show">
               {tier?.features.map((f) => (
-                <div key={f} className="feat"><Check size={17} strokeWidth={2.6} aria-hidden="true" />{f}</div>
+                <motion.li key={f} className="feat" variants={{ hidden: { opacity: 0, x: -8 }, show: { opacity: 1, x: 0 } }}>
+                  <Check size={17} strokeWidth={2.6} className="c-gold" aria-hidden="true" />{f}
+                </motion.li>
               ))}
-            </div>
-            <button type="button" className="btn btn--accent" onClick={onDone}>Start practicing</button>
+            </motion.ul>
+            <button type="button" className="btn btn--gold" onClick={onDone} autoFocus>Start practicing</button>
             {api.mode === 'live' && <p className="t-cap">A receipt from Razorpay is on its way to your email.</p>}
-          </div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
