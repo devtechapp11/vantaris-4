@@ -1,0 +1,150 @@
+/*
+  Vantaris design tokens
+  Identity carried over from the Valoris prototype: malachite ink and brass on
+  cool stone. Newsreader for display, Hanken Grotesk for interface, JetBrains
+  Mono for every financial figure. Layout follows iOS: large titles, inset
+  grouped lists, a frosted tab bar and bottom sheets.
+*/
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --bg: #EEF2F0;
+  --surface: #FFFFFF;
+  --surface-2: #E6EBE8;
+  --surface-3: #DCE3DF;
+  --line: rgba(13, 21, 18, 0.09);
+  --line-strong: rgba(13, 21, 18, 0.16);
+
+  /* Text */
+  --fg: #0D1512;
+  --fg-2: #4F5C56;
+  --fg-3: #85928B;
+
+  /* Brand */
+  --accent: #0E6B52;
+  --accent-press: #0A5642;
+  --accent-soft: #DDEFE7;
+  --on-accent: #FFFFFF;
+  --brass: #A9863A;
+  --brass-bright: #C9A24E;
+  --brass-soft: #F3ECDB;
+  --brass-ink: #6B5418;
+
+  /* Deal tombstone card */
+  --ink: #0F1A16;
+  --ink-2: #17241F;
+  --on-ink: #EEF3F0;
+  --on-ink-2: #92A49B;
+
+  /* Status */
+  --pos: #0E8F5F;
+  --pos-soft: #DCF2E6;
+  --neg: #C23A40;
+  --neg-soft: #F9E5E5;
+  --warn: #B4610A;
+  --warn-soft: #FBEEDD;
+
+  /* Effects */
+  --glass: rgba(238, 242, 240, 0.78);
+  --glass-line: rgba(13, 21, 18, 0.08);
+  --scrim: rgba(9, 16, 13, 0.36);
+  --shadow-card: 0 1px 2px rgba(13, 21, 18, 0.05), 0 2px 8px rgba(13, 21, 18, 0.04);
+  --shadow-float: 0 12px 40px rgba(13, 21, 18, 0.16), 0 2px 8px rgba(13, 21, 18, 0.06);
+  --mascot-stage: #E6EBE8;
+
+  /* Type */
+  --font-display: 'Newsreader', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-ui: 'Hanken Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-figure: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Shape */
+  --r-xs: 8px;
+  --r-sm: 11px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+
+  /* Layout */
+  --col: 560px;
+  --gutter: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+  --tabbar-h: 58px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #050807;
+    --surface: #101815;
+    --surface-2: #18221E;
+    --surface-3: #212D28;
+    --line: rgba(238, 243, 240, 0.08);
+    --line-strong: rgba(238, 243, 240, 0.15);
+    --fg: #EEF3F0;
+    --fg-2: #A3B1AA;
+    --fg-3: #6A7972;
+    --accent: #3FBF94;
+    --accent-press: #33A47E;
+    --accent-soft: #10271E;
+    --on-accent: #03110B;
+    --brass: #D4B062;
+    --brass-bright: #E6C77A;
+    --brass-soft: #2A2312;
+    --brass-ink: #E9CF8E;
+    --ink: #0C1411;
+    --ink-2: #14201B;
+    --on-ink: #EEF3F0;
+    --on-ink-2: #8B9C94;
+    --pos: #3FBF94;
+    --pos-soft: #0F261C;
+    --neg: #EE6A6F;
+    --neg-soft: #2C1416;
+    --warn: #EBA347;
+    --warn-soft: #2A1F10;
+    --glass: rgba(9, 14, 12, 0.74);
+    --glass-line: rgba(238, 243, 240, 0.07);
+    --scrim: rgba(0, 0, 0, 0.58);
+    --shadow-card: 0 0 0 1px rgba(238, 243, 240, 0.04);
+    --shadow-float: 0 16px 48px rgba(0, 0, 0, 0.6);
+    --mascot-stage: #18221E;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #050807;
+  --surface: #101815;
+  --surface-2: #18221E;
+  --surface-3: #212D28;
+  --line: rgba(238, 243, 240, 0.08);
+  --line-strong: rgba(238, 243, 240, 0.15);
+  --fg: #EEF3F0;
+  --fg-2: #A3B1AA;
+  --fg-3: #6A7972;
+  --accent: #3FBF94;
+  --accent-press: #33A47E;
+  --accent-soft: #10271E;
+  --on-accent: #03110B;
+  --brass: #D4B062;
+  --brass-bright: #E6C77A;
+  --brass-soft: #2A2312;
+  --brass-ink: #E9CF8E;
+  --ink: #0C1411;
+  --ink-2: #14201B;
+  --on-ink: #EEF3F0;
+  --on-ink-2: #8B9C94;
+  --pos: #3FBF94;
+  --pos-soft: #0F261C;
+  --neg: #EE6A6F;
+  --neg-soft: #2C1416;
+  --warn: #EBA347;
+  --warn-soft: #2A1F10;
+  --glass: rgba(9, 14, 12, 0.74);
+  --glass-line: rgba(238, 243, 240, 0.07);
+  --scrim: rgba(0, 0, 0, 0.58);
+  --shadow-card: 0 0 0 1px rgba(238, 243, 240, 0.04);
+  --shadow-float: 0 16px 48px rgba(0, 0, 0, 0.6);
+  --mascot-stage: #18221E;
+}

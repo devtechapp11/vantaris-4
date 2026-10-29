@@ -1,0 +1,16 @@
+# Supabase CLI settings for this project (used by `npx supabase functions deploy`).
+project_id = "uoxxbefprjbczhdrjuiv"
+
+# All three functions check the caller themselves:
+#  - billing and tutor verify the player's session with Supabase Auth,
+#  - razorpay-webhook verifies Razorpay's HMAC signature.
+# The platform JWT gate is off so it works with both legacy and new API keys
+# and so Razorpay (which has no Supabase session) can reach the webhook.
+[functions.billing]
+verify_jwt = false
+
+[functions.razorpay-webhook]
+verify_jwt = false
+
+[functions.tutor]
+verify_jwt = false

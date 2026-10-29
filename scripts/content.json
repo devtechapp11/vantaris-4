@@ -1,0 +1,1544 @@
+{
+  "levels": [
+    "Analyst",
+    "Associate",
+    "VP",
+    "MD"
+  ],
+  "modules": [
+    {
+      "id": "statements",
+      "name": "Financial statements",
+      "tier": "Analyst",
+      "blurb": "Income statement, margins, cash flow"
+    },
+    {
+      "id": "dcf",
+      "name": "DCF valuation",
+      "tier": "Analyst",
+      "blurb": "WACC, terminal value, discounting"
+    },
+    {
+      "id": "comps",
+      "name": "Trading comparables",
+      "tier": "Analyst",
+      "blurb": "Multiples and the equity bridge"
+    },
+    {
+      "id": "precedents",
+      "name": "Precedent transactions",
+      "tier": "Associate",
+      "blurb": "Control premiums, deal multiples"
+    },
+    {
+      "id": "lbo",
+      "name": "LBO modeling",
+      "tier": "Associate",
+      "blurb": "Leverage, MOIC, IRR, paydown"
+    },
+    {
+      "id": "ma",
+      "name": "M&A accretion / dilution",
+      "tier": "VP",
+      "blurb": "EPS impact, synergies, exchange"
+    },
+    {
+      "id": "restructuring",
+      "name": "Restructuring",
+      "tier": "VP",
+      "blurb": "Recovery waterfalls, priority"
+    },
+    {
+      "id": "structuring",
+      "name": "Deal structuring",
+      "tier": "MD",
+      "blurb": "Pricing a deal backwards from returns"
+    }
+  ],
+  "problems": [
+    {
+      "id": "forge",
+      "module": "statements",
+      "tier": "Analyst",
+      "difficulty": 1,
+      "minutes": 5,
+      "title": "Forge Industrial",
+      "kind": "Net income build",
+      "scenario": "Forge Industrial makes precision valves. Build its net income for the fiscal year from the line items below.",
+      "data": [
+        [
+          "Revenue",
+          "$200M"
+        ],
+        [
+          "COGS",
+          "$120M"
+        ],
+        [
+          "SG&A",
+          "$30M"
+        ],
+        [
+          "D&A",
+          "$15M"
+        ],
+        [
+          "Interest expense",
+          "$5M"
+        ],
+        [
+          "Tax rate",
+          "25%"
+        ]
+      ],
+      "question": "What is Forge Industrial's net income?",
+      "options": [
+        {
+          "id": "a",
+          "label": "$18.75M"
+        },
+        {
+          "id": "b",
+          "label": "$22.50M"
+        },
+        {
+          "id": "c",
+          "label": "$26.25M"
+        },
+        {
+          "id": "d",
+          "label": "$30.00M"
+        }
+      ],
+      "answer": "b",
+      "steps": [
+        [
+          "Gross profit",
+          "$200M − $120M = $80M"
+        ],
+        [
+          "EBIT",
+          "$80M − $30M SG&A − $15M D&A = $35M"
+        ],
+        [
+          "Pre-tax income",
+          "$35M − $5M interest = $30M"
+        ],
+        [
+          "Taxes",
+          "$30M × 25% = $7.5M"
+        ],
+        [
+          "Net income",
+          "$30M − $7.5M = $22.5M"
+        ]
+      ],
+      "concept": "Walk the income statement top to bottom: revenue, gross profit, EBIT, pre-tax income, net income. Interest comes after EBIT and before tax, which is why debt lowers a company's tax bill.",
+      "hints": [
+        "Start at the top. What do you get when you subtract COGS from revenue?",
+        "Operating expenses (SG&A and D&A) come out next. That gives you EBIT, operating profit before interest and tax.",
+        "Interest is deducted before tax. Apply the 25% rate to pre-tax income, not to EBIT."
+      ],
+      "formula": "Net income = (Revenue − COGS − SG&A − D&A − Interest) × (1 − tax rate)"
+    },
+    {
+      "id": "halcyon",
+      "module": "statements",
+      "tier": "Analyst",
+      "difficulty": 1,
+      "minutes": 4,
+      "title": "Halcyon Foods",
+      "kind": "Margin analysis",
+      "scenario": "Halcyon Foods sells packaged snacks to supermarkets. An investor wants to compare its profitability with peers.",
+      "data": [
+        [
+          "Revenue",
+          "$500M"
+        ],
+        [
+          "Cost of goods sold",
+          "$325M"
+        ],
+        [
+          "Operating expenses",
+          "$110M"
+        ]
+      ],
+      "question": "What is Halcyon's gross margin?",
+      "options": [
+        {
+          "id": "a",
+          "label": "13%"
+        },
+        {
+          "id": "b",
+          "label": "25%"
+        },
+        {
+          "id": "c",
+          "label": "35%"
+        },
+        {
+          "id": "d",
+          "label": "65%"
+        }
+      ],
+      "answer": "c",
+      "steps": [
+        [
+          "Gross profit",
+          "$500M − $325M = $175M"
+        ],
+        [
+          "Gross margin",
+          "$175M ÷ $500M = 35%"
+        ],
+        [
+          "Check the traps",
+          "13% is the operating margin ($65M ÷ $500M); 65% is COGS as a share of revenue"
+        ]
+      ],
+      "concept": "Gross margin only looks at the direct cost of making the product. Operating expenses belong to operating margin, one line further down.",
+      "hints": [
+        "Gross margin uses only one cost line. Which one is it?",
+        "Gross profit is revenue minus COGS. Divide that by revenue.",
+        "Operating expenses are a distraction here. They matter for operating margin, not gross margin."
+      ],
+      "formula": "Gross margin = (Revenue − COGS) ÷ Revenue"
+    },
+    {
+      "id": "corbel",
+      "module": "statements",
+      "tier": "Analyst",
+      "difficulty": 2,
+      "minutes": 6,
+      "title": "Corbel Tools",
+      "kind": "Unlevered free cash flow",
+      "scenario": "You are building the first year of a DCF for Corbel Tools, a hardware manufacturer. Calculate its unlevered free cash flow.",
+      "data": [
+        [
+          "EBIT",
+          "$80M"
+        ],
+        [
+          "Tax rate",
+          "25%"
+        ],
+        [
+          "D&A",
+          "$20M"
+        ],
+        [
+          "Capital expenditure",
+          "$30M"
+        ],
+        [
+          "Increase in net working capital",
+          "$10M"
+        ]
+      ],
+      "question": "What is Corbel's unlevered free cash flow?",
+      "options": [
+        {
+          "id": "a",
+          "label": "$30M"
+        },
+        {
+          "id": "b",
+          "label": "$40M"
+        },
+        {
+          "id": "c",
+          "label": "$50M"
+        },
+        {
+          "id": "d",
+          "label": "$60M"
+        }
+      ],
+      "answer": "b",
+      "steps": [
+        [
+          "NOPAT",
+          "$80M × (1 − 25%) = $60M"
+        ],
+        [
+          "Add back D&A",
+          "$60M + $20M = $80M (non-cash charge)"
+        ],
+        [
+          "Subtract capex",
+          "$80M − $30M = $50M"
+        ],
+        [
+          "Subtract NWC increase",
+          "$50M − $10M = $40M"
+        ]
+      ],
+      "concept": "Unlevered FCF is the cash the business generates before any payment to lenders or shareholders. That is why it is discounted at WACC, the blended cost of both.",
+      "hints": [
+        "Unlevered means before interest. Start by taxing EBIT directly.",
+        "D&A reduced EBIT but no cash left the company. What should you do with it?",
+        "Capex and a growing working capital balance both consume cash."
+      ],
+      "formula": "UFCF = EBIT × (1 − t) + D&A − Capex − ΔNWC"
+    },
+    {
+      "id": "veridian",
+      "module": "dcf",
+      "tier": "Analyst",
+      "difficulty": 2,
+      "minutes": 6,
+      "title": "Veridian Utilities",
+      "kind": "WACC",
+      "scenario": "Veridian Utilities is financed with both equity and debt. Compute the discount rate you would use in its DCF.",
+      "data": [
+        [
+          "Market value of equity",
+          "$600M"
+        ],
+        [
+          "Market value of debt",
+          "$400M"
+        ],
+        [
+          "Cost of equity",
+          "12%"
+        ],
+        [
+          "Pre-tax cost of debt",
+          "6%"
+        ],
+        [
+          "Tax rate",
+          "25%"
+        ]
+      ],
+      "question": "What is Veridian's WACC?",
+      "options": [
+        {
+          "id": "a",
+          "label": "7.8%"
+        },
+        {
+          "id": "b",
+          "label": "9.0%"
+        },
+        {
+          "id": "c",
+          "label": "9.6%"
+        },
+        {
+          "id": "d",
+          "label": "10.2%"
+        }
+      ],
+      "answer": "b",
+      "steps": [
+        [
+          "Weights",
+          "Equity 600 ÷ 1,000 = 60%; debt 400 ÷ 1,000 = 40%"
+        ],
+        [
+          "After-tax cost of debt",
+          "6% × (1 − 25%) = 4.5%"
+        ],
+        [
+          "Equity contribution",
+          "60% × 12% = 7.2%"
+        ],
+        [
+          "Debt contribution",
+          "40% × 4.5% = 1.8%"
+        ],
+        [
+          "WACC",
+          "7.2% + 1.8% = 9.0%"
+        ]
+      ],
+      "concept": "Interest is tax-deductible, so debt costs less than its stated rate. Forgetting the tax shield is the most common WACC mistake: here it would give 9.6%.",
+      "hints": [
+        "First find what share of total capital is equity and what share is debt.",
+        "Debt gets a tax shield. Adjust the 6% before you weight it.",
+        "Multiply each cost by its weight and add the two pieces together."
+      ],
+      "formula": "WACC = E/V × Re + D/V × Rd × (1 − t)"
+    },
+    {
+      "id": "lumen",
+      "module": "dcf",
+      "tier": "Analyst",
+      "difficulty": 2,
+      "minutes": 5,
+      "title": "Lumen Health",
+      "kind": "Terminal value",
+      "scenario": "Your DCF of Lumen Health, a clinic operator, projects five years of cash flow. You need the terminal value at the end of year 5.",
+      "data": [
+        [
+          "Year 5 free cash flow",
+          "$50M"
+        ],
+        [
+          "Perpetual growth rate",
+          "3%"
+        ],
+        [
+          "WACC",
+          "10%"
+        ]
+      ],
+      "question": "What is the terminal value using the perpetuity growth method?",
+      "options": [
+        {
+          "id": "a",
+          "label": "$500M"
+        },
+        {
+          "id": "b",
+          "label": "$714M"
+        },
+        {
+          "id": "c",
+          "label": "$736M"
+        },
+        {
+          "id": "d",
+          "label": "$1,000M"
+        }
+      ],
+      "answer": "c",
+      "steps": [
+        [
+          "Next year's cash flow",
+          "$50M × 1.03 = $51.5M"
+        ],
+        [
+          "Spread",
+          "WACC − g = 10% − 3% = 7%"
+        ],
+        [
+          "Terminal value",
+          "$51.5M ÷ 7% = $735.7M ≈ $736M"
+        ],
+        [
+          "The trap",
+          "$714M forgets to grow the cash flow one year forward"
+        ]
+      ],
+      "concept": "The Gordon growth formula values a cash flow stream that starts one year from now. That is why the numerator is year 6 cash flow, not year 5.",
+      "hints": [
+        "The perpetuity formula needs the cash flow of the first year inside the perpetuity. Is that year 5 or year 6?",
+        "Grow the year 5 cash flow by 3% once.",
+        "Divide by the difference between WACC and the growth rate."
+      ],
+      "formula": "TV = FCF₅ × (1 + g) ÷ (WACC − g)"
+    },
+    {
+      "id": "byteshift",
+      "module": "dcf",
+      "tier": "Analyst",
+      "difficulty": 3,
+      "minutes": 9,
+      "title": "ByteShift",
+      "kind": "Full DCF",
+      "scenario": "ByteShift is a mid-stage cloud infrastructure company. Value it with a five-year DCF and a perpetuity-growth terminal value.",
+      "data": [
+        [
+          "Year 1 free cash flow",
+          "$20M"
+        ],
+        [
+          "FCF growth, years 2–5",
+          "15% / year"
+        ],
+        [
+          "WACC",
+          "10%"
+        ],
+        [
+          "Terminal growth",
+          "3%"
+        ],
+        [
+          "Projection period",
+          "5 years"
+        ]
+      ],
+      "question": "What is ByteShift's approximate enterprise value?",
+      "options": [
+        {
+          "id": "a",
+          "label": "$320M"
+        },
+        {
+          "id": "b",
+          "label": "$420M"
+        },
+        {
+          "id": "c",
+          "label": "$515M"
+        },
+        {
+          "id": "d",
+          "label": "$615M"
+        }
+      ],
+      "answer": "b",
+      "steps": [
+        [
+          "Project cash flows",
+          "$20.0M, $23.0M, $26.5M, $30.4M, $35.0M"
+        ],
+        [
+          "Discount them",
+          "PV at 10% ≈ $18.2M + $19.0M + $19.9M + $20.8M + $21.7M = $99.6M"
+        ],
+        [
+          "Terminal value",
+          "$35.0M × 1.03 ÷ 7% = $514.7M"
+        ],
+        [
+          "Discount the TV",
+          "$514.7M ÷ 1.10⁵ = $319.6M"
+        ],
+        [
+          "Enterprise value",
+          "$99.6M + $319.6M ≈ $419M"
+        ]
+      ],
+      "concept": "In most DCFs the terminal value is more than half of the total. Here it is 76%, which is why analysts always run a sensitivity table on WACC and terminal growth.",
+      "hints": [
+        "Lay out five years of cash flow first, growing 15% each year after year 1.",
+        "Discount each year by 1.10 raised to its year number, then add them up.",
+        "Do not forget the terminal value. It sits at year 5, so it gets discounted five years too."
+      ],
+      "formula": "EV = Σ FCFₜ ÷ (1 + WACC)ᵗ + TV ÷ (1 + WACC)⁵"
+    },
+    {
+      "id": "atlas",
+      "module": "comps",
+      "tier": "Analyst",
+      "difficulty": 2,
+      "minutes": 6,
+      "title": "Atlas Retail Group",
+      "kind": "Implied share price",
+      "scenario": "You are valuing Atlas Retail Group using the median trading multiple of four peer retailers.",
+      "data": [
+        [
+          "Peer median EV / EBITDA",
+          "7.5x"
+        ],
+        [
+          "Atlas EBITDA",
+          "$60M"
+        ],
+        [
+          "Atlas net debt",
+          "$120M"
+        ],
+        [
+          "Shares outstanding",
+          "50M"
+        ]
+      ],
+      "question": "What share price does this imply?",
+      "options": [
+        {
+          "id": "a",
+          "label": "$4.20"
+        },
+        {
+          "id": "b",
+          "label": "$6.60"
+        },
+        {
+          "id": "c",
+          "label": "$9.00"
+        },
+        {
+          "id": "d",
+          "label": "$11.40"
+        }
+      ],
+      "answer": "b",
+      "steps": [
+        [
+          "Implied EV",
+          "$60M × 7.5x = $450M"
+        ],
+        [
+          "Equity value",
+          "$450M − $120M net debt = $330M"
+        ],
+        [
+          "Per share",
+          "$330M ÷ 50M = $6.60"
+        ],
+        [
+          "The trap",
+          "$9.00 skips the net debt step and divides EV by shares"
+        ]
+      ],
+      "concept": "EV multiples give enterprise value, which belongs to all capital providers. Lenders get paid first, so subtract net debt before dividing by shares.",
+      "hints": [
+        "Apply the peer multiple to Atlas's EBITDA. What does that give you, EV or equity value?",
+        "Enterprise value includes the claims of lenders. What do you remove to get to shareholders?",
+        "Only once you have equity value should you divide by shares outstanding."
+      ],
+      "formula": "Share price = (EBITDA × multiple − net debt) ÷ shares"
+    },
+    {
+      "id": "northwind",
+      "module": "comps",
+      "tier": "Analyst",
+      "difficulty": 1,
+      "minutes": 4,
+      "title": "Northwind Apparel",
+      "kind": "P/E valuation",
+      "scenario": "Northwind Apparel is about to list. Bankers benchmark it against listed apparel brands.",
+      "data": [
+        [
+          "Peer median P/E",
+          "18x"
+        ],
+        [
+          "Northwind EPS",
+          "$2.50"
+        ],
+        [
+          "Northwind net debt",
+          "$40M"
+        ]
+      ],
+      "question": "What share price does the peer P/E imply?",
+      "options": [
+        {
+          "id": "a",
+          "label": "$36.00"
+        },
+        {
+          "id": "b",
+          "label": "$45.00"
+        },
+        {
+          "id": "c",
+          "label": "$50.00"
+        },
+        {
+          "id": "d",
+          "label": "$54.00"
+        }
+      ],
+      "answer": "b",
+      "steps": [
+        [
+          "Apply the multiple",
+          "$2.50 × 18 = $45.00"
+        ],
+        [
+          "Why no debt adjustment",
+          "EPS is already after interest, so P/E maps straight to equity value per share"
+        ]
+      ],
+      "concept": "Match the multiple to the metric. Equity multiples (P/E) pair with equity metrics like EPS; enterprise multiples pair with EBITDA or EBIT. The net debt figure is a deliberate distraction.",
+      "hints": [
+        "P/E is price divided by earnings per share. Rearrange it.",
+        "Does net income already account for interest paid to lenders?",
+        "Since EPS is after interest, you do not touch net debt here."
+      ],
+      "formula": "Price = EPS × P/E"
+    },
+    {
+      "id": "kestrel",
+      "module": "comps",
+      "tier": "Analyst",
+      "difficulty": 2,
+      "minutes": 5,
+      "title": "Kestrel Systems",
+      "kind": "Equity bridge",
+      "scenario": "Your model values Kestrel Systems, a defense electronics maker, at an enterprise value of $1.2B. Convert that into a share price.",
+      "data": [
+        [
+          "Enterprise value",
+          "$1,200M"
+        ],
+        [
+          "Total debt",
+          "$300M"
+        ],
+        [
+          "Cash",
+          "$100M"
+        ],
+        [
+          "Diluted shares",
+          "50M"
+        ]
+      ],
+      "question": "What is the implied value per share?",
+      "options": [
+        {
+          "id": "a",
+          "label": "$16.00"
+        },
+        {
+          "id": "b",
+          "label": "$18.00"
+        },
+        {
+          "id": "c",
+          "label": "$20.00"
+        },
+        {
+          "id": "d",
+          "label": "$26.00"
+        }
+      ],
+      "answer": "c",
+      "steps": [
+        [
+          "Net debt",
+          "$300M − $100M = $200M"
+        ],
+        [
+          "Equity value",
+          "$1,200M − $200M = $1,000M"
+        ],
+        [
+          "Per share",
+          "$1,000M ÷ 50M = $20.00"
+        ]
+      ],
+      "concept": "Cash is added back because a buyer of the whole company gets it. Debt is subtracted because the buyer has to repay it.",
+      "hints": [
+        "Going from EV to equity, which items do you subtract and which do you add?",
+        "Debt reduces what is left for shareholders. Cash increases it.",
+        "Use diluted shares for the final division."
+      ],
+      "formula": "Equity value = EV − debt + cash"
+    },
+    {
+      "id": "halden",
+      "module": "precedents",
+      "tier": "Associate",
+      "difficulty": 2,
+      "minutes": 5,
+      "title": "Halden Biosciences",
+      "kind": "Control premium",
+      "scenario": "A large pharma company has offered to acquire Halden Biosciences. The board wants to know how generous the bid is.",
+      "data": [
+        [
+          "Undisturbed share price",
+          "$40.00"
+        ],
+        [
+          "Offer price per share",
+          "$52.00"
+        ],
+        [
+          "Shares outstanding",
+          "80M"
+        ]
+      ],
+      "question": "What control premium does the offer represent?",
+      "options": [
+        {
+          "id": "a",
+          "label": "12%"
+        },
+        {
+          "id": "b",
+          "label": "23%"
+        },
+        {
+          "id": "c",
+          "label": "30%"
+        },
+        {
+          "id": "d",
+          "label": "52%"
+        }
+      ],
+      "answer": "c",
+      "steps": [
+        [
+          "Premium in dollars",
+          "$52 − $40 = $12"
+        ],
+        [
+          "Premium in percent",
+          "$12 ÷ $40 = 30%"
+        ],
+        [
+          "The trap",
+          "23% divides by the offer price instead of the undisturbed price"
+        ]
+      ],
+      "concept": "Premiums are measured against the undisturbed price, before any rumor moved the stock. Typical public-company control premiums fall between 20% and 40%.",
+      "hints": [
+        "How much more per share is the buyer paying than the market price?",
+        "The base for the percentage is the price before the offer.",
+        "Shares outstanding is not needed for this one."
+      ],
+      "formula": "Premium = (Offer − undisturbed price) ÷ undisturbed price"
+    },
+    {
+      "id": "ardent",
+      "module": "precedents",
+      "tier": "Associate",
+      "difficulty": 3,
+      "minutes": 7,
+      "title": "Ardent Logistics",
+      "kind": "Transaction multiple",
+      "scenario": "Ardent Logistics was acquired last year. You are adding the deal to a precedent transactions table.",
+      "data": [
+        [
+          "Equity purchase price",
+          "$800M"
+        ],
+        [
+          "Debt assumed",
+          "$200M"
+        ],
+        [
+          "Target cash acquired",
+          "$50M"
+        ],
+        [
+          "Target LTM EBITDA",
+          "$95M"
+        ]
+      ],
+      "question": "What EV / EBITDA multiple did the buyer pay?",
+      "options": [
+        {
+          "id": "a",
+          "label": "8.4x"
+        },
+        {
+          "id": "b",
+          "label": "9.5x"
+        },
+        {
+          "id": "c",
+          "label": "10.0x"
+        },
+        {
+          "id": "d",
+          "label": "10.5x"
+        }
+      ],
+      "answer": "c",
+      "steps": [
+        [
+          "Transaction EV",
+          "$800M + $200M − $50M = $950M"
+        ],
+        [
+          "Multiple",
+          "$950M ÷ $95M = 10.0x"
+        ],
+        [
+          "The traps",
+          "8.4x uses equity value only; 10.5x forgets to subtract cash"
+        ]
+      ],
+      "concept": "Deal multiples are built on enterprise value so they can be compared across targets with different capital structures.",
+      "hints": [
+        "The multiple needs enterprise value, not just the equity price.",
+        "Add the debt the buyer took on, then subtract the cash it received.",
+        "Divide that EV by LTM EBITDA."
+      ],
+      "formula": "EV = equity price + debt − cash; multiple = EV ÷ EBITDA"
+    },
+    {
+      "id": "meridian",
+      "module": "lbo",
+      "tier": "Associate",
+      "difficulty": 3,
+      "minutes": 10,
+      "title": "Meridian Software",
+      "kind": "LBO returns",
+      "scenario": "Apex Capital is evaluating a leveraged buyout of Meridian Software, a B2B SaaS company with stable recurring revenue. Assume interest is paid from cash flow and no debt is repaid.",
+      "data": [
+        [
+          "LTM EBITDA",
+          "$85M"
+        ],
+        [
+          "Entry multiple",
+          "9.0x EV / EBITDA"
+        ],
+        [
+          "Debt / equity",
+          "65% / 35%"
+        ],
+        [
+          "Senior debt rate",
+          "6.5%"
+        ],
+        [
+          "EBITDA growth",
+          "10% / year"
+        ],
+        [
+          "Exit multiple",
+          "9.0x"
+        ],
+        [
+          "Hold period",
+          "5 years"
+        ]
+      ],
+      "question": "What is the approximate equity IRR?",
+      "options": [
+        {
+          "id": "a",
+          "label": "~18%"
+        },
+        {
+          "id": "b",
+          "label": "~22%"
+        },
+        {
+          "id": "c",
+          "label": "~28%"
+        },
+        {
+          "id": "d",
+          "label": "~35%"
+        }
+      ],
+      "answer": "b",
+      "steps": [
+        [
+          "Entry EV",
+          "$85M × 9.0x = $765M"
+        ],
+        [
+          "Sources",
+          "Debt $497M (65%), equity $268M (35%)"
+        ],
+        [
+          "Exit EV",
+          "EBITDA $85M × 1.10⁵ = $136.9M; × 9.0x = $1,232M"
+        ],
+        [
+          "Exit equity",
+          "$1,232M − $497M = $735M"
+        ],
+        [
+          "Returns",
+          "MOIC 2.74x; IRR = 2.74^(1/5) − 1 ≈ 22.4%"
+        ]
+      ],
+      "concept": "LBO returns come from three levers: EBITDA growth, multiple expansion and debt paydown. With a flat multiple and no paydown, 10% EBITDA growth becomes a 22% equity return purely through leverage.",
+      "hints": [
+        "Start with what the sponsor pays: entry EBITDA times the entry multiple.",
+        "Split that price into debt and equity. Only the equity check matters for the IRR.",
+        "Find exit EV from year 5 EBITDA, subtract the debt, then compare exit equity to the equity check over 5 years."
+      ],
+      "formula": "IRR = (Exit equity ÷ Entry equity)^(1/years) − 1"
+    },
+    {
+      "id": "quarry",
+      "module": "lbo",
+      "tier": "Associate",
+      "difficulty": 2,
+      "minutes": 4,
+      "title": "Quarry Partners",
+      "kind": "MOIC to IRR",
+      "scenario": "Quarry Partners sold a portfolio company after five years and returned 3.0x the equity it invested. LPs want the annualized return.",
+      "data": [
+        [
+          "MOIC",
+          "3.0x"
+        ],
+        [
+          "Hold period",
+          "5 years"
+        ],
+        [
+          "Interim dividends",
+          "None"
+        ]
+      ],
+      "question": "What IRR does a 3.0x MOIC over five years represent?",
+      "options": [
+        {
+          "id": "a",
+          "label": "~20%"
+        },
+        {
+          "id": "b",
+          "label": "~25%"
+        },
+        {
+          "id": "c",
+          "label": "~30%"
+        },
+        {
+          "id": "d",
+          "label": "~40%"
+        }
+      ],
+      "answer": "b",
+      "steps": [
+        [
+          "Set up",
+          "IRR = 3.0^(1/5) − 1"
+        ],
+        [
+          "Compute",
+          "3.0^0.2 = 1.246"
+        ],
+        [
+          "Result",
+          "IRR ≈ 24.6%"
+        ],
+        [
+          "The trap",
+          "40% simply divides the 200% gain by five years and ignores compounding"
+        ]
+      ],
+      "concept": "Memorize the grid used in interviews: 2x in 3 years ≈ 26%, 2x in 5 years ≈ 15%, 3x in 5 years ≈ 25%. It lets you sanity check any LBO in seconds.",
+      "hints": [
+        "Returns compound. A simple average of the gain per year will overstate the IRR.",
+        "You need the yearly rate that turns 1 into 3 over five years.",
+        "Take the fifth root of 3.0 and subtract 1."
+      ],
+      "formula": "IRR = MOIC^(1/n) − 1"
+    },
+    {
+      "id": "bastion",
+      "module": "lbo",
+      "tier": "Associate",
+      "difficulty": 4,
+      "minutes": 10,
+      "title": "Bastion Foods",
+      "kind": "Paper LBO with paydown",
+      "scenario": "A sponsor buys Bastion Foods, a frozen food producer. Free cash flow after interest is used to repay debt over the hold.",
+      "data": [
+        [
+          "Entry EBITDA",
+          "$50M"
+        ],
+        [
+          "Entry and exit multiple",
+          "8.0x"
+        ],
+        [
+          "Debt at entry",
+          "60% of EV"
+        ],
+        [
+          "Year 5 EBITDA",
+          "$70M"
+        ],
+        [
+          "Debt at exit",
+          "$140M"
+        ],
+        [
+          "Hold period",
+          "5 years"
+        ]
+      ],
+      "question": "What is the approximate equity IRR?",
+      "options": [
+        {
+          "id": "a",
+          "label": "~15%"
+        },
+        {
+          "id": "b",
+          "label": "~21%"
+        },
+        {
+          "id": "c",
+          "label": "~26%"
+        },
+        {
+          "id": "d",
+          "label": "~32%"
+        }
+      ],
+      "answer": "b",
+      "steps": [
+        [
+          "Entry",
+          "EV $400M; debt $240M; equity $160M"
+        ],
+        [
+          "Exit EV",
+          "$70M × 8.0x = $560M"
+        ],
+        [
+          "Exit equity",
+          "$560M − $140M = $420M"
+        ],
+        [
+          "MOIC",
+          "$420M ÷ $160M = 2.63x"
+        ],
+        [
+          "IRR",
+          "2.625^(1/5) − 1 ≈ 21.3%"
+        ]
+      ],
+      "concept": "Paying down $100M of debt moves $100M of value from lenders to the sponsor. Here paydown accounts for $100M of the sponsor's $260M equity gain.",
+      "hints": [
+        "Work out the entry EV and the equity cheque first.",
+        "At exit, use the remaining debt, not the original debt.",
+        "Compare exit equity to entry equity, then annualize over five years."
+      ],
+      "formula": "Exit equity = Exit EBITDA × multiple − remaining debt"
+    },
+    {
+      "id": "pinnacle",
+      "module": "ma",
+      "tier": "VP",
+      "difficulty": 4,
+      "minutes": 10,
+      "title": "Pinnacle Healthcare",
+      "kind": "Accretion / dilution",
+      "scenario": "NovaCorp plans an all-stock acquisition of Pinnacle Healthcare at a 25% premium. Ignore synergies and fees.",
+      "data": [
+        [
+          "NovaCorp EPS",
+          "$4.00"
+        ],
+        [
+          "NovaCorp shares",
+          "100M"
+        ],
+        [
+          "NovaCorp P/E",
+          "20x"
+        ],
+        [
+          "Pinnacle EPS",
+          "$2.50"
+        ],
+        [
+          "Pinnacle shares",
+          "40M"
+        ],
+        [
+          "Pinnacle share price",
+          "$50.00"
+        ],
+        [
+          "Offer premium",
+          "25%"
+        ]
+      ],
+      "question": "Is the deal accretive or dilutive to NovaCorp's EPS, and by how much?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Accretive ~3%"
+        },
+        {
+          "id": "b",
+          "label": "Dilutive ~5%"
+        },
+        {
+          "id": "c",
+          "label": "Accretive ~8%"
+        },
+        {
+          "id": "d",
+          "label": "Dilutive ~12%"
+        }
+      ],
+      "answer": "b",
+      "steps": [
+        [
+          "Purchase price",
+          "$50 × 1.25 = $62.50 per share; × 40M = $2,500M"
+        ],
+        [
+          "New NovaCorp shares",
+          "NovaCorp price $80 (20 × $4); $2,500M ÷ $80 = 31.25M shares"
+        ],
+        [
+          "Combined net income",
+          "$400M + $100M = $500M"
+        ],
+        [
+          "Pro forma EPS",
+          "$500M ÷ 131.25M = $3.81"
+        ],
+        [
+          "Impact",
+          "$3.81 vs $4.00 = −4.8%, dilutive"
+        ]
+      ],
+      "concept": "In an all-stock deal, if the buyer's P/E is lower than the P/E it pays for the target, the deal is dilutive. NovaCorp trades at 20x but pays 25x ($62.50 ÷ $2.50).",
+      "hints": [
+        "First work out the total purchase price including the premium.",
+        "In an all-stock deal NovaCorp issues new shares at its own price. What is that price?",
+        "Combine the two net incomes and divide by the new total share count. Compare with $4.00."
+      ],
+      "formula": "Pro forma EPS = (NI buyer + NI target) ÷ (buyer shares + new shares)"
+    },
+    {
+      "id": "pinnacle-syn",
+      "module": "ma",
+      "tier": "VP",
+      "difficulty": 5,
+      "minutes": 10,
+      "title": "Pinnacle Healthcare II",
+      "kind": "Breakeven synergies",
+      "scenario": "Same deal as Pinnacle Healthcare: pro forma NovaCorp has 131.25M shares and $500M of combined net income. The board asks what synergies would make the deal EPS-neutral.",
+      "data": [
+        [
+          "Standalone NovaCorp EPS",
+          "$4.00"
+        ],
+        [
+          "Pro forma shares",
+          "131.25M"
+        ],
+        [
+          "Combined net income",
+          "$500M"
+        ],
+        [
+          "Tax rate",
+          "25%"
+        ]
+      ],
+      "question": "What pre-tax synergies are needed to break even?",
+      "options": [
+        {
+          "id": "a",
+          "label": "$25M"
+        },
+        {
+          "id": "b",
+          "label": "$33M"
+        },
+        {
+          "id": "c",
+          "label": "$50M"
+        },
+        {
+          "id": "d",
+          "label": "$100M"
+        }
+      ],
+      "answer": "b",
+      "steps": [
+        [
+          "Net income needed",
+          "$4.00 × 131.25M = $525M"
+        ],
+        [
+          "After-tax gap",
+          "$525M − $500M = $25M"
+        ],
+        [
+          "Gross up for tax",
+          "$25M ÷ (1 − 25%) = $33.3M"
+        ]
+      ],
+      "concept": "Synergies are earned pre-tax but EPS is after tax. Always gross the after-tax gap up by (1 − t).",
+      "hints": [
+        "What total net income would keep EPS at $4.00 with the new share count?",
+        "The gap you found is after tax. Synergies are quoted before tax.",
+        "Divide the after-tax gap by (1 − tax rate)."
+      ],
+      "formula": "Pre-tax synergies = (Target EPS × shares − combined NI) ÷ (1 − t)"
+    },
+    {
+      "id": "pe-rule",
+      "module": "ma",
+      "tier": "VP",
+      "difficulty": 2,
+      "minutes": 3,
+      "title": "Calloway Media",
+      "kind": "P/E rule",
+      "scenario": "Calloway Media trades at 15x earnings. It agrees to buy a smaller rival in an all-stock deal at a purchase price of 20x the rival's earnings. No synergies.",
+      "data": [
+        [
+          "Acquirer P/E",
+          "15x"
+        ],
+        [
+          "Purchase P/E paid",
+          "20x"
+        ],
+        [
+          "Consideration",
+          "100% stock"
+        ]
+      ],
+      "question": "What is the EPS impact on Calloway?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Accretive"
+        },
+        {
+          "id": "b",
+          "label": "Dilutive"
+        },
+        {
+          "id": "c",
+          "label": "Neutral"
+        },
+        {
+          "id": "d",
+          "label": "Depends on deal size"
+        }
+      ],
+      "answer": "b",
+      "steps": [
+        [
+          "Earnings yield bought",
+          "1 ÷ 20x = 5.0%"
+        ],
+        [
+          "Cost of the stock used",
+          "1 ÷ 15x = 6.7%"
+        ],
+        [
+          "Conclusion",
+          "Paying 6.7% of earnings to acquire 5.0% of earnings lowers EPS: dilutive"
+        ]
+      ],
+      "concept": "Size changes how much dilution you get, never the direction. The direction is set by comparing the two P/E ratios.",
+      "hints": [
+        "Think of a P/E as a price tag on one dollar of earnings.",
+        "Calloway's own stock is the currency. Is that currency expensive or cheap relative to what it buys?",
+        "Compare the earnings yield acquired with the earnings yield given up."
+      ],
+      "formula": "All-stock: dilutive if acquirer P/E < purchase P/E"
+    },
+    {
+      "id": "granite",
+      "module": "restructuring",
+      "tier": "VP",
+      "difficulty": 3,
+      "minutes": 7,
+      "title": "Granite Retail",
+      "kind": "Recovery waterfall",
+      "scenario": "Granite Retail has filed for bankruptcy. Its business is valued at $300M as a going concern. Claims are paid in strict priority.",
+      "data": [
+        [
+          "Distributable value",
+          "$300M"
+        ],
+        [
+          "Secured term loan",
+          "$200M"
+        ],
+        [
+          "Senior unsecured notes",
+          "$150M"
+        ],
+        [
+          "Subordinated notes",
+          "$100M"
+        ]
+      ],
+      "question": "What recovery do the senior unsecured noteholders receive?",
+      "options": [
+        {
+          "id": "a",
+          "label": "0%"
+        },
+        {
+          "id": "b",
+          "label": "33%"
+        },
+        {
+          "id": "c",
+          "label": "67%"
+        },
+        {
+          "id": "d",
+          "label": "100%"
+        }
+      ],
+      "answer": "c",
+      "steps": [
+        [
+          "Secured first",
+          "$200M paid in full; $100M left"
+        ],
+        [
+          "Senior unsecured",
+          "$100M available for $150M of claims"
+        ],
+        [
+          "Recovery",
+          "$100M ÷ $150M = 66.7%"
+        ],
+        [
+          "Below them",
+          "Subordinated notes and equity receive nothing"
+        ]
+      ],
+      "concept": "The absolute priority rule means each class is paid in full before the next class gets anything. The class where value runs out is called the fulcrum security, and it usually ends up owning the reorganized company.",
+      "hints": [
+        "Pay the classes in order of seniority. Who is first?",
+        "After the secured lenders, how much value is left?",
+        "Divide what is left by the senior unsecured claim."
+      ],
+      "formula": "Recovery = value available to the class ÷ size of the class claim"
+    },
+    {
+      "id": "solstice",
+      "module": "structuring",
+      "tier": "MD",
+      "difficulty": 4,
+      "minutes": 8,
+      "title": "Solstice Hotels",
+      "kind": "Maximum equity check",
+      "scenario": "Your fund targets a 25% IRR. In your base case, the equity in Solstice Hotels is worth $900M at exit in five years.",
+      "data": [
+        [
+          "Target IRR",
+          "25%"
+        ],
+        [
+          "Exit equity value",
+          "$900M"
+        ],
+        [
+          "Hold period",
+          "5 years"
+        ]
+      ],
+      "question": "What is the most equity the fund can invest today?",
+      "options": [
+        {
+          "id": "a",
+          "label": "$225M"
+        },
+        {
+          "id": "b",
+          "label": "$295M"
+        },
+        {
+          "id": "c",
+          "label": "$360M"
+        },
+        {
+          "id": "d",
+          "label": "$450M"
+        }
+      ],
+      "answer": "b",
+      "steps": [
+        [
+          "Required multiple",
+          "1.25⁵ = 3.05x"
+        ],
+        [
+          "Max equity",
+          "$900M ÷ 3.05 = $294.9M"
+        ],
+        [
+          "The trap",
+          "$360M divides by 2.5x, which ignores compounding"
+        ]
+      ],
+      "concept": "Working backwards from a target return is how sponsors set their maximum bid. Discount the exit value at the target IRR instead of WACC.",
+      "hints": [
+        "Which multiple of money does 25% a year compound to over five years?",
+        "Raise 1.25 to the fifth power.",
+        "Divide exit equity by that multiple."
+      ],
+      "formula": "Max equity = Exit equity ÷ (1 + target IRR)ⁿ"
+    },
+    {
+      "id": "orion",
+      "module": "structuring",
+      "tier": "MD",
+      "difficulty": 5,
+      "minutes": 12,
+      "title": "Orion Aerospace",
+      "kind": "Maximum entry multiple",
+      "scenario": "A sponsor is bidding for Orion Aerospace. It will fund the deal with $500M of debt that stays outstanding until exit, and it needs a 20% IRR.",
+      "data": [
+        [
+          "LTM EBITDA",
+          "$100M"
+        ],
+        [
+          "EBITDA growth",
+          "10% / year"
+        ],
+        [
+          "Exit multiple",
+          "10.0x"
+        ],
+        [
+          "Debt (no paydown)",
+          "$500M"
+        ],
+        [
+          "Target IRR",
+          "20%"
+        ],
+        [
+          "Hold period",
+          "5 years"
+        ]
+      ],
+      "question": "What is the highest EV / EBITDA multiple the sponsor can pay?",
+      "options": [
+        {
+          "id": "a",
+          "label": "8.0x"
+        },
+        {
+          "id": "b",
+          "label": "9.5x"
+        },
+        {
+          "id": "c",
+          "label": "10.5x"
+        },
+        {
+          "id": "d",
+          "label": "11.0x"
+        }
+      ],
+      "answer": "b",
+      "steps": [
+        [
+          "Exit EBITDA",
+          "$100M × 1.10⁵ = $161.1M"
+        ],
+        [
+          "Exit equity",
+          "$161.1M × 10.0x − $500M = $1,110.5M"
+        ],
+        [
+          "Max equity today",
+          "$1,110.5M ÷ 1.20⁵ = $446.3M"
+        ],
+        [
+          "Max entry EV",
+          "$446.3M + $500M = $946.3M"
+        ],
+        [
+          "Max multiple",
+          "$946.3M ÷ $100M ≈ 9.5x"
+        ]
+      ],
+      "concept": "This is a reverse LBO: start from the exit, discount equity at the target IRR, then add debt back to find the enterprise value you can afford.",
+      "hints": [
+        "Start at the end. What is the business worth at exit?",
+        "Strip out the debt to get exit equity, then discount it back at 20% for five years.",
+        "Add the debt back to that equity to get the maximum entry EV, then divide by today's EBITDA."
+      ],
+      "formula": "Max EV = (Exit equity ÷ (1 + IRR)ⁿ) + debt"
+    }
+  ]
+}
