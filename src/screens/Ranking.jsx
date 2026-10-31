@@ -20,7 +20,7 @@ const SCOPES = [
 ];
 
 export default function Ranking() {
-  useMeta({ title: 'Rank', noindex: true });
+  useMeta({ title: 'Rank' });
   const { showToast, me } = useApp();
   const [scope, setScope] = useState('week');
   const [board, setBoard] = useState({});

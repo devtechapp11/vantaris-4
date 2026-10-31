@@ -409,6 +409,8 @@ button.chip { cursor: pointer; min-height: var(--chip-h); transition: border-col
 
 /* Mascot slot */
 .mascot { position: relative; flex: none; isolation: isolate; }
+.mascot-float { animation: mascot-float 3.2s var(--ease-in-out) infinite; will-change: transform; }
+@keyframes mascot-float { 50% { transform: translateY(-1.3%); } }
 
 /* Preview band (preview build only) */
 .preview-band {

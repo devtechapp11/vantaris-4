@@ -21,7 +21,7 @@ import { useMeta } from '../app/useMeta';
  * and three numbers. Everything else lives one tap away (Deals, Rank, Profile).
  */
 export default function Home() {
-  useMeta({ title: 'Home', noindex: true });
+  useMeta({ title: 'Home' });
   const { me, openPaywall, refreshMe } = useApp();
   const ptr = usePullToRefresh(refreshMe);
   const navigate = useNavigate();

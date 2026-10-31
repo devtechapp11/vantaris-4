@@ -12,13 +12,20 @@ function preloadFonts(base) {
     transformIndexHtml: {
       order: 'post',
       handler(_html, ctx) {
-        return Object.keys(ctx.bundle ?? {})
+        const files = Object.keys(ctx.bundle ?? {});
+        const fonts = files
           .filter((file) => CRITICAL_FONTS.test(file))
           .map((file) => ({
             tag: 'link',
             attrs: { rel: 'preload', href: `${base}${file}`, as: 'font', type: 'font/woff2', crossorigin: '' },
             injectTo: 'head',
           }));
+        // The landing page is the first screen for new visitors: fetch its small
+        // chunk in parallel with the app shell instead of after it (~6 KB gzip).
+        const landing = files
+          .filter((file) => /assets\/Landing-[\w-]+\.js$/.test(file))
+          .map((file) => ({ tag: 'link', attrs: { rel: 'modulepreload', href: `${base}${file}`, crossorigin: '' }, injectTo: 'head' }));
+        return [...fonts, ...landing];
       },
     },
   };

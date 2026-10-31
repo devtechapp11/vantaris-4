@@ -31,6 +31,7 @@ a { color: inherit; }
 :focus { outline: none; }
 :focus-visible { outline: var(--ring) solid var(--silver); outline-offset: var(--ring); border-radius: var(--r-xs); }
 [hidden] { display: none !important; }
+main:focus { outline: none; }
 ::selection { background: var(--aluminium-dark); color: var(--fg); }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { background: var(--aluminium-dark); border-radius: var(--r-full); border: 3px solid transparent; background-clip: padding-box; }

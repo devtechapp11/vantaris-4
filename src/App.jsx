@@ -7,6 +7,7 @@ import { Toast } from './components/chrome';
 import { Sidebar, TabBar, TABS } from './components/Shell';
 import Paywall from './components/Paywall';
 import { LogoLoader } from './components/Logo';
+import HeroShell from './components/HeroShell';
 import Mascot from './components/Mascot';
 import { IS_DEMO } from './lib/config';
 import { loaders } from './app/routes';
@@ -80,7 +81,11 @@ function Gate() {
     return () => cancel(h);
   }, [signedIn]);
 
-  if (session === undefined) return <LogoLoader />;
+  // Signed-out visitors on the home page already see the pre-rendered hero
+  // (index.html); keep showing it, not a splash, until the landing chunk is in.
+  const prerendered = document.documentElement.hasAttribute('data-prerender') && /^\/(welcome)?$/.test(location.pathname);
+  const loader = prerendered ? <HeroShell /> : <LogoLoader />;
+  if (session === undefined) return loader;
 
   let routes;
   if (location.pathname === '/reset-password') {
@@ -131,7 +136,7 @@ function Gate() {
       {signedIn && <Sidebar />}
       <div className="app-main">
         <ErrorBoundary resetKey={location.pathname}>
-          <Suspense fallback={<LogoLoader />}>
+          <Suspense fallback={loader}>
             <AnimatePresence mode="wait" initial={false} onExitComplete={restoreScroll}>
               <Routes location={location} key={routeKey(location.pathname)}>{routes}</Routes>
             </AnimatePresence>

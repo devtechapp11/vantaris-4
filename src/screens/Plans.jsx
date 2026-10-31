@@ -33,7 +33,7 @@ const ROWS = [
 ];
 
 export default function Plans() {
-  useMeta({ title: 'Plans', noindex: true });
+  useMeta({ title: 'Plans' });
   const navigate = useNavigate();
   const location = useLocation();
   const { me, refreshMe, showToast } = useApp();

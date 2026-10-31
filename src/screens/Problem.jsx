@@ -47,7 +47,7 @@ export default function Problem() {
   const [promotion, setPromotion] = useState(null);
   const calc = useRef(null);
   const titleRef = useRef(null);
-  useMeta({ title: data?.problem?.title ?? 'Deal', noindex: true });
+  useMeta({ title: data?.problem?.title ?? 'Deal' });
   useSharedEnter(titleRef, `deal-${id}`, Boolean(data));
   const termsRef = useRef(null);
   const resultRef = useRef(null);

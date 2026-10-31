@@ -111,8 +111,8 @@ function useFloorTexture(colors) {
     const g = c.getContext('2d');
     const grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
     const dark = `#${colors.aluDark.getHexString()}`;
-    grd.addColorStop(0, 'rgba(0,0,0,1)');
-    grd.addColorStop(0.4, 'rgba(0,0,0,0.85)');
+    grd.addColorStop(0, 'rgba(9,10,11,1)');
+    grd.addColorStop(0.4, 'rgba(9,10,11,0.85)');
     grd.addColorStop(0.62, `${dark}66`);
     grd.addColorStop(1, `${dark}00`);
     g.fillStyle = grd;

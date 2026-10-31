@@ -35,7 +35,7 @@ const TABS = [
 ];
 
 export default function Profile() {
-  useMeta({ title: 'Profile', noindex: true });
+  useMeta({ title: 'Profile' });
   const { me, openPaywall, refreshMe, showToast } = useApp();
   const navigate = useNavigate();
   const prefs = usePrefs();

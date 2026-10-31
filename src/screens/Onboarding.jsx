@@ -25,7 +25,7 @@ const GOALS = [
 const STEPS = 3;
 
 export default function Onboarding() {
-  useMeta({ title: 'Welcome', noindex: true });
+  useMeta({ title: 'Welcome' });
   const navigate = useNavigate();
   const { me, setMe, showToast } = useApp();
   const [[step, dir], setStep] = useState([0, 1]);

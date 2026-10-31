@@ -126,8 +126,8 @@ export default function MascotSVG({ state = 'idle', lookAt = null, pulse = 0, in
         run(sx, [1, 0.97, 1.05, 0.99, 1.02, 1], { duration: 1 });
         run(lid, [1, 0.4, 0.4, 1], { duration: 1.4 });
         break;
-      default: // idle, typing, privacy: a slow float
-        run(y, [0, -3, 0], { duration: 3.2, repeat: Infinity, ease: 'easeInOut' });
+      default: // idle, typing, privacy: the slow float is a CSS animation (compositor only)
+        break;
     }
     // Blink every few seconds (not while the visor is dimmed).
     let blink = null;

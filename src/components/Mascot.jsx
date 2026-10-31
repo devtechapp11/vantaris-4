@@ -12,6 +12,9 @@ const MOOD_STATE = {
   levelup: 'celebrate',
 };
 
+// States that drift gently up and down (a CSS animation, so it costs no JavaScript).
+const FLOAT = new Set(['idle', 'typing', 'privacy']);
+
 export const MASCOT_STATES = ['idle', 'curious', 'typing', 'privacy', 'success', 'error', 'thinking', 'celebrate'];
 
 /**
@@ -34,7 +37,7 @@ export default function Mascot({
   const a11y = decorative ? { 'aria-hidden': true } : { role: 'img', 'aria-label': label };
   const svg = <MascotSVG state={s} lookAt={lookAt} pulse={pulse} interactive={interactive} style={{ width: '100%', height: '100%' }} />;
   return (
-    <div {...a11y} className={`mascot ${className}`} style={{ width: size, height: size * 1.18, ...style }}>
+    <div {...a11y} className={`mascot ${mode !== '3d' && FLOAT.has(s) ? 'mascot-float' : ''} ${className}`} style={{ width: size, height: size * 1.18, ...style }}>
       {mode === '3d' ? (
         <Scene3D scene="mascot" fallback={svg} state={s} lookAt={lookAt} pulse={pulse} interactive={interactive} />
       ) : svg}

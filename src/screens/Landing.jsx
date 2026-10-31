@@ -24,7 +24,8 @@ const YEAR = new Date().getFullYear();
 /** Lenis smooth scrolling, on the public website only, loaded on demand. */
 function useLenis(enabled) {
   useEffect(() => {
-    if (!enabled) return undefined;
+    // Touch scrolling is already native and smooth; Lenis only helps wheels.
+    if (!enabled || window.matchMedia?.('(pointer: coarse)').matches) return undefined;
     let lenis = null;
     let raf = 0;
     let alive = true;

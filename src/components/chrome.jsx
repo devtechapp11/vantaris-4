@@ -15,7 +15,7 @@ import { duration, ease, spring } from '../design/tokens';
 export function Page({ children, className = 'screen', wide = false, as = 'main', ...rest }) {
   const Tag = as === 'div' ? motion.div : motion.main;
   return (
-    <Tag className={`${className} ${wide ? 'screen--wide' : ''}`} variants={page} initial="hidden" animate="show" exit="exit" {...rest}>
+    <Tag id="main" tabIndex={-1} className={`${className} ${wide ? 'screen--wide' : ''}`} variants={page} initial="hidden" animate="show" exit="exit" {...rest}>
       {children}
     </Tag>
   );
