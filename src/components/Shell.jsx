@@ -1,11 +1,10 @@
 import { Link, NavLink } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { House, LayoutGrid, Trophy, CircleUserRound, Sparkles } from 'lucide-react';
+import { House, LayoutGrid, Trophy, CircleUserRound } from 'lucide-react';
 import { useApp } from '../app/AppContext';
 import { spring } from '../design/tokens';
 import Logo from './Logo';
 import { Avatar, TierBadge } from './bits';
-import StreakFlame from './StreakFlame';
 
 export const TABS = [
   { to: '/', label: 'Home', Icon: House, end: true },
@@ -17,14 +16,14 @@ export const TABS = [
 /** Bottom tab bar on phones and tablets. */
 export function TabBar() {
   return (
-    <nav className="tabbar" aria-label="Main">
+    <nav className="tabbar glass" aria-label="Main">
       <div className="tabbar-inner">
         {TABS.map(({ to, label, Icon, end }) => (
           <NavLink key={to} to={to} end={end} className="tab">
             {({ isActive }) => (
               <>
-                {isActive && <motion.span layoutId="tab-glow" className="tab-glow" transition={spring.snappy} />}
-                <Icon size={23} strokeWidth={isActive ? 2.3 : 1.8} aria-hidden="true" />
+                {isActive && <motion.span layoutId="tab-mark" className="tab-mark" transition={spring.snappy} />}
+                <Icon size={22} aria-hidden="true" />
                 {label}
               </>
             )}
@@ -49,7 +48,7 @@ export function Sidebar() {
             {({ isActive }) => (
               <>
                 {isActive && <motion.span layoutId="side-pill" className="side-pill" transition={spring.snappy} />}
-                <Icon size={20} strokeWidth={isActive ? 2.3 : 1.9} aria-hidden="true" />
+                <Icon size={20} aria-hidden="true" />
                 {label}
               </>
             )}
@@ -58,9 +57,9 @@ export function Sidebar() {
       </nav>
       <div className="side-foot">
         {free && (
-          <Link to="/plans" className="card card--interactive card--tight" style={{ borderColor: 'var(--gold-line)' }}>
-            <div className="row-8"><Sparkles size={16} className="c-gold" aria-hidden="true" /><span className="t-label c-fg">Go Pro</span></div>
-            <p className="t-cap" style={{ marginTop: 'var(--sp-1)' }}>Unlimited deals, VP modules and Vale, your AI tutor.</p>
+          <Link to="/plans" className="side-upgrade">
+            <span className="t-label c-fg">Go Pro</span>
+            <span className="t-cap">Unlimited deals, VP modules and Vale, your AI tutor.</span>
           </Link>
         )}
         {profile && (
@@ -68,7 +67,7 @@ export function Sidebar() {
             <Avatar name={profile.display_name} variant="me" />
             <span className="grow stack-4">
               <span className="t-label c-fg ellipsis">{profile.display_name}</span>
-              <span className="row-8"><TierBadge level={profile.level} /><StreakFlame streak={profile.streak} compact /></span>
+              <span className="row-8"><TierBadge level={profile.level} />{profile.streak > 0 && <span className="t-cap fig">{profile.streak}d</span>}</span>
             </span>
           </Link>
         )}

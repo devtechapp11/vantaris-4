@@ -13,8 +13,6 @@ import { ProgressBar } from '../components/ui';
 import Calculator from '../components/Calculator';
 import { FormulaBlock, highlight } from '../components/Formula';
 import Mascot from '../components/Mascot';
-import Scene3D from '../components/three/Scene3D';
-import { MedalFallback } from '../components/three/Fallbacks';
 import Tutor, { TutorFab } from './Tutor';
 import { burst, originOf, shower } from '../lib/celebrate';
 import { shareCard } from '../lib/shareCard';
@@ -167,7 +165,7 @@ export default function Problem() {
             <Mascot mood="wrong" size={110} />
             <h1 className="t-h3">We couldn’t open this deal</h1>
             <p className="t-callout">{error.message}</p>
-            <button type="button" className="btn btn--gold btn--md btn--auto" onClick={load}>Try again</button>
+            <button type="button" className="btn btn--primary btn--md btn--auto" onClick={load}>Try again</button>
           </div>
         </Page>
       </>
@@ -238,7 +236,7 @@ export default function Problem() {
               )}
             </AnimatePresence>
 
-            <section className="card question" aria-labelledby="q">
+            <section className="question" aria-labelledby="q">
               <h2 id="q" className="t-title">{p.question}</h2>
               <div className="options" role={answered ? undefined : 'radiogroup'} aria-labelledby="q">
                 {p.options.map((o, i) => (
@@ -247,11 +245,11 @@ export default function Problem() {
               </div>
               {!answered && desktop && (
                 <div className="question-actions">
-                  <button type="button" className="btn btn--glass btn--auto" onClick={askHint} disabled={thinking}>
+                  <button type="button" className="btn btn--secondary btn--auto" onClick={askHint} disabled={thinking}>
                     <Lightbulb size={18} aria-hidden="true" /> Hint
                     {!tutorAllowed && <Lock size={12} aria-hidden="true" />}
                   </button>
-                  <button type="button" className="btn btn--gold" disabled={!choice || submitting} onClick={submit}>
+                  <button type="button" className="btn btn--primary" disabled={!choice || submitting} onClick={submit}>
                     {submitting ? <Spinner /> : <>Submit answer <span className="kbd kbd--dark">↵</span></>}
                   </button>
                 </div>
@@ -267,12 +265,12 @@ export default function Problem() {
       </Page>
 
       {!answered && !desktop && (
-        <div className="dock">
+        <div className="dock glass">
           <div className="dock-inner">
-            <button type="button" className="btn btn--glass btn--icon" onClick={askHint} disabled={thinking} aria-label={tutorAllowed ? 'Get a hint from Vale' : 'Hints from Vale come with Pro'}>
+            <button type="button" className="btn btn--secondary btn--icon" onClick={askHint} disabled={thinking} aria-label={tutorAllowed ? 'Get a hint from Vale' : 'Hints from Vale come with Pro'}>
               <Lightbulb size={20} aria-hidden="true" />
             </button>
-            <button type="button" className="btn btn--gold" disabled={!choice || submitting} onClick={submit}>
+            <button type="button" className="btn btn--primary" disabled={!choice || submitting} onClick={submit}>
               {submitting ? <Spinner /> : 'Submit answer'}
             </button>
           </div>
@@ -365,7 +363,7 @@ function ValeThinking({ show }) {
     <AnimatePresence>
       {show && (
         <motion.div
-          className="vale-thinking"
+          className="vale-thinking glass"
           role="status"
           initial={{ opacity: 0, y: 20, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -402,11 +400,10 @@ function Result({ outcome, me, nextId, onNext, onShare, onTutor }) {
       transition={{ ...spring.gentle }}
       aria-live="polite"
     >
-      <div className="result-glow" aria-hidden="true" />
       <div className="result-top">
         <div className="result-vale share-vale"><Mascot mood={r.correct ? 'correct' : 'wrong'} size={124} label={r.correct ? 'Vale nods approvingly' : 'Vale, encouraging you to try again'} /></div>
         <div className="stack-8 grow">
-          <span className={`t-eyebrow ${r.correct ? '' : 't-eyebrow--cyan'}`}>{r.correct ? 'Deal closed' : 'Not quite'}</span>
+          <span className="t-eyebrow">{r.correct ? 'Deal closed' : 'Not quite'}</span>
           {r.correct ? (
             r.points > 0 ? (
               <motion.div className="score" initial={reduce ? false : { scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ ...spring.bouncy, delay: 0.15 }}>
@@ -420,7 +417,7 @@ function Result({ outcome, me, nextId, onNext, onShare, onTutor }) {
           ) : (
             <p className="t-h3">The answer is <span className="fig c-pos">{r.answer_label}</span></p>
           )}
-          {r.correct && r.points > 0 && r.time_ratio > 0 && <span className="chip chip--gold">Speed bonus +{Math.round(r.time_ratio * 50)}%</span>}
+          {r.correct && r.points > 0 && r.time_ratio > 0 && <span className="chip chip--strong">Speed bonus +{Math.round(r.time_ratio * 50)}%</span>}
           {!r.correct && <p className="t-callout">Even senior analysts miss this one. Here’s how it works, step by step.</p>}
         </div>
       </div>
@@ -431,20 +428,20 @@ function Result({ outcome, me, nextId, onNext, onShare, onTutor }) {
             <span className="t-label"><TierBadge level={profile.level} /></span>
             <span className="t-cap fig">{profile.points} / {profile.next_level_at ?? '—'} pts{profile.next_level ? ` to ${profile.next_level}` : ''}</span>
           </div>
-          <ProgressBar value={to} from={from} glow delay={0.8} label="Progress to the next tier" />
+          <ProgressBar value={to} from={from} size="sm" delay={0.6} label="Progress to the next tier" />
         </div>
       )}
 
       <div className="result-actions">
         {nextId && (
-          <button type="button" className="btn btn--gold btn--pulse" onClick={onNext}>
+          <button type="button" className="btn btn--primary" onClick={onNext}>
             Next deal <ArrowRight size={18} aria-hidden="true" />
           </button>
         )}
         {r.correct && r.points > 0 && (
-          <button type="button" className="btn btn--glass btn--auto" onClick={onShare}><Share2 size={17} aria-hidden="true" /> Share</button>
+          <button type="button" className="btn btn--secondary btn--auto" onClick={onShare}><Share2 size={17} aria-hidden="true" /> Share</button>
         )}
-        <button type="button" className="btn btn--cyan btn--auto" onClick={onTutor}><Sparkles size={17} aria-hidden="true" /> Ask Vale</button>
+        <button type="button" className="btn btn--secondary btn--auto" onClick={onTutor}><Sparkles size={17} aria-hidden="true" /> Ask Vale</button>
       </div>
     </motion.section>
   );
@@ -472,7 +469,7 @@ function Breakdown({ result: r, onSteps }) {
                 <div key={i} className="row"><span className="step-n">·</span><span className="grow skeleton" style={{ height: 34 }} /></div>
               ))}
             </div>
-            <button type="button" className="btn btn--outline btn--md" onClick={onSteps}>
+            <button type="button" className="btn btn--secondary btn--md" onClick={onSteps}>
               <Lock size={16} aria-hidden="true" /> See all {r.steps_total} steps with Core
             </button>
           </div>
@@ -491,7 +488,7 @@ function Breakdown({ result: r, onSteps }) {
 function Accordion({ title, icon, meta, defaultOpen = false, children }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className={`acc card card--flush ${open ? 'is-open' : ''}`}>
+    <div className={`acc ${open ? 'is-open' : ''}`}>
       <button type="button" className="acc-head" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         {icon}
         <span className="t-headline grow">{title}</span>
@@ -523,17 +520,14 @@ function Promotion({ level, onClose, onShare }) {
     <AnimatePresence>
       {level && (
         <motion.div className="promo" role="dialog" aria-modal="true" aria-labelledby="promo-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          <motion.div className="promo-card" data-tier={level} initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0 }} transition={spring.gentle}>
-            <div className="promo-medal">
-              <Scene3D scene="medal" level={level} fallback={<MedalFallback level={level} />} />
-            </div>
+          <motion.div className="promo-card glass" data-tier={level} initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0 }} transition={spring.gentle}>
+            <div className="promo-mascot share-vale"><Mascot mood="levelup" size={200} decorative /></div>
             <p className="t-eyebrow">Promoted</p>
             <h2 id="promo-title" className="t-h1">You’re now {level === 'Associate' ? 'an' : 'a'} {level}.</h2>
             <p className="t-body">New modules are open to you on the right plan, and your tier shows on the leaderboard.</p>
-            <div className="promo-vale share-vale"><Mascot mood="levelup" size={120} decorative /></div>
             <div className="row-8 wrap" style={{ justifyContent: 'center' }}>
-              <button type="button" className="btn btn--glass btn--auto" onClick={onShare}><Share2 size={17} aria-hidden="true" /> Share</button>
-              <button type="button" className="btn btn--gold btn--auto" onClick={onClose} autoFocus>Keep climbing <ArrowRight size={17} aria-hidden="true" /></button>
+              <button type="button" className="btn btn--secondary btn--auto" onClick={onShare}><Share2 size={17} aria-hidden="true" /> Share</button>
+              <button type="button" className="btn btn--primary btn--auto" onClick={onClose} autoFocus>Keep climbing <ArrowRight size={17} aria-hidden="true" /></button>
             </div>
           </motion.div>
         </motion.div>
@@ -561,7 +555,7 @@ function Locked({ lock }) {
               ? `Your free deals come back on ${me?.quota?.resets_at ? weekday(me.quota.resets_at) : 'Monday'}. Go unlimited to keep your streak alive today.`
               : 'Unlock harder modules and the deals interviewers actually ask about.'}
           </p>
-          <button type="button" className="btn btn--gold" onClick={() => navigate('/plans', { state: { highlight: isQuota ? 'core' : LEVEL_TIER[lock.detail] } })}>
+          <button type="button" className="btn btn--primary" onClick={() => navigate('/plans', { state: { highlight: isQuota ? 'core' : LEVEL_TIER[lock.detail] } })}>
             See plans
           </button>
           <Link to="/practice" className="btn btn--ghost">Back to practice</Link>

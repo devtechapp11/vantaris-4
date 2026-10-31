@@ -1,12 +1,12 @@
+/* Plans: flat columns divided by hairlines; the featured one is marked, not lifted */
 .plans-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--sp-6);
-  align-items: stretch;
+  border-top: var(--hairline) solid var(--line);
 }
 @media (min-width: 900px) {
-  .plans-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-5); align-items: center; }
-  .plans-grid .plan--featured { transform: translateY(calc(var(--sp-4) * -1)) scale(1.03); z-index: var(--z-raised); }
+  .plans-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .plans-grid .plan + .plan { border-left: var(--hairline) solid var(--line); }
 }
 
 .plan {
@@ -14,95 +14,37 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
-  padding: var(--sp-6);
-  border-radius: var(--r-xl);
-  background: var(--glass-fill), var(--surface);
-  border: var(--hairline) solid var(--glass-line);
-  box-shadow: var(--glass-highlight), var(--shadow-md);
-  isolation: isolate;
+  padding: var(--sp-8) var(--sp-1);
+  border-bottom: var(--hairline) solid var(--line);
 }
-.plan-name { font-size: var(--fs-xl); font-weight: var(--fw-heavy); letter-spacing: var(--tracking-tight); margin: 0; }
+@media (min-width: 900px) { .plan { padding: var(--sp-8) var(--sp-6); border-bottom: 0; } }
+.plan--featured { box-shadow: inset 0 1px 0 var(--platinum); }
+.plan-name { font-family: var(--font-display); font-size: var(--fs-3xl); font-weight: 400; margin: 0; }
 .plan-price { display: flex; align-items: baseline; gap: var(--sp-1); min-height: calc(var(--fs-4xl) * 1.1); }
-.price { font-family: var(--font-ui); font-variant-numeric: tabular-nums lining-nums; font-size: var(--fs-4xl); font-weight: var(--fw-heavy); letter-spacing: -0.04em; line-height: 1; display: inline-block; }
+.price { font-variant-numeric: tabular-nums lining-nums; font-size: var(--fs-4xl); font-weight: var(--fw-medium); letter-spacing: -0.04em; line-height: 1; display: inline-block; }
 .plan-sub { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); min-height: var(--chip-h); flex-wrap: wrap; }
-.plan-save { font-weight: var(--fw-bold); }
+.plan-save { font-weight: var(--fw-medium); }
 .plan-feats { list-style: none; margin: 0; padding: var(--sp-4) 0 0; display: flex; flex-direction: column; gap: var(--sp-3); border-top: var(--hairline) solid var(--line); flex: 1; }
 .feat { display: flex; gap: var(--sp-3); align-items: flex-start; font-size: var(--fs-base); color: var(--fg-2); line-height: 1.45; }
-.draw-check { flex: none; margin-top: 1px; }
-.draw-check circle { fill: var(--gold-soft); stroke: var(--gold-line); stroke-width: 1; }
-.draw-check path { fill: none; stroke: var(--gold-bright); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.draw-check { flex: none; margin-top: 2px; }
+.draw-check circle { fill: none; stroke: var(--aluminium-dark); stroke-width: 1; }
+.draw-check path { fill: none; stroke: var(--fg); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .plan-cta { margin-top: var(--sp-2); }
 
 .plan-flag {
-  position: absolute; top: calc(var(--chip-h) / -2); left: var(--sp-6);
-  display: inline-flex; align-items: center; gap: var(--sp-1);
-  height: var(--chip-h); padding: 0 var(--sp-3); border-radius: var(--r-full);
-  font-size: var(--fs-xs); font-weight: var(--fw-heavy); letter-spacing: 0.02em;
-  background: var(--grad-gold); color: var(--fg-inverse);
-  box-shadow: var(--glow-gold);
-  overflow: hidden;
+  position: absolute; top: var(--sp-3); left: var(--sp-1);
+  font-size: var(--fs-2xs); font-weight: var(--fw-semibold); letter-spacing: var(--tracking-wider); text-transform: uppercase;
+  color: var(--fg);
 }
-.plan-flag--current { left: auto; right: var(--sp-6); background: var(--surface-3); color: var(--fg); box-shadow: none; border: var(--hairline) solid var(--glass-line-strong); }
-.shimmer-loop::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.75) 50%, transparent 70%);
-  transform: translateX(-120%);
-  animation: sheen-loop var(--dur-sheen) var(--ease-in-out) 0.6s infinite;
-}
-
-/* Pro: lifted, with a rotating gold border and a soft breathing glow.
-   The border is a masked ring whose oversized conic child spins with transform,
-   and the glow only animates opacity, so both run on the compositor. */
-.plan--featured {
-  background: radial-gradient(120% 60% at 50% 0%, rgba(212, 175, 55, 0.12), transparent 60%), var(--glass-fill), var(--surface-raised);
-  border-color: transparent;
-  box-shadow: var(--glass-highlight), var(--shadow-lg), 0 0 40px rgba(212, 175, 55, 0.12);
-}
-.plan-ring {
-  position: absolute; inset: calc(var(--hairline) * -1.5);
-  border-radius: inherit;
-  padding: 1.5px;
-  overflow: hidden;
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-  pointer-events: none;
-  z-index: var(--z-bg);
-}
-.plan-ring::before {
-  content: '';
-  position: absolute; left: 50%; top: 50%;
-  width: 160%; aspect-ratio: 1;
-  translate: -50% -50%;
-  background: var(--grad-conic-border);
-  animation: spin 5s linear infinite;
-}
-.plan--featured::after {
-  content: '';
-  position: absolute; inset: 0;
-  border-radius: inherit;
-  box-shadow: 0 0 80px rgba(212, 175, 55, 0.28);
-  opacity: 0.2;
-  animation: glow-breathe 3.6s var(--ease-in-out) infinite;
-  pointer-events: none;
-  z-index: var(--z-bg);
-}
-
-/* Elite: black-and-platinum with gold light */
-.plan--elite {
-  background:
-    radial-gradient(120% 70% at 100% 0%, rgba(220, 227, 238, 0.12), transparent 55%),
-    radial-gradient(90% 60% at 0% 100%, rgba(212, 175, 55, 0.12), transparent 60%),
-    linear-gradient(180deg, var(--navy-850), var(--navy-1000));
-  border-color: rgba(220, 227, 238, 0.18);
-}
-.plan--elite .plan-name { background: var(--grad-platinum); -webkit-background-clip: text; background-clip: text; color: transparent; }
+@media (min-width: 900px) { .plan-flag { left: var(--sp-6); } }
+.plan-flag--current { left: auto; right: var(--sp-1); color: var(--fg-3); }
+@media (min-width: 900px) { .plan-flag--current { right: var(--sp-6); } }
 
 .billing { display: inline-flex; align-items: center; gap: var(--sp-3); position: relative; }
-.billing-track { display: inline-grid; grid-auto-flow: column; padding: var(--sp-1); border-radius: var(--r-full); background: rgba(255, 255, 255, 0.04); border: var(--hairline) solid var(--glass-line); }
-.billing-track button { position: relative; height: var(--control-h-sm); padding: 0 var(--sp-5); border: 0; background: none; border-radius: var(--r-full); font-size: var(--fs-sm); font-weight: var(--fw-bold); color: var(--fg-3); transition: color var(--dur-fast); }
+.billing-track { display: inline-grid; grid-auto-flow: column; padding: 2px; border-radius: var(--r-md); border: var(--hairline) solid var(--line-strong); }
+.billing-track button { position: relative; min-height: 40px; padding: 0 var(--sp-5); border: 0; background: none; border-radius: var(--r-sm); font-size: var(--fs-sm); font-weight: var(--fw-medium); color: var(--fg-3); transition: color var(--dur-fast); }
 .billing-label { position: relative; z-index: var(--z-raised); }
-.billing-track button[aria-pressed='true'] { color: var(--fg-inverse); }
-.billing-thumb { position: absolute; inset: 0; border-radius: inherit; background: var(--grad-gold); box-shadow: var(--glow-gold); }
+.billing-track button[aria-pressed='true'] { color: var(--fg); }
+.billing-thumb { position: absolute; inset: 0; border-radius: inherit; background: var(--surface-2); box-shadow: var(--edge-highlight); }
 .billing-badge { position: absolute; left: calc(100% + var(--sp-2)); white-space: nowrap; }
 @media (max-width: 520px) { .billing-badge { position: static; } .billing { flex-direction: column; } }

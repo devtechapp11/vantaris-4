@@ -1,42 +1,24 @@
-.pf-hero {
-  position: relative; overflow: hidden;
-  display: flex; align-items: center; gap: var(--sp-8); flex-wrap: wrap;
-  padding: var(--sp-6);
-  background: var(--tbg), var(--glass-fill), var(--surface);
-  border-color: color-mix(in srgb, var(--tc) 30%, transparent);
-}
-@media (min-width: 768px) { .pf-hero { padding: var(--sp-8) var(--sp-10); flex-wrap: nowrap; } }
-.pf-hero-glow { position: absolute; left: -10%; top: -50%; width: 50%; height: 200%; background: radial-gradient(closest-side, color-mix(in srgb, var(--tc) 30%, transparent), transparent); pointer-events: none; }
-.pf-emblem { background: none !important; border: 0 !important; box-shadow: none !important; padding: var(--sp-2) !important; display: grid; place-items: center; }
-.pf-id { min-width: min(100%, 280px); }
+.pf-id { display: flex; flex-direction: column; gap: var(--sp-5); padding-top: var(--sp-5); border-top: var(--hairline) solid var(--line); }
+.pf-tabs { max-width: 360px; }
 
-.pf-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-@media (min-width: 900px) { .pf-stats { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.pf-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; border-top: var(--hairline) solid var(--line); border-bottom: var(--hairline) solid var(--line); }
+.pf-stats > div { padding: var(--sp-4) 0 var(--sp-4) var(--sp-4); border-left: var(--hairline) solid var(--line); display: flex; flex-direction: column; gap: var(--sp-1); }
+.pf-stats > div:first-child { padding-left: 0; border-left: 0; }
+.pf-stats dt { font-size: var(--fs-2xs); font-weight: var(--fw-semibold); letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--fg-3); }
+.pf-stats dd { margin: 0; font-size: var(--fs-2xl); font-weight: var(--fw-medium); letter-spacing: -0.02em; display: flex; align-items: baseline; gap: var(--sp-1); }
+.pf-stats .unit { font-size: var(--fs-xs); color: var(--fg-3); letter-spacing: 0; }
 
-.pf-two { display: grid; gap: var(--sp-6); grid-template-columns: minmax(0, 1fr); align-items: start; }
-@media (min-width: 1000px) { .pf-two { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.pf-two { display: grid; gap: var(--sp-8); grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 1000px) { .pf-two { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-12); } }
 
-/* Trophy room */
-.shelf { padding: var(--sp-4) var(--sp-4) var(--sp-5); background: radial-gradient(90% 80% at 50% 100%, rgba(212, 175, 55, 0.12), transparent 70%), var(--glass-fill), var(--surface); }
-.shelf-stage { position: relative; height: 200px; }
-.shelf-fallback { position: absolute; inset: 0; display: grid; align-items: center; justify-items: center; }
-.shelf-labels { list-style: none; margin: 0; padding: var(--sp-2) 0 0; display: grid; gap: var(--sp-2); text-align: center; }
-.shelf-labels li { display: flex; flex-direction: column; gap: 2px; opacity: 0.6; transition: opacity var(--dur-base), transform var(--dur-base) var(--ease-out); }
-.shelf-labels li.is-earned { opacity: 1; }
-.shelf-labels li.is-hover { transform: translateY(-3px); }
-.shelf-labels li.is-earned .t-label { color: var(--gold-bright); }
+/* Achievements: a plain list, earned ones in full contrast */
+.badges { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.badge { display: flex; align-items: center; gap: var(--sp-3); min-height: 56px; padding: var(--sp-2) 0; border-bottom: var(--hairline) solid var(--line); opacity: 0.55; }
+.badge.is-earned { opacity: 1; }
+.badge-mark { width: 32px; height: 32px; flex: none; display: grid; place-items: center; border-radius: 50%; border: var(--hairline) solid var(--line-strong); color: var(--fg-3); }
+.badge.is-earned .badge-mark { border-color: var(--aluminium); color: var(--fg); }
 
-.badges { list-style: none; margin: 0 calc(var(--gutter) * -1); padding: var(--sp-2) var(--gutter) var(--sp-4); display: grid; grid-auto-flow: column; grid-auto-columns: 132px; gap: var(--sp-3); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; }
-.badges::-webkit-scrollbar { display: none; }
-.badge { scroll-snap-align: start; display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--sp-2); padding: var(--sp-4) var(--sp-2); border-radius: var(--r-lg); background: var(--glass-fill), var(--surface); border: var(--hairline) solid var(--glass-line); }
-.badge.is-earned { border-color: var(--gold-line); }
-.badge-medal { position: relative; overflow: hidden; width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.45), inset 0 -3px 6px rgba(0, 0, 0, 0.25), 0 8px 20px rgba(0, 0, 0, 0.4); }
-.badge-medal.metal-gold { box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5), inset 0 -3px 6px rgba(0, 0, 0, 0.25), var(--glow-gold); }
-.badge-medal.metal-dull { box-shadow: none; }
-
-/* Subscription */
-.pf-sub { display: flex; flex-direction: column; gap: var(--sp-4); }
-.pf-sub--paid { border-color: var(--gold-line); background: radial-gradient(100% 80% at 100% 0%, rgba(212, 175, 55, 0.14), transparent 60%), var(--glass-fill), var(--surface); }
-.pf-pro { position: relative; overflow: hidden; }
+/* Plan */
+.pf-sub { padding-top: var(--sp-2); }
 .setting { align-items: center; }
 .setting label { cursor: pointer; }

@@ -7,7 +7,7 @@ import './MemberCard.css';
 
 const YEAR = new Date().getFullYear();
 
-/** Elite member card: navy and gold, tilts toward the pointer with a moving sheen. */
+/** Elite member card: black with a chrome wordmark, tilts gently toward the pointer. */
 export default function MemberCard({ name, level, score, locked, onLockedClick }) {
   const reduce = useReducedMotion();
   const ref = useRef(null);
@@ -15,12 +15,12 @@ export default function MemberCard({ name, level, score, locked, onLockedClick }
   const py = useMotionValue(0.5);
   const sx = useSpring(px, { stiffness: 180, damping: 18 });
   const sy = useSpring(py, { stiffness: 180, damping: 18 });
-  const rotateY = useTransform(sx, [0, 1], [-14, 14]);
-  const rotateX = useTransform(sy, [0, 1], [10, -10]);
+  const rotateY = useTransform(sx, [0, 1], [-3, 3]);
+  const rotateX = useTransform(sy, [0, 1], [3, -3]);
   const sheenX = useTransform(sx, [0, 1], ['-30%', '130%']);
 
   const move = (e) => {
-    if (reduce || locked) return;
+    if (reduce || locked || e.pointerType !== 'mouse') return;
     const r = ref.current.getBoundingClientRect();
     px.set((e.clientX - r.left) / r.width);
     py.set((e.clientY - r.top) / r.height);
@@ -45,7 +45,7 @@ export default function MemberCard({ name, level, score, locked, onLockedClick }
       <motion.div aria-hidden="true" className="mcard-sheen" style={{ left: sheenX }} />
       <div className="mcard-body">
         <div className="between">
-          <span className="mcard-brand"><VMark size={22} /> {BRAND.name.toUpperCase()}</span>
+          <span className="mcard-brand"><VMark size={22} /> <span className="text-chrome">{BRAND.name.toUpperCase()}</span></span>
           <span className="mcard-tier">ELITE</span>
         </div>
         <div className="mcard-chip" />
@@ -64,7 +64,7 @@ export default function MemberCard({ name, level, score, locked, onLockedClick }
   return (
     <button type="button" onClick={onLockedClick} className="mcard-wrap mcard-button" aria-label="Elite member card, locked. See the Elite plan.">
       {card}
-      <span className="mcard-lock"><span className="chip chip--solid-gold"><Lock size={13} aria-hidden="true" /> Unlock with Elite</span></span>
+      <span className="mcard-lock"><span className="chip chip--strong"><Lock size={13} aria-hidden="true" /> Unlock with Elite</span></span>
     </button>
   );
 }

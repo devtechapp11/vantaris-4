@@ -27,7 +27,7 @@ const KEY = 'vantaris-unlocked-v1';
 
 /**
  * Modules that became unlocked since this device last looked (e.g. right after
- * an upgrade), so their cards can play the golden shimmer once. The first visit
+ * an upgrade), so their cards can mark the unlock once. The first visit
  * only records the current state.
  */
 export function takeNewlyUnlocked(unlockedIds) {

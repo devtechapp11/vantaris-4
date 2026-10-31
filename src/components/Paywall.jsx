@@ -65,7 +65,7 @@ export default function Paywall() {
               <div className={`plan ${copy.tier === 'elite' ? 'plan--elite' : 'plan--featured'}`} style={{ animation: 'none' }}>
                 <div className="between">
                   <div className="stack-4">
-                    <span className="row-8"><Crown size={16} className="c-gold" aria-hidden="true" /><span className="plan-name">{tier.name}</span></span>
+                    <span className="row-8"><Crown size={16} className="c-fg" aria-hidden="true" /><span className="plan-name">{tier.name}</span></span>
                     <span className="t-foot">{tier.tagline}</span>
                   </div>
                   {price && (
@@ -85,7 +85,7 @@ export default function Paywall() {
               </div>
             )}
             <div className="stack-4">
-              <button type="button" className="btn btn--gold" onClick={() => go(copy.tier)}>
+              <button type="button" className="btn btn--primary" onClick={() => go(copy.tier)}>
                 Continue with {tier?.name ?? 'a plan'}
               </button>
               <button type="button" className="btn btn--ghost" onClick={() => go(null)}>Compare all plans</button>

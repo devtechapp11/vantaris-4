@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { duration, ease } from '../design/tokens';
 
@@ -51,10 +51,9 @@ function monotonePath(pts) {
 const dayLabel = (iso, today) => (today ? 'Today' : new Date(`${iso}T12:00:00`).toLocaleDateString('en-GB', { weekday: 'short' }));
 const longDay = (iso) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
 
-/** Points per day, last seven days: gold area chart with a crosshair tooltip. */
+/** Points per day, last seven days: a thin platinum line that draws in, with a crosshair tooltip. */
 export function ActivityChart({ week = [] }) {
   const reduce = useReducedMotion();
-  const id = useId().replace(/:/g, '');
   const [active, setActive] = useState(null);
   const [box, width] = useWidth(640);
   const W = Math.max(280, width), H = W < 480 ? 190 : 210, L = 34, R = 18, T = 22, B = 30;
@@ -66,7 +65,6 @@ export function ActivityChart({ week = [] }) {
     [week, max, plotW, plotH, base],
   );
   const line = monotonePath(pts);
-  const area = pts.length ? `${line} L${pts[pts.length - 1][0]},${base} L${pts[0][0]},${base} Z` : '';
   const last = week.length - 1;
   const show = active ?? null;
   const band = week.length > 1 ? plotW / (week.length - 1) : plotW;
@@ -83,35 +81,23 @@ export function ActivityChart({ week = [] }) {
         viewBox={`0 0 ${W} ${H}`} width="100%" role="img" tabIndex={0} onKeyDown={onKey} onBlur={() => setActive(null)}
         aria-label={`Points over the last seven days: ${total} in total. Use the arrow keys to read each day.`}
       >
-        <defs>
-          <linearGradient id={`${id}-fill`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="var(--gold-500)" stopOpacity="0.28" />
-            <stop offset="1" stopColor="var(--gold-500)" stopOpacity="0" />
-          </linearGradient>
-        </defs>
         {[0, 0.5, 1].map((f) => (
           <g key={f}>
-            <line x1={L} x2={W - R} y1={base - f * plotH} y2={base - f * plotH} stroke="var(--line)" strokeWidth="1" />
+            <line x1={L} x2={W - R} y1={base - f * plotH} y2={base - f * plotH} className="chart-grid" />
             <text x={L - 8} y={base - f * plotH} textAnchor="end" dominantBaseline="middle" className="chart-tick">{Math.round(max * f)}</text>
           </g>
         ))}
         <motion.path
-          d={area} fill={`url(#${id}-fill)`}
-          initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: duration.slower, delay: 0.3 }}
+          d={line} fill="none" stroke="var(--platinum)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+          initial={reduce ? false : { pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.9, ease: ease.out }}
         />
-        <motion.path
-          d={line} fill="none" stroke="var(--gold-500)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-          initial={reduce ? false : { pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: duration.slower * 1.6, ease: ease.out }}
-          style={{ filter: 'drop-shadow(0 0 6px rgba(212,175,55,0.45))' }}
-        />
-        {show != null && <line x1={pts[show][0]} x2={pts[show][0]} y1={T} y2={base} stroke="var(--line-strong)" strokeWidth="1" />}
+        {show != null && <line x1={pts[show][0]} x2={pts[show][0]} y1={T} y2={base} stroke="var(--aluminium)" strokeWidth="1" />}
         {pts.map(([x, y], i) => (
           <motion.circle
             key={week[i].date}
-            cx={x} cy={y} r={i === last || i === show ? 6 : 4.5}
-            fill={i === last ? 'var(--gold-400)' : 'var(--gold-500)'} stroke="var(--surface)" strokeWidth="2"
-            initial={reduce ? false : { scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.5 + i * 0.06, type: 'spring', stiffness: 400, damping: 18 }}
-            style={{ originX: 0.5, originY: 0.5, filter: i === last ? 'drop-shadow(0 0 8px rgba(241,210,122,0.8))' : undefined }}
+            cx={x} cy={y} r={i === last || i === show ? 3.5 : 2.5}
+            fill={i === last ? 'var(--platinum)' : 'var(--bg)'} stroke={i === last ? 'var(--platinum)' : 'var(--silver)'} strokeWidth="1.25"
+            initial={reduce ? false : { opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.4 + i * 0.05, duration: duration.base }}
           />
         ))}
         {/* Selective direct label: today's value at the end of the line */}
@@ -134,7 +120,7 @@ export function ActivityChart({ week = [] }) {
         ))}
       </svg>
       {show != null && (
-        <div className="chart-tip" style={{ left: `${(pts[show][0] / W) * 100}%`, top: `${(pts[show][1] / H) * 100}%` }} role="status">
+        <div className="chart-tip glass" style={{ left: `${(pts[show][0] / W) * 100}%`, top: `${(pts[show][1] / H) * 100}%` }} role="status">
           <span className="fig chart-tip-v">{week[show].points} pts</span>
           <span className="t-cap"><i className="chart-key" aria-hidden="true" />{longDay(week[show].date)}</span>
         </div>
@@ -147,10 +133,9 @@ export function ActivityChart({ week = [] }) {
   );
 }
 
-/** Share of each module solved, as a radar. */
+/** Share of each module solved, as a radar: thin lines, no fill. */
 export function Radar({ skills = [] }) {
   const reduce = useReducedMotion();
-  const id = useId().replace(/:/g, '');
   const [box, width] = useWidth(420);
   const W = 420, H = 300, cx = W / 2, cy = H / 2 - 4;
   const k = Math.max(1, W / Math.max(260, width)); // keep labels ~12px when the chart shrinks
@@ -165,35 +150,28 @@ export function Radar({ skills = [] }) {
   return (
     <div ref={box}>
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" overflow="visible" role="img" aria-label={`Modules solved: ${skills.map((s) => `${s.short} ${s.solved} of ${s.total}`).join(', ')}`}>
-      <defs>
-        <radialGradient id={`${id}-r`}>
-          <stop offset="0" stopColor="var(--cyan)" stopOpacity="0.35" />
-          <stop offset="1" stopColor="var(--cyan)" stopOpacity="0.08" />
-        </radialGradient>
-      </defs>
-      {[0.25, 0.5, 0.75, 1].map((f) => (
-        <polygon key={f} points={ring(f)} fill={f === 1 ? 'rgba(255,255,255,0.02)' : 'none'} stroke="var(--line-strong)" strokeWidth="1" />
+      {[0.5, 1].map((f) => (
+        <polygon key={f} points={ring(f)} fill="none" className="chart-grid" />
       ))}
       {skills.map((s, i) => {
         const [x, y] = pt(i, Rr);
-        return <line key={s.module_id} x1={cx} y1={cy} x2={x} y2={y} stroke="var(--line)" strokeWidth="1" />;
+        return <line key={s.module_id} x1={cx} y1={cy} x2={x} y2={y} className="chart-grid" />;
       })}
       <motion.polygon
-        points={shape} fill={`url(#${id}-r)`} stroke="var(--cyan)" strokeWidth="2" strokeLinejoin="round"
-        style={{ originX: 0.5, originY: 0.5, filter: 'drop-shadow(0 0 10px rgba(0,212,255,0.35))' }}
-        initial={reduce ? false : { scale: 0.2, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: duration.slower, ease: ease.out }}
+        points={shape} fill="none" stroke="var(--platinum)" strokeWidth="1.5" strokeLinejoin="round"
+        initial={reduce ? false : { pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true, amount: 0.4 }}
+        transition={{ duration: 0.9, ease: ease.out }}
       />
       {skills.map((s, i) => {
         const [x, y] = pt(i, Rr * Math.max(0.04, s.total ? s.solved / s.total : 0));
-        return <circle key={`d-${s.module_id}`} cx={x} cy={y} r="4" fill="var(--cyan)" stroke="var(--surface)" strokeWidth="2" />;
+        return <circle key={`d-${s.module_id}`} cx={x} cy={y} r="2.5" fill="var(--bg)" stroke="var(--silver)" strokeWidth="1.25" />;
       })}
       {skills.map((s, i) => {
         const [x, y] = pt(i, Rr + 22 * k);
         const anchor = Math.abs(x - cx) < 8 ? 'middle' : x > cx ? 'start' : 'end';
         return (
           <g key={`l-${s.module_id}`}>
-            <text x={x} y={y} textAnchor={anchor} dominantBaseline="middle" style={{ fill: 'var(--fg-2)', fontSize: 12 * k, fontWeight: 600 }}>{s.short}</text>
+            <text x={x} y={y} textAnchor={anchor} dominantBaseline="middle" style={{ fill: 'var(--fg-2)', fontSize: 12 * k, fontWeight: 500 }}>{s.short}</text>
             <text x={x} y={y + 14 * k} textAnchor={anchor} dominantBaseline="middle" className="fig" style={{ fill: 'var(--fg-3)', fontSize: 10.5 * k }}>{s.solved}/{s.total}</text>
           </g>
         );
@@ -203,31 +181,22 @@ export function Radar({ skills = [] }) {
   );
 }
 
-/** Progress ring with a gold gradient stroke. */
-export function Ring({ value, size = 64, stroke = 8, tone = 'gold', children, delay = 0.2 }) {
+/** Progress ring: a thin platinum stroke on an aluminium-dark track. */
+export function Ring({ value, size = 64, stroke = 2, children, delay = 0.2 }) {
   const reduce = useReducedMotion();
-  const id = useId().replace(/:/g, '');
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const v = Math.max(0, Math.min(1, value || 0));
-  const stops = tone === 'cyan' ? ['var(--cyan-300)', 'var(--cyan-700)'] : ['var(--gold-300)', 'var(--gold-600)'];
   return (
     <div style={{ position: 'relative', width: size, height: size, flex: 'none' }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true" style={{ transform: 'rotate(-90deg)', overflow: 'visible' }}>
-        <defs>
-          <linearGradient id={`${id}-g`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor={stops[0]} />
-            <stop offset="1" stopColor={stops[1]} />
-          </linearGradient>
-        </defs>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--aluminium-dark)" strokeWidth={stroke} />
         <motion.circle
           cx={size / 2} cy={size / 2} r={r} fill="none"
-          stroke={`url(#${id}-g)`} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={c}
+          stroke="var(--platinum)" strokeWidth={stroke} strokeDasharray={c}
           initial={reduce ? false : { strokeDashoffset: c }}
           animate={{ strokeDashoffset: c * (1 - v) }}
-          transition={{ duration: duration.slower * 1.6, delay: reduce ? 0 : delay, ease: ease.out }}
-          style={{ filter: `drop-shadow(0 0 6px ${tone === 'cyan' ? 'rgba(0,212,255,0.5)' : 'rgba(212,175,55,0.55)'})` }}
+          transition={{ duration: 0.9, delay: reduce ? 0 : delay, ease: ease.out }}
         />
       </svg>
       <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center' }}>{children}</div>

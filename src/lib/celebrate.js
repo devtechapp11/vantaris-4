@@ -12,7 +12,7 @@ function allowed() {
   return !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 }
 
-const palette = () => [cssVar('--gold-300', '#F7E3A3'), cssVar('--gold-500', '#D4AF37'), cssVar('--cyan-500', '#00D4FF'), '#FFFFFF'];
+const palette = () => [cssVar('--platinum', '#E7E8E5'), cssVar('--silver', '#B9BEC0'), cssVar('--aluminium', '#858D92')];
 
 /** Subtle burst for a correct answer. `origin` is 0–1 of the viewport. */
 export async function burst(origin = { x: 0.5, y: 0.35 }) {

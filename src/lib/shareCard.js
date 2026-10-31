@@ -61,135 +61,106 @@ export async function drawShareCard({ kind = 'deal', title, subtitle, points, le
   c.height = H;
   const g = c.getContext('2d');
   const ui = cssVar('--font-ui', 'sans-serif');
-  const mono = cssVar('--font-figure', 'monospace');
-  const gold = [cssVar('--gold-300'), cssVar('--gold-500'), cssVar('--gold-600')];
-  const cyan = cssVar('--cyan-500');
-  const fg = cssVar('--fg');
-  const fg2 = cssVar('--fg-2');
+  const display = cssVar('--font-display', 'serif');
+  const black = cssVar('--black', '#090A0B');
+  const platinum = cssVar('--platinum', '#E7E8E5');
+  const silver = cssVar('--silver', '#B9BEC0');
+  const aluminium = cssVar('--aluminium', '#858D92');
+  const aluDark = cssVar('--aluminium-dark', '#343A3E');
+  const gain = cssVar('--gain', '#35A77A');
 
-  // Background: navy → plum → black, gold glow, constellation
-  const bg = g.createLinearGradient(0, 0, 0, H);
-  bg.addColorStop(0, cssVar('--navy-900'));
-  bg.addColorStop(0.55, cssVar('--plum-900'));
-  bg.addColorStop(1, cssVar('--navy-1000'));
-  g.fillStyle = bg;
+  // Flat black with a faint ruled grid, like a term sheet
+  g.fillStyle = black;
   g.fillRect(0, 0, W, H);
-  const glow = g.createRadialGradient(W / 2, 760, 40, W / 2, 760, 760);
-  glow.addColorStop(0, 'rgba(212,175,55,0.30)');
-  glow.addColorStop(1, 'rgba(212,175,55,0)');
-  g.fillStyle = glow;
-  g.fillRect(0, 0, W, H);
-  let seed = 42;
-  const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
-  const dots = Array.from({ length: 70 }, () => [rnd() * W, rnd() * H, 1 + rnd() * 3]);
-  g.lineWidth = 1.5;
-  dots.forEach(([x, y], i) => dots.slice(i + 1).forEach(([x2, y2]) => {
-    const d = Math.hypot(x - x2, y - y2);
-    if (d < 190) {
-      g.strokeStyle = `rgba(212,175,55,${(1 - d / 190) * 0.25})`;
-      g.beginPath();
-      g.moveTo(x, y);
-      g.lineTo(x2, y2);
-      g.stroke();
-    }
-  }));
-  dots.forEach(([x, y, r], i) => {
-    g.fillStyle = i % 4 ? 'rgba(241,210,122,0.8)' : cyan;
-    g.beginPath();
-    g.arc(x, y, r, 0, Math.PI * 2);
-    g.fill();
-  });
+  g.strokeStyle = aluDark;
+  g.globalAlpha = 0.35;
+  g.lineWidth = 1;
+  for (let y = 120; y < H; y += 120) { g.beginPath(); g.moveTo(80, y + 0.5); g.lineTo(W - 80, y + 0.5); g.stroke(); }
+  g.globalAlpha = 1;
 
-  // Brand
-  const goldGrad = (x0, x1) => {
-    const lg = g.createLinearGradient(x0, 0, x1, 0);
-    lg.addColorStop(0, gold[0]);
-    lg.addColorStop(0.55, gold[1]);
-    lg.addColorStop(1, gold[2]);
+  // Chrome wordmark
+  const chrome = (x0, x1, y0 = 0, y1 = 0) => {
+    const lg = g.createLinearGradient(x0, y0, x1, y1);
+    lg.addColorStop(0, platinum);
+    lg.addColorStop(0.45, silver);
+    lg.addColorStop(0.55, aluminium);
+    lg.addColorStop(1, platinum);
     return lg;
   };
   g.save();
   g.translate(W / 2 - 200, 150);
   g.scale(2, 2);
-  g.fillStyle = goldGrad(0, 48);
+  g.fillStyle = chrome(0, 0, 0, 48);
   g.beginPath(); g.moveTo(5, 8); g.lineTo(16, 8); g.lineTo(24, 28); g.lineTo(24, 41); g.lineTo(20.5, 41); g.closePath(); g.fill();
   g.beginPath(); g.moveTo(43, 8); g.lineTo(32, 8); g.lineTo(24, 28); g.lineTo(24, 41); g.lineTo(27.5, 41); g.closePath(); g.fill();
-  g.fillStyle = cyan;
-  g.beginPath(); g.moveTo(24, 9.5); g.lineTo(27.5, 13); g.lineTo(24, 16.5); g.lineTo(20.5, 13); g.closePath(); g.fill();
   g.restore();
-  g.fillStyle = fg;
-  g.font = `800 52px ${ui}`;
+  g.fillStyle = chrome(0, 0, 170, 222);
+  g.font = `600 52px ${ui}`;
   if ('letterSpacing' in g) g.letterSpacing = '14px';
   g.textBaseline = 'middle';
   g.fillText(BRAND.name.toUpperCase(), W / 2 - 90, 196);
   if ('letterSpacing' in g) g.letterSpacing = '0px';
 
-  // Vale
+  // Mascot
   const vale = await svgImage(valeSvg);
-  if (vale) g.drawImage(vale, W / 2 - 270, 270, 540, 540);
+  if (vale) g.drawImage(vale, W / 2 - 250, 290, 500, 500);
 
   // Headline
   g.textAlign = 'center';
-  g.fillStyle = gold[0];
-  g.font = `800 34px ${ui}`;
+  g.fillStyle = aluminium;
+  g.font = `600 30px ${ui}`;
   if ('letterSpacing' in g) g.letterSpacing = '8px';
   g.fillText(kind === 'promotion' ? 'PROMOTED' : 'DEAL CLOSED', W / 2, 880);
   if ('letterSpacing' in g) g.letterSpacing = '0px';
-  g.fillStyle = fg;
-  g.font = `900 96px ${ui}`;
+  g.fillStyle = platinum;
+  g.font = `400 108px ${display}`;
   const lines = wrap(g, title, W - 160).slice(0, 2);
-  lines.forEach((l, i) => g.fillText(l, W / 2, 985 + i * 104));
-  let y = 985 + (lines.length - 1) * 104 + 80;
+  lines.forEach((l, i) => g.fillText(l, W / 2, 990 + i * 112));
+  let y = 990 + (lines.length - 1) * 112 + 80;
   if (subtitle) {
-    g.fillStyle = fg2;
-    g.font = `500 40px ${ui}`;
+    g.fillStyle = silver;
+    g.font = `400 40px ${ui}`;
     g.fillText(subtitle, W / 2, y);
     y += 30;
   }
 
-  // Points
+  // Points: the one figure in colour (a gain)
   if (points != null) {
-    g.font = `700 200px ${mono}`;
-    g.fillStyle = goldGrad(W / 2 - 300, W / 2 + 300);
-    g.shadowColor = 'rgba(212,175,55,0.55)';
-    g.shadowBlur = 50;
+    g.font = `500 190px ${ui}`;
+    g.fillStyle = gain;
     g.fillText(`+${points}`, W / 2, y + 150);
-    g.shadowBlur = 0;
-    g.fillStyle = fg2;
-    g.font = `600 40px ${ui}`;
-    g.fillText('points', W / 2, y + 265);
+    g.fillStyle = aluminium;
+    g.font = `500 38px ${ui}`;
+    g.fillText('points', W / 2, y + 262);
     y += 290;
   }
 
-  // Tier + streak pills
-  const pills = [level && `${level}`, streak >= 1 && `🔥 ${streak}-day streak`].filter(Boolean);
-  g.font = `700 38px ${ui}`;
-  const widths = pills.map((p) => g.measureText(p).width + 80);
+  // Tier + streak, outlined
+  const pills = [level && `${level}`, streak >= 1 && `${streak}-day streak`].filter(Boolean);
+  g.font = `500 36px ${ui}`;
+  const widths = pills.map((p) => g.measureText(p).width + 72);
   const totalW = widths.reduce((s, w) => s + w, 0) + (pills.length - 1) * 24;
   let x = W / 2 - totalW / 2;
   pills.forEach((p, i) => {
-    roundRect(g, x, y + 20, widths[i], 84, 42);
-    g.fillStyle = 'rgba(212,175,55,0.14)';
-    g.fill();
-    g.strokeStyle = 'rgba(212,175,55,0.5)';
+    roundRect(g, x + 1, y + 21, widths[i] - 2, 82, 6);
+    g.strokeStyle = aluDark;
     g.lineWidth = 2;
     g.stroke();
-    g.fillStyle = gold[0];
+    g.fillStyle = silver;
     g.fillText(p, x + widths[i] / 2, y + 64);
     x += widths[i] + 24;
   });
 
   // Footer
-  g.fillStyle = fg2;
-  g.font = `600 36px ${ui}`;
-  // The name sits above the footer only when the pills leave room for it.
+  g.fillStyle = silver;
+  g.font = `500 36px ${ui}`;
   if (name && y + 110 < H - 290) g.fillText(name, W / 2, H - 250);
-  g.fillStyle = fg;
-  g.font = `800 44px ${ui}`;
+  g.fillStyle = platinum;
+  g.font = `400 56px ${display}`;
   g.fillText(BRAND.tagline, W / 2, H - 170);
-  g.fillStyle = gold[1];
-  g.font = `600 36px ${mono}`;
-  g.fillText(BRAND.site.replace(/^https?:\/\//, ''), W / 2, H - 105);
+  g.fillStyle = aluminium;
+  g.font = `500 34px ${ui}`;
+  g.fillText(BRAND.site.replace(/^https?:\/\//, ''), W / 2, H - 100);
 
   return new Promise((resolve, reject) => {
     try {

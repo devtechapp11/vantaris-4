@@ -86,7 +86,7 @@ export default function Practice() {
                   <p className="t-foot">{m.blurb}</p>
                 </div>
                 {m.locked ? (
-                  <button type="button" className="chip chip--gold" onClick={() => openPaywall('level', { level: m.level })}>
+                  <button type="button" className="chip chip--strong" onClick={() => openPaywall('level', { level: m.level })}>
                     <Lock size={12} aria-hidden="true" /> {TIER_LABEL[m.unlock_tier]}
                   </button>
                 ) : (

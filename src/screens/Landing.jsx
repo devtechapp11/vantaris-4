@@ -122,7 +122,7 @@ function Hero({ can3D }) {
   return (
     <section ref={ref} className="hero" aria-labelledby="hero-title">
       <motion.div className="hero-copy" style={{ y: copyY, opacity: fade }}>
-        <motion.span className="chip chip--gold hero-chip" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: duration.slow, delay: 0.05 }}>
+        <motion.span className="chip chip--strong hero-chip" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: duration.slow, delay: 0.05 }}>
           <Sparkles size={13} aria-hidden="true" /> The LeetCode of investment banking
         </motion.span>
         <h1 id="hero-title" className="t-display hero-title">
@@ -136,7 +136,7 @@ function Hero({ can3D }) {
         </motion.p>
         <motion.div className="hero-ctas" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: duration.reveal, delay: 0.5, ease: ease.out }}>
           <span className="cta-conic"><Link to="/signup" className="btn btn--lg btn--auto">Start free <ArrowRight size={18} aria-hidden="true" /></Link></span>
-          <button type="button" className="btn btn--glass btn--lg btn--auto" onClick={() => scrollTo('peek')}>See a deal</button>
+          <button type="button" className="btn btn--secondary btn--lg btn--auto" onClick={() => scrollTo('peek')}>See a deal</button>
         </motion.div>
         <motion.p className="t-foot hero-note" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
           Free plan, no card needed. Three deals a week, forever.
@@ -219,7 +219,7 @@ function Ticker() {
         {row.map(([k, v], i) => (
           <span key={`${k}-${i}`} className="ticker-item">
             <span className="ticker-k">{k}</span>
-            <span className={`ticker-v fig ${i % 3 === 0 ? 'c-cyan' : 'c-gold'}`}>{v}</span>
+            <span className={`ticker-v fig ${i % 3 === 0 ? 'c-fg' : 'c-fg'}`}>{v}</span>
             <span className={i % 4 === 1 ? 'c-neg' : 'c-pos'}>{i % 4 === 1 ? '▼' : '▲'}</span>
           </span>
         ))}
@@ -321,7 +321,7 @@ function Peek() {
         </div>
         <div className="terminal-body">
           <div className="stack-4">
-            <span className="t-eyebrow t-eyebrow--cyan">{d.kind}</span>
+            <span className="t-eyebrow">{d.kind}</span>
             <h3 className="t-h3">{d.title}</h3>
           </div>
           <dl className="terminal-terms">
@@ -346,7 +346,7 @@ function Peek() {
           transition={{ ...spring.bouncy, delay: 0.5 }}
         >
           <Mascot mood="think" size={64} variant="face" decorative />
-          <p className="t-callout"><b className="c-gold">Vale:</b> {d.hint}</p>
+          <p className="t-callout"><b className="c-fg">Vale:</b> {d.hint}</p>
         </motion.div>
       </Reveal>
     </section>
@@ -419,7 +419,7 @@ function Reviews() {
         {TESTIMONIALS.map((t, i) => (
           <figure key={i} className="review card card--glass">
             <div className="between">
-              <Quote size={26} className="c-gold" aria-hidden="true" />
+              <Quote size={26} className="c-fg" aria-hidden="true" />
               {t.sample && <span className="chip">Sample quote</span>}
             </div>
             <blockquote className="review-quote">{t.quote}</blockquote>

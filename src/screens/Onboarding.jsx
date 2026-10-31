@@ -6,11 +6,10 @@ import { api } from '../lib/api';
 import { timeZone } from '../lib/format';
 import { useApp } from '../app/AppContext';
 import { haptic } from '../app/prefs';
-import { Spinner } from '../components/bits';
+import { Spinner, TierBadge } from '../components/bits';
 import { FloatingField } from '../components/ui';
 import Logo from '../components/Logo';
 import Mascot from '../components/Mascot';
-import { ConstellationFallback } from '../components/three/Fallbacks';
 import { step as stepVariants } from '../design/motion';
 import { duration, ease, spring } from '../design/tokens';
 import './Onboarding.css';
@@ -64,7 +63,6 @@ export default function Onboarding() {
 
   return (
     <motion.main className="onb" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.98 }} transition={{ duration: duration.slow }}>
-      <div className="onb-bg" aria-hidden="true"><ConstellationFallback count={40} seed={3} /></div>
       <header className="onb-head">
         <Logo size={26} />
         <div className="onb-progress" role="progressbar" aria-valuemin={1} aria-valuemax={STEPS} aria-valuenow={step + 1} aria-label={`Step ${step + 1} of ${STEPS}`}>
@@ -96,12 +94,12 @@ export default function Onboarding() {
                   <ol className="onb-ladder">
                     {['Analyst', 'Associate', 'VP', 'MD'].map((l, i) => (
                       <motion.li key={l} data-tier={l} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.08, ...spring.gentle }}>
-                        <span className="tier" data-tier={l}>{l}</span>
+                        <TierBadge level={l} />
                         <span className="t-cap fig">{[0, 251, 501, 751][i]} pts</span>
                       </motion.li>
                     ))}
                   </ol>
-                  <button type="button" className="btn btn--gold" onClick={() => go(1)}>Let’s go <ArrowRight size={18} aria-hidden="true" /></button>
+                  <button type="button" className="btn btn--primary" onClick={() => go(1)}>Let’s go <ArrowRight size={18} aria-hidden="true" /></button>
                 </>
               )}
               {step === 1 && (
@@ -122,8 +120,8 @@ export default function Onboarding() {
                   </div>
                   {error && <div className="alert" role="alert">{error}</div>}
                   <div className="onb-actions">
-                    <button type="button" className="btn btn--glass btn--icon" onClick={() => go(0)} aria-label="Back"><ArrowLeft size={18} /></button>
-                    <button className="btn btn--gold">Continue <ArrowRight size={18} aria-hidden="true" /></button>
+                    <button type="button" className="btn btn--secondary btn--icon" onClick={() => go(0)} aria-label="Back"><ArrowLeft size={18} /></button>
+                    <button className="btn btn--primary">Continue <ArrowRight size={18} aria-hidden="true" /></button>
                   </div>
                 </form>
               )}
@@ -140,8 +138,8 @@ export default function Onboarding() {
                   </div>
                   {error && <div className="alert" role="alert">{error}</div>}
                   <div className="onb-actions">
-                    <button type="button" className="btn btn--glass btn--icon" onClick={() => go(1)} aria-label="Back"><ArrowLeft size={18} /></button>
-                    <button type="button" className="btn btn--gold" disabled={busy} onClick={finish}>
+                    <button type="button" className="btn btn--secondary btn--icon" onClick={() => go(1)} aria-label="Back"><ArrowLeft size={18} /></button>
+                    <button type="button" className="btn btn--primary" disabled={busy} onClick={finish}>
                       {busy ? <Spinner /> : <>Start practicing <ArrowRight size={18} aria-hidden="true" /></>}
                     </button>
                   </div>
@@ -165,18 +163,10 @@ function GoalCard({ g, on, onPick }) {
       className={`goal ${on ? 'goal--on' : ''}`}
       data-tier={g.tier}
       onClick={onPick}
-      animate={{ scale: on ? 1.03 : 1 }}
-      whileTap={{ scale: 0.97 }}
+      whileTap={{ scale: 0.98 }}
       transition={spring.bouncy}
     >
-      <span className="goal-art" aria-hidden="true">
-        <svg viewBox="0 0 64 64" className="goal-rings">
-          <circle cx="32" cy="32" r="30" />
-          <circle cx="32" cy="32" r="21" />
-          <circle cx="32" cy="32" r="12" />
-        </svg>
-        <Icon size={26} strokeWidth={1.8} />
-      </span>
+      <span className="goal-art" aria-hidden="true"><Icon size={22} /></span>
       <span className="goal-text">
         <span className="t-headline">{g.label}</span>
         <span className="t-foot">{g.detail}</span>
@@ -184,7 +174,7 @@ function GoalCard({ g, on, onPick }) {
       <AnimatePresence>
         {on && (
           <motion.span className="goal-check" initial={{ scale: 0, rotate: -45 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0 }} transition={spring.bouncy}>
-            <Check size={14} strokeWidth={3.2} aria-hidden="true" />
+            <Check size={14} aria-hidden="true" />
           </motion.span>
         )}
       </AnimatePresence>

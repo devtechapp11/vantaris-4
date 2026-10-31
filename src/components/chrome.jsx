@@ -52,7 +52,7 @@ export function NavBar({ back = 'Back', to, title, right }) {
     else navigate('/');
   };
   return (
-    <div className="navbar">
+    <div className="navbar glass">
       <div className="navbar-inner">
         <div>
           <button type="button" className="nav-back" onClick={goBack}>
@@ -110,7 +110,7 @@ export function Sheet({ open, onClose, children, tall = false, label }) {
             aria-modal="true"
             aria-labelledby={label ? undefined : `${id}-t`}
             aria-label={label}
-            className={`sheet ${tall ? 'sheet--tall' : ''}`}
+            className={`sheet glass ${tall ? "sheet--tall" : ""}`}
             {...motionProps}
             transition={spring.snappy}
             drag={reduce || wide ? false : 'y'}
@@ -146,7 +146,7 @@ export function Toast() {
         {toast && (
           <motion.div
             key={toast.id}
-            className="toast"
+            className="toast glass"
             data-kind={toast.kind}
             initial={{ opacity: 0, y: -16, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}

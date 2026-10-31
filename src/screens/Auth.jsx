@@ -9,8 +9,6 @@ import { Spinner } from '../components/bits';
 import { FloatingField, PasswordField } from '../components/ui';
 import Logo from '../components/Logo';
 import Mascot from '../components/Mascot';
-import Scene3D from '../components/three/Scene3D';
-import { ConstellationFallback, SculptureFallback } from '../components/three/Fallbacks';
 import { duration, ease, spring } from '../design/tokens';
 import { number } from '../lib/format';
 import { track } from '../lib/analytics';
@@ -95,12 +93,11 @@ function AuthLayout({ children, mood }) {
       </section>
       <aside className="auth-right" aria-hidden="true">
         <div className="auth-stage">
-          <Scene3D scene="hero" variant="auth" fallback={<AuthFallback />} />
           <div className="auth-stage-vale">
-            <Mascot mood={mood} size={320} decorative />
+            <Mascot mood={mood} size={340} decorative />
           </div>
-          <div className="auth-quote card card--glass">
-            <p className="t-title">“Don’t study finance. Do finance.”</p>
+          <div className="auth-quote">
+            <p className="t-display auth-quote-line text-chrome">Don’t study finance. Do finance.</p>
             <SocialProof stats={stats} />
           </div>
         </div>
@@ -109,23 +106,13 @@ function AuthLayout({ children, mood }) {
   );
 }
 
-function AuthFallback() {
-  return (
-    <>
-      <ConstellationFallback count={50} seed={11} />
-      <div style={{ position: 'absolute', inset: '6% 10% 30%' }}><SculptureFallback /></div>
-    </>
-  );
-}
-
 /** "Join 2,341 future dealmakers" once the community is big enough to say so. */
 export function SocialProof({ stats }) {
   const players = stats?.players ?? 0;
-  const tones = ['var(--tier-analyst)', 'var(--tier-associate)', 'var(--tier-vp)', 'var(--tier-md)', 'var(--cyan)'];
   return (
     <div className="row social-proof">
       <span className="avatar-stack" aria-hidden="true">
-        {tones.map((c) => <span key={c} className="avatar proof-dot" style={{ background: `radial-gradient(circle at 35% 30%, ${c}, var(--navy-700) 75%)` }} />)}
+        {[0, 1, 2, 3].map((i) => <span key={i} className="avatar proof-dot" />)}
       </span>
       <span className="t-foot">
         {players >= SOCIAL_PROOF_MIN ? <>Join <b className="c-fg fig">{number(players)}</b> future dealmakers</> : 'Join the next class of future dealmakers'}
@@ -190,7 +177,7 @@ function SignUpForm({ onSent }) {
         {show('agree') && <span id="su-agree-err" className="field-error" role="alert">{show('agree')}</span>}
       </div>
       <FormError error={error} />
-      <button className="btn btn--gold" disabled={busy}>{busy ? <Spinner /> : 'Create free account'}</button>
+      <button className="btn btn--primary" disabled={busy}>{busy ? <Spinner /> : 'Create free account'}</button>
       <SocialProof stats={stats} />
     </form>
   );
@@ -222,7 +209,7 @@ function SignInForm() {
         <Link to="/forgot" replace className="link t-foot">Forgot password?</Link>
       </div>
       <FormError error={error} />
-      <button className="btn btn--gold" disabled={busy}>{busy ? <Spinner /> : 'Sign in'}</button>
+      <button className="btn btn--primary" disabled={busy}>{busy ? <Spinner /> : 'Sign in'}</button>
     </form>
   );
 }
@@ -252,7 +239,7 @@ function ForgotForm() {
         <div className="alert alert--info" role="status">
           If an account exists for {email.trim()}, a reset link is on its way. Open it on this device.
         </div>
-        <Link to="/signin" replace className="btn btn--glass">Back to sign in</Link>
+        <Link to="/signin" replace className="btn btn--secondary">Back to sign in</Link>
       </div>
     );
   }
@@ -260,7 +247,7 @@ function ForgotForm() {
     <form className="stack-16" onSubmit={submit} noValidate>
       <FloatingField label="Email" type="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" autoCapitalize="none" spellCheck="false" required />
       <FormError error={error} />
-      <button className="btn btn--gold" disabled={busy}>{busy ? <Spinner /> : 'Send reset link'}</button>
+      <button className="btn btn--primary" disabled={busy}>{busy ? <Spinner /> : 'Send reset link'}</button>
       <Link to="/signin" replace className="btn btn--ghost">Back to sign in</Link>
     </form>
   );
@@ -311,7 +298,7 @@ function CheckInbox({ email }) {
       <p className="t-body">
         We sent a confirmation link to <b className="c-fg">{email}</b>. Open it on this device to finish creating your account.
       </p>
-      <button type="button" className="btn btn--glass btn--md" onClick={resend} disabled={cooldown > 0}>
+      <button type="button" className="btn btn--secondary btn--md" onClick={resend} disabled={cooldown > 0}>
         {cooldown > 0 ? <>Resend in <span className="fig">{cooldown}s</span></> : 'Resend email'}
       </button>
       {note && <p className="t-foot" role="status">{note}</p>}
@@ -354,7 +341,7 @@ export function ResetPassword() {
               <h1 className="t-h1">This link has expired</h1>
               <p className="t-body">Reset links work once and for one hour. Request a new one and open it on this device.</p>
             </header>
-            <Link to="/forgot" className="btn btn--gold">Request a new link</Link>
+            <Link to="/forgot" className="btn btn--primary">Request a new link</Link>
           </>
         ) : (
           <>
@@ -366,7 +353,7 @@ export function ResetPassword() {
               <PasswordField value={password} onChange={setPassword} autoComplete="new-password" label="New password" showMeter />
               <PasswordField value={confirm} onChange={setConfirm} autoComplete="new-password" label="Confirm new password" />
               <FormError error={error} />
-              <button className="btn btn--gold" disabled={busy}>{busy ? <Spinner /> : 'Save password'}</button>
+              <button className="btn btn--primary" disabled={busy}>{busy ? <Spinner /> : 'Save password'}</button>
             </form>
           </>
         )}

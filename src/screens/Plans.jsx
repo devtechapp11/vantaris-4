@@ -89,7 +89,7 @@ export default function Plans() {
         <Item className="plans-hero">
           <div className="stack-12">
             <p className="t-eyebrow">Plans</p>
-            <h1 className="t-h1 plans-title">Invest in your career.<br /><span className="text-gold">Cancel anytime.</span></h1>
+            <h1 className="t-h1 plans-title">Invest in your career.<br /><span className="c-3">Cancel anytime.</span></h1>
             <p className="t-body">You keep access until the end of the period you paid for. Your progress always stays.</p>
           </div>
           <Mascot mood="levelup" size={150} className="plans-vale" label="Vale adjusting a tie, ready for the next level" />
@@ -187,7 +187,7 @@ function DemoCheckout({ checkout, onClose, onPay }) {
     <Sheet open={Boolean(checkout)} onClose={onClose}>
       {(titleId) => checkout && (
         <div className="sheet-body">
-          <span className="chip chip--gold" style={{ alignSelf: 'flex-start' }}><Lock size={12} aria-hidden="true" /> Preview checkout</span>
+          <span className="chip chip--strong" style={{ alignSelf: 'flex-start' }}><Lock size={12} aria-hidden="true" /> Preview checkout</span>
           <h2 id={titleId} className="t-h3">{TIER_LABEL[checkout.plan.tier]}, billed {checkout.plan.interval}</h2>
           <div className="group">
             <div className="cell"><span className="grow cell-title">Due today</span><span className="fig t-headline">{money(checkout.plan.amount, checkout.plan.currency)}</span></div>
@@ -195,7 +195,7 @@ function DemoCheckout({ checkout, onClose, onPay }) {
           <p className="t-callout">
             This preview has no payment system. In the live app, Razorpay’s secure checkout opens here for card, UPI or net banking, and the payment is verified on the server before the plan unlocks.
           </p>
-          <button type="button" className="btn btn--gold" onClick={onPay}>Simulate a successful payment</button>
+          <button type="button" className="btn btn--primary" onClick={onPay}>Simulate a successful payment</button>
           <button type="button" className="btn btn--ghost" onClick={onClose}>Cancel</button>
         </div>
       )}
@@ -229,11 +229,11 @@ function Success({ plan, tiers, onDone }) {
             <motion.ul className="paid-feats" variants={group(stagger.list, 0.3)} initial="hidden" animate="show">
               {tier?.features.map((f) => (
                 <motion.li key={f} className="feat" variants={{ hidden: { opacity: 0, x: -8 }, show: { opacity: 1, x: 0 } }}>
-                  <Check size={17} strokeWidth={2.6} className="c-gold" aria-hidden="true" />{f}
+                  <Check size={17} strokeWidth={2.6} className="c-fg" aria-hidden="true" />{f}
                 </motion.li>
               ))}
             </motion.ul>
-            <button type="button" className="btn btn--gold" onClick={onDone} autoFocus>Start practicing</button>
+            <button type="button" className="btn btn--primary" onClick={onDone} autoFocus>Start practicing</button>
             {api.mode === 'live' && <p className="t-cap">A receipt from Razorpay is on its way to your email.</p>}
           </motion.div>
         </motion.div>

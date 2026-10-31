@@ -154,7 +154,7 @@ export default function Profile() {
                 <p className="t-callout">Three deals a week and the Analyst desk.</p>
               )}
               <div className="row-8 wrap">
-                <Link to="/plans" className={`btn ${paid ? 'btn--glass' : 'btn--gold'} btn--md btn--auto`}>{paid ? 'Compare plans' : 'See plans'}</Link>
+                <Link to="/plans" className={`btn ${paid ? 'btn--secondary' : 'btn--primary'} btn--md btn--auto`}>{paid ? 'Compare plans' : 'See plans'}</Link>
                 {paid && !sub.cancel_at_cycle_end && <button type="button" className="btn btn--ghost btn--md btn--auto" onClick={() => setSheet('cancel')}>Cancel subscription</button>}
               </div>
             </div>
@@ -268,7 +268,7 @@ function EditSheet({ open, onClose }) {
           <FloatingField label="First name" value={name} onChange={(e) => setName(e.target.value)} maxLength={40} required />
           <FloatingField label="School (optional)" placeholder="Your school" value={school} onChange={(e) => setSchool(e.target.value)} maxLength={80} hint="Shown next to your name on the leaderboard. Leave empty to hide it." />
           {error && <div className="alert" role="alert">{error}</div>}
-          <button className="btn btn--gold" disabled={busy}>{busy ? <Spinner /> : 'Save changes'}</button>
+          <button className="btn btn--primary" disabled={busy}>{busy ? <Spinner /> : 'Save changes'}</button>
         </form>
       )}
     </Sheet>
@@ -300,7 +300,7 @@ function CancelSheet({ open, onClose, sub }) {
             You won’t be charged again. You keep {TIER_LABEL[sub?.tier]} until {longDate(sub?.current_end)}, then move to the free plan. Your progress stays.
           </p>
           <div className="stack-8">
-            <button type="button" className="btn btn--gold" onClick={onClose}>Keep my plan</button>
+            <button type="button" className="btn btn--primary" onClick={onClose}>Keep my plan</button>
             <button type="button" className="btn btn--danger" onClick={cancel} disabled={busy}>
               {busy ? <Spinner /> : 'Cancel subscription'}
             </button>
@@ -358,15 +358,15 @@ function PreviewControls({ onChange }) {
       <div className="card stack-12">
         <div className="row-8 wrap">
           {['free', 'core', 'pro', 'elite'].map((t) => (
-            <button key={t} type="button" className={`btn btn--sm ${me.tier.id === t ? 'btn--gold' : 'btn--glass'}`} onClick={run(() => api.demo.setTier(t))}>
+            <button key={t} type="button" className={`btn btn--sm ${me.tier.id === t ? 'btn--primary' : 'btn--secondary'}`} onClick={run(() => api.demo.setTier(t))}>
               {TIER_LABEL[t]}
             </button>
           ))}
         </div>
         <div className="row-8 wrap">
-          <button type="button" className="btn btn--sm btn--glass" onClick={run(() => api.demo.loadSample())}>Load sample progress</button>
-          <button type="button" className="btn btn--sm btn--glass" onClick={run(() => api.demo.resetWeek())}>Reset weekly quota</button>
-          <button type="button" className="btn btn--sm btn--glass" onClick={run(() => api.demo.reset())}>Erase progress</button>
+          <button type="button" className="btn btn--sm btn--secondary" onClick={run(() => api.demo.loadSample())}>Load sample progress</button>
+          <button type="button" className="btn btn--sm btn--secondary" onClick={run(() => api.demo.resetWeek())}>Reset weekly quota</button>
+          <button type="button" className="btn btn--sm btn--secondary" onClick={run(() => api.demo.reset())}>Erase progress</button>
         </div>
       </div>
     </Item>

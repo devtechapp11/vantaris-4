@@ -1,150 +1,70 @@
 /*
   Vantaris design tokens: the only place raw values live.
-  Identity: deep navy and rich black, electric gold for ambition and key
-  figures, cool cyan for data. Inter (with optical sizing) for everything
-  people read, JetBrains Mono with tabular figures for every number.
 
-  Motion values are mirrored in src/design/tokens.js for Framer Motion.
-  Colours are read from here at runtime by the 3D scenes and the share card
+  Identity: monochrome. Black, carbon, aluminium, silver, platinum.
+  Colour appears only as data: --gain and --loss, for +/- and ▲/▼ figures.
+  Chrome (a metallic gradient) is reserved for the mascot, the wordmark and
+  the hero headline. Liquid Glass is reserved for floating layers. Everything
+  else is flat: whitespace, type, 1px dividers.
+
+  Inter (tabular figures) for everything people read, Instrument Serif for
+  editorial headings. Dark only: there is no light theme.
+
+  Motion values are mirrored in src/design/tokens.js for Motion.
+  Colours are read from here at runtime by the 3D mascot and the share card
   (see cssVar in tokens.js), so this file stays the single source of truth.
 */
 :root {
   color-scheme: dark;
 
-  /* ---------- Palette ---------- */
-  --navy-1000: #03050B;
-  --navy-950: #060912;
-  --navy-900: #0A0F1E;
-  --navy-850: #0D1326;
-  --navy-800: #111833;
-  --navy-750: #151D3B;
-  --navy-700: #18213F;
-  --navy-600: #1E2A4D;
-  --navy-500: #2A3866;
-  --plum-900: #160F2E;
-  --plum-700: #2A1A55;
+  /* ---------- Palette (the only colours in the product) ---------- */
+  --black: #090A0B;
+  --carbon: #171A1D;
+  --aluminium-dark: #343A3E;
+  --aluminium: #858D92;
+  --silver: #B9BEC0;
+  --platinum: #E7E8E5;
+  --gain: #35A77A;
+  --loss: #D45B60;
 
-  --gold-300: #F7E3A3;
-  --gold-400: #F1D27A;
-  --gold-500: #D4AF37;
-  --gold-600: #B8931F;
-  --gold-700: #8C6D12;
-  --cyan-300: #7FE9FF;
-  --cyan-500: #00D4FF;
-  --cyan-700: #0092B3;
-  --mint-500: #2EE6A6;
-  --rose-500: #FF6B81;
-  --amber-500: #FFB547;
-  --blue-300: #CFE0FF;
-  --blue-500: #5B9BFF;
-  --blue-800: #1E3F86;
-  --violet-300: #E7DCFF;
-  --violet-500: #A98BFF;
-  --violet-800: #46308F;
-  --platinum-300: #F2F5FA;
-  --platinum-500: #DCE3EE;
-  --platinum-700: #9AA6BA;
-  --silver-300: #F7F9FC;
-  --silver-400: #EEF2F7;
-  --silver-500: #AEB8C6;
-  --silver-600: #7D8899;
-  --silver-700: #6F7A8C;
-  --bronze-300: #F4CFA9;
-  --bronze-400: #F1C39A;
-  --bronze-500: #B5763F;
-  --bronze-600: #7A4522;
-  --bronze-700: #6E3F1E;
-
-  /* ---------- Vale (mascot) ---------- */
-  --vale-fur: #3B5290;
-  --vale-fur-light: #5470B5;
-  --vale-fur-dark: #2A3C6E;
-  --vale-ear-inner: #17213F;
-  --vale-mask: #EEF2FA;
-  --vale-mask-shade: #C9D2E6;
-  --vale-brow: #D7DEEE;
-  --vale-eye: #FFB21E;
-  --vale-eye-deep: #E07800;
-  --vale-ink: #0A0F1E;
-  --vale-suit: #131B36;
-  --vale-suit-light: #1C2849;
-  --vale-lapel: #0C1328;
-  --vale-lapel-edge: #34447A;
-  --vale-shirt: #F3F5FB;
-  --vale-tie: #2A1A55;
-  --vale-tie-light: #3B2775;
-  --vale-paper: #F6F7FB;
-  --vale-flame: #FF8A1F;
-
-  /* ---------- Semantic surfaces ---------- */
-  --bg: var(--navy-900);
-  --bg-deep: var(--navy-950);
-  --surface: var(--navy-800);
-  --surface-2: var(--navy-700);
-  --surface-3: var(--navy-600);
-  --surface-raised: var(--navy-750);
-  --glass: rgba(17, 24, 51, 0.62);
-  --glass-strong: rgba(10, 15, 30, 0.82);
-  --glass-fill: linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.02));
-  --glass-line: rgba(255, 255, 255, 0.08);
-  --glass-line-strong: rgba(255, 255, 255, 0.14);
-  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.07);
-  --line: rgba(174, 182, 204, 0.10);
-  --line-strong: rgba(174, 182, 204, 0.18);
-  --scrim: rgba(3, 5, 11, 0.66);
-  --blur-sm: 10px;
-  --blur-md: 18px;
-  --blur-lg: 28px;
+  /* ---------- Surfaces ---------- */
+  --bg: var(--black);
+  --surface: var(--carbon);
+  --surface-2: color-mix(in srgb, var(--carbon) 70%, var(--aluminium-dark));
+  --surface-3: var(--aluminium-dark);
+  --line: color-mix(in srgb, var(--platinum) 9%, transparent);
+  --line-strong: var(--aluminium-dark);
+  --hover: color-mix(in srgb, var(--platinum) 4%, transparent);
+  --press: color-mix(in srgb, var(--platinum) 7%, transparent);
+  --scrim: color-mix(in srgb, var(--black) 72%, transparent);
 
   /* ---------- Text ---------- */
-  --fg: #F8F8F8;
-  --fg-2: #AEB6CC;
-  --fg-3: #8C95B2;
-  --fg-inverse: var(--navy-900);
+  --fg: var(--platinum);
+  --fg-2: var(--silver);
+  --fg-3: var(--aluminium);
+  --fg-inverse: var(--black);
 
-  /* ---------- Brand + status ---------- */
-  --gold: var(--gold-500);
-  --gold-bright: var(--gold-400);
-  --gold-soft: rgba(212, 175, 55, 0.12);
-  --gold-line: rgba(212, 175, 55, 0.34);
-  --cyan: var(--cyan-500);
-  --cyan-soft: rgba(0, 212, 255, 0.12);
-  --cyan-line: rgba(0, 212, 255, 0.32);
-  --pos: var(--mint-500);
-  --pos-soft: rgba(46, 230, 166, 0.12);
-  --pos-line: rgba(46, 230, 166, 0.4);
-  --neg: var(--rose-500);
-  --neg-soft: rgba(255, 107, 129, 0.12);
-  --neg-line: rgba(255, 107, 129, 0.4);
-  --warn: var(--amber-500);
-  --warn-soft: rgba(255, 181, 71, 0.12);
+  /* ---------- Data colour (figures only) ---------- */
+  --pos: var(--gain);
+  --neg: var(--loss);
 
-  /* Career tiers: Analyst blue, Associate purple, VP gold, MD platinum */
-  --tier-analyst: var(--blue-500);
-  --tier-analyst-bg: linear-gradient(150deg, rgba(91, 155, 255, 0.22), rgba(91, 155, 255, 0.04) 60%);
-  --tier-associate: var(--violet-500);
-  --tier-associate-bg: linear-gradient(150deg, rgba(169, 139, 255, 0.24), rgba(169, 139, 255, 0.04) 60%);
-  --tier-vp: var(--gold-500);
-  --tier-vp-bg: linear-gradient(150deg, rgba(212, 175, 55, 0.26), rgba(212, 175, 55, 0.04) 60%);
-  --tier-md: var(--platinum-500);
-  --tier-md-bg: linear-gradient(150deg, rgba(220, 227, 238, 0.24), rgba(154, 166, 186, 0.05) 60%);
+  /* ---------- Chrome: mascot, wordmark, hero headline only ---------- */
+  --chrome: linear-gradient(180deg, var(--platinum) 0%, var(--silver) 38%, var(--aluminium) 52%, var(--platinum) 64%, var(--silver) 100%);
+  --edge-highlight: inset 0 1px 0 color-mix(in srgb, var(--platinum) 14%, transparent);
 
-  /* ---------- Gradients ---------- */
-  --grad-gold: linear-gradient(135deg, var(--gold-300) 0%, var(--gold-500) 45%, var(--gold-600) 100%);
-  --grad-gold-text: linear-gradient(100deg, var(--gold-300), var(--gold-500) 55%, var(--gold-400));
-  --grad-cyan: linear-gradient(135deg, var(--cyan-300), var(--cyan-500));
-  --grad-hero: radial-gradient(120% 80% at 75% 10%, rgba(42, 26, 85, 0.85), transparent 60%),
-    radial-gradient(90% 70% at 10% 30%, rgba(20, 34, 78, 0.9), transparent 65%),
-    linear-gradient(180deg, var(--navy-900) 0%, var(--plum-900) 55%, var(--navy-1000) 100%);
-  --grad-ambient: radial-gradient(60% 50% at 85% -10%, rgba(42, 26, 85, 0.55), transparent 70%),
-    radial-gradient(50% 40% at -10% 10%, rgba(0, 146, 179, 0.12), transparent 70%),
-    radial-gradient(70% 50% at 50% 120%, rgba(212, 175, 55, 0.06), transparent 70%);
-  --grad-platinum: linear-gradient(135deg, var(--platinum-300), var(--platinum-500) 45%, var(--platinum-700));
-  --grad-conic-border: conic-gradient(var(--gold-600), var(--gold-300), var(--cyan-500), var(--gold-500), var(--gold-600));
+  /* ---------- Liquid Glass: floating layers only (max three at once) ---------- */
+  --glass-bg: color-mix(in srgb, var(--carbon) 64%, transparent);
+  --glass-solid: var(--carbon);
+  --glass-blur: 24px;
+  --glass-saturate: 120%;
+  --glass-edge: inset 0 1px 0 color-mix(in srgb, var(--platinum) 16%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--platinum) 7%, transparent);
+  /* 2% monochrome grain so large glass areas don't band */
+  --glass-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
 
   /* ---------- Type ---------- */
-  --font-ui: 'Inter Variable', 'SF Pro Display', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-figure: 'JetBrains Mono Variable', 'SF Mono', ui-monospace, Menlo, monospace;
+  --font-ui: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --font-figure: var(--font-ui);
   --fs-2xs: 11px;
   --fs-xs: 12px;
   --fs-sm: 13px;
@@ -153,23 +73,20 @@
   --fs-lg: 18px;
   --fs-xl: 21px;
   --fs-2xl: 26px;
-  --fs-3xl: 32px;
-  --fs-4xl: 42px;
-  --fs-5xl: 56px;
-  --fs-display: clamp(44px, 7.4vw, 96px);
+  --fs-3xl: 34px;
+  --fs-4xl: 44px;
+  --fs-5xl: 60px;
+  --fs-display: clamp(48px, 8vw, 112px);
   --fw-regular: 400;
   --fw-medium: 500;
   --fw-semibold: 600;
-  --fw-bold: 700;
-  --fw-heavy: 800;
-  --fw-black: 900;
-  --lh-tight: 1.05;
+  --fw-bold: 650;
+  --lh-tight: 1.04;
   --lh-snug: 1.25;
   --lh-body: 1.6;
   --tracking-tight: -0.02em;
-  --tracking-tighter: -0.035em;
   --tracking-wide: 0.08em;
-  --tracking-wider: 0.18em;
+  --tracking-wider: 0.14em;
 
   /* ---------- Space (4px grid) ---------- */
   --sp-0: 2px;
@@ -188,13 +105,11 @@
   --sp-24: 96px;
   --sp-32: 128px;
 
-  /* ---------- Shape ---------- */
-  --r-xs: 6px;
-  --r-sm: 10px;
-  --r-md: 14px;
-  --r-lg: 20px;
-  --r-xl: 28px;
-  --r-2xl: 36px;
+  /* ---------- Shape: 2-6px, sheets up to 16px ---------- */
+  --r-xs: 2px;
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-sheet: 16px;
   --r-full: 999px;
   --hairline: 1px;
   --ring: 2px;
@@ -202,60 +117,35 @@
   /* ---------- Size ---------- */
   --tap: 44px;
   --control-h: 52px;
-  --control-h-sm: 36px;
-  --control-h-md: 44px;
-  --control-h-lg: 58px;
-  --icon-sm: 16px;
-  --icon-md: 20px;
-  --icon-lg: 24px;
+  --control-h-sm: 44px;
+  --control-h-md: 48px;
+  --control-h-lg: 56px;
   --avatar: 40px;
-  --avatar-lg: 88px;
-  --fab: 56px;
-  --chip-h: 26px;
-  --chip-h-sm: 22px;
+  --avatar-lg: 72px;
+  --chip-h: 24px;
   --field-h: 58px;
-  --toggle-w: 50px;
-  --toggle-h: 30px;
-  --toggle-thumb: 24px;
-  --bar-h: 8px;
-  --bar-h-sm: 4px;
-  --dot: 6px;
-
-  /* ---------- Elevation ---------- */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.24);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.38), 0 2px 6px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.55), 0 4px 16px rgba(0, 0, 0, 0.35);
-  --shadow-hover: 0 18px 44px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(212, 175, 55, 0.22), 0 0 28px rgba(212, 175, 55, 0.08);
-  --glow-gold: 0 0 0 1px rgba(212, 175, 55, 0.45), 0 0 24px rgba(212, 175, 55, 0.28);
-  --glow-gold-strong: 0 0 0 1px rgba(241, 210, 122, 0.7), 0 0 36px rgba(212, 175, 55, 0.45), 0 0 80px rgba(212, 175, 55, 0.18);
-  --glow-cyan: 0 0 0 1px rgba(0, 212, 255, 0.4), 0 0 24px rgba(0, 212, 255, 0.25);
-  --glow-pos: 0 0 0 1px rgba(46, 230, 166, 0.5), 0 0 32px rgba(46, 230, 166, 0.3);
-  --glow-neg: 0 0 0 1px rgba(255, 107, 129, 0.5), 0 0 28px rgba(255, 107, 129, 0.22);
-  --text-glow-gold: 0 0 24px rgba(212, 175, 55, 0.45);
+  --toggle-w: 46px;
+  --toggle-h: 28px;
+  --toggle-thumb: 22px;
+  --bar-h: 4px;
+  --bar-h-sm: 2px;
+  --dot: 5px;
 
   /* ---------- Motion (mirrored in src/design/tokens.js) ---------- */
-  --dur-instant: 100ms;
-  --dur-fast: 160ms;
-  --dur-base: 240ms;
-  --dur-slow: 420ms;
-  --dur-slower: 700ms;
-  --dur-loop: 3s;
-  --dur-sheen: 2.4s;
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --hover-scale: 1.02;
   --press-scale: 0.98;
-  --lift: -4px;
-  --float: 3px;
 
   /* ---------- Layout ---------- */
-  --col: 600px;
-  --col-wide: 1180px;
+  --col: 640px;
+  --col-wide: 1160px;
   --col-narrow: 440px;
-  --sidebar-w: 252px;
+  --sidebar-w: 240px;
   --tabbar-h: 64px;
-  --navbar-h: 60px;
+  --navbar-h: 56px;
   --gutter: max(16px, env(safe-area-inset-left, 0px));
   --gutter-r: max(16px, env(safe-area-inset-right, 0px));
   --safe-top: env(safe-area-inset-top, 0px);
@@ -275,13 +165,13 @@
 
 @media (min-width: 768px) {
   :root {
-    --gutter: max(28px, env(safe-area-inset-left, 0px));
-    --gutter-r: max(28px, env(safe-area-inset-right, 0px));
+    --gutter: max(32px, env(safe-area-inset-left, 0px));
+    --gutter-r: max(32px, env(safe-area-inset-right, 0px));
   }
 }
 @media (min-width: 1100px) {
   :root {
-    --gutter: 40px;
-    --gutter-r: 40px;
+    --gutter: 48px;
+    --gutter-r: 48px;
   }
 }

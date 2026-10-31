@@ -130,7 +130,7 @@ function AccountError({ message, retry }) {
         <Mascot mood="wrong" size={120} />
         <h1 className="t-h3">We couldn’t load your account</h1>
         <p className="t-callout">{message}</p>
-        <button type="button" className="btn btn--gold btn--md" onClick={retry}>Try again</button>
+        <button type="button" className="btn btn--primary btn--md" onClick={retry}>Try again</button>
       </div>
     </main>
   );

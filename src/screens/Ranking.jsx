@@ -85,7 +85,7 @@ function Row({ r }) {
   return (
     <motion.li variants={item} className={`rank-row ${r.is_me ? 'is-me' : ''}`} aria-current={r.is_me ? 'true' : undefined}>
       <span className="fig rank-pos">{r.rank}</span>
-      <Avatar name={r.name} variant={r.is_me ? 'solid' : ''} />
+      <Avatar name={r.name} variant={r.is_me ? 'me' : ''} />
       <span className="grow stack-4" style={{ minWidth: 0 }}>
         <span className="t-headline ellipsis">{r.name}{r.is_me ? ' (you)' : ''}</span>
         <span className="row-8" style={{ minWidth: 0 }}>
@@ -99,17 +99,16 @@ function Row({ r }) {
 }
 
 const PODIUM = {
-  1: { h: 150, metal: 'metal-gold', label: 'gold' },
-  2: { h: 112, metal: 'metal-silver', label: 'silver' },
-  3: { h: 88, metal: 'metal-bronze', label: 'bronze' },
+  1: { h: 150, label: 'first' },
+  2: { h: 112, label: 'second' },
+  3: { h: 88, label: 'third' },
 };
 
 function Podium({ rows }) {
   const reduce = useReducedMotion();
   const order = [rows[1], rows[0], rows[2]].filter(Boolean);
   return (
-    <div className="podium card">
-      <div className="podium-glow" aria-hidden="true" />
+    <div className="podium">
       <div className="podium-row" style={{ gridTemplateColumns: `repeat(${order.length}, 1fr)` }}>
         {order.map((r, i) => {
           const p = PODIUM[r.rank] ?? PODIUM[3];
@@ -121,10 +120,10 @@ function Podium({ rows }) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ ...spring.gentle, delay: 0.35 + i * 0.12 }}
               >
-                {r.rank === 1 && <Crown size={22} className="c-gold podium-crown" aria-hidden="true" />}
+                {r.rank === 1 && <Crown size={18} className="podium-crown" aria-hidden="true" />}
                 <span style={{ position: 'relative' }}>
-                  <Avatar name={r.name} variant={p.label} style={r.rank === 1 ? { width: 64, height: 64, fontSize: 20 } : { width: 52, height: 52 }} />
-                  {r.is_me && <span className="chip chip--gold podium-you">You</span>}
+                  <Avatar name={r.name} variant={r.is_me ? 'me' : ''} style={r.rank === 1 ? { width: 64, height: 64, fontSize: 20 } : { width: 52, height: 52 }} />
+                  {r.is_me && <span className="chip chip--strong podium-you">You</span>}
                 </span>
                 <div className="center" style={{ minWidth: 0, width: '100%' }}>
                   <div className="t-label c-fg ellipsis">{r.name.split(' ')[0]}</div>
@@ -132,7 +131,7 @@ function Podium({ rows }) {
                 </div>
               </motion.div>
               <motion.div
-                className={`podium-step ${p.metal}`}
+                className="podium-step" data-place={r.rank}
                 style={{ height: p.h }}
                 initial={reduce ? false : { scaleY: 0 }}
                 animate={{ scaleY: 1 }}

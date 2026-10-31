@@ -59,14 +59,14 @@ export default function Home() {
                   <p className="t-h2">{target.title}</p>
                   <p className="t-foot">{target.kind} · {target.module_name} · <span className="fig">{target.minutes}</span> min</p>
                 </div>
-                <button type="button" className="btn btn--gold btn--lg home-cta" onClick={() => navigate(`/practice/${target.id}`)} data-magnetic>
+                <button type="button" className="btn btn--primary btn--lg home-cta" onClick={() => navigate(`/practice/${target.id}`)} data-magnetic>
                   {label} <ArrowRight size={18} aria-hidden="true" />
                 </button>
               </>
             ) : (
               <>
                 <p className="t-callout">Every deal on your desk is closed. Harder modules open on the next plan.</p>
-                <Link to="/plans" className="btn btn--gold btn--lg home-cta">See plans <ArrowRight size={18} aria-hidden="true" /></Link>
+                <Link to="/plans" className="btn btn--primary btn--lg home-cta">See plans <ArrowRight size={18} aria-hidden="true" /></Link>
               </>
             )}
             {tier.id === 'free' && quota.limit != null && (

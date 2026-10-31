@@ -1,5 +1,4 @@
 import { AnimatePresence, motion } from 'motion/react';
-import { Crown } from 'lucide-react';
 import { money } from '../lib/format';
 import { group } from '../design/motion';
 import { duration, ease, spring, stagger } from '../design/tokens';
@@ -26,8 +25,8 @@ export function DrawCheck({ size = 18 }) {
 }
 
 /**
- * One plan. `featured` (Pro) is lifted with a rotating gold border and a
- * shimmering "Most popular" badge. Feature checks tick in one after another.
+ * One plan, as a flat column. `featured` (Pro) carries the page's one primary
+ * button and a small "Most popular" label. Feature checks tick in one after another.
  */
 export default function PlanCard({ tier, plan, monthly, featured = false, current = false, busy = false, disabled = false, busyLabel, onSelect, cta, note }) {
   const elite = tier.id === 'elite';
@@ -42,8 +41,7 @@ export default function PlanCard({ tier, plan, monthly, featured = false, curren
       viewport={{ once: true, amount: 0.3 }}
       variants={group(stagger.list, 0.15)}
     >
-      {featured && <span className="plan-ring" aria-hidden="true" />}
-      {featured && <span className="plan-flag shimmer-loop"><Crown size={12} aria-hidden="true" /> Most popular</span>}
+      {featured && <span className="plan-flag">Most popular</span>}
       {current && <span className="plan-flag plan-flag--current">Current plan</span>}
       <header className="stack-4">
         <h3 id={`plan-${tier.id}`} className="plan-name">{tier.name}</h3>
@@ -74,7 +72,7 @@ export default function PlanCard({ tier, plan, monthly, featured = false, curren
           {saving > 0 && (
             <motion.span
               key="save"
-              className="chip chip--pos plan-save"
+              className="chip chip--strong plan-save"
               initial={{ opacity: 0, scale: 0.4, y: 6 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.6 }}
@@ -95,7 +93,7 @@ export default function PlanCard({ tier, plan, monthly, featured = false, curren
       </ul>
       <button
         type="button"
-        className={`btn ${featured || elite ? 'btn--gold' : 'btn--glass'} plan-cta`}
+        className={`btn ${featured ? 'btn--primary' : 'btn--secondary'} plan-cta`}
         disabled={disabled || current}
         onClick={onSelect}
       >
@@ -122,7 +120,7 @@ export function BillingToggle({ cycle, onChange }) {
       <AnimatePresence>
         {yearly && (
           <motion.span
-            className="chip chip--solid-gold billing-badge"
+            className="chip chip--strong billing-badge"
             initial={{ opacity: 0, scale: 0.3, rotate: -8 }}
             animate={{ opacity: 1, scale: 1, rotate: 0 }}
             exit={{ opacity: 0, scale: 0.5 }}

@@ -46,7 +46,7 @@ export default function Tutor({ open, onClose, problem, submitted, prompt, onPro
     <AnimatePresence>
       {open && (
         <motion.div
-          className="tutor-panel"
+          className="tutor-panel glass"
           role="dialog"
           aria-modal="false"
           aria-labelledby="tutor-title"
@@ -133,7 +133,7 @@ function Chat({ titleId, problem, submitted, prompt, onPromptUsed, onClose, wide
       <header className="chat-head">
         <span className="chat-avatar"><Mascot mood={headMood} size={44} variant="face" decorative /></span>
         <div className="grow stack-4" style={{ minWidth: 0 }}>
-          <h2 id={titleId} className="t-headline">Vale <span className="chip chip--gold chat-badge">AI tutor</span></h2>
+          <h2 id={titleId} className="t-headline">Vale <span className="chip chip--strong chat-badge">AI tutor</span></h2>
           <p className="t-cap ellipsis">
             {problem.title} · {unlimited ? 'unlimited messages' : remaining != null ? `${remaining} messages left today` : ''}
           </p>
@@ -164,7 +164,7 @@ function Chat({ titleId, problem, submitted, prompt, onPromptUsed, onClose, wide
         <div className="chat-prompts">
           {PROMPTS.map(({ text, Icon }) => (
             <button key={text} type="button" className="chip chat-prompt" onClick={() => send(text)}>
-              <Icon size={14} className="c-gold" aria-hidden="true" /> {text}
+              <Icon size={14} className="c-fg" aria-hidden="true" /> {text}
             </button>
           ))}
         </div>
@@ -224,7 +224,7 @@ export function TutorFab({ onClick, locked, hidden }) {
       {!hidden && (
         <motion.button
           type="button"
-          className="vale-fab"
+          className="vale-fab glass"
           onClick={onClick}
           aria-label={locked ? 'Vale, the AI tutor, available with Pro' : 'Ask Vale, the AI tutor'}
           initial={{ scale: 0, opacity: 0 }}

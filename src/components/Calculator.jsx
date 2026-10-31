@@ -40,9 +40,9 @@ export default function Calculator({ defaultOpen = true, ref }) {
   return (
     <section className={`calc ${open ? 'is-open' : ''}`} aria-label="Deal calculator">
       <button type="button" className="calc-head" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-        <span className="row-8"><CalcIcon size={16} className="c-cyan" aria-hidden="true" /><span className="t-label c-fg">Deal calculator</span></span>
+        <span className="row-8"><CalcIcon size={16} className="c-fg" aria-hidden="true" /><span className="t-label c-fg">Deal calculator</span></span>
         <span className="row-8">
-          {!open && shown && <span className="fig t-cap c-cyan">{shown.alt ?? shown.main}</span>}
+          {!open && shown && <span className="fig t-cap c-fg">{shown.alt ?? shown.main}</span>}
           <motion.span animate={{ rotate: open ? 180 : 0 }} transition={spring.snappy}><ChevronDown size={16} aria-hidden="true" /></motion.span>
         </span>
       </button>
@@ -104,7 +104,7 @@ export default function Calculator({ defaultOpen = true, ref }) {
                     <li key={t.id}>
                       <button type="button" onClick={() => insert(String(+t.value.toPrecision(10)))} title="Use this result">
                         <span className="t-cap ellipsis fig">{t.expr}</span>
-                        <span className="fig c-gold">{formatResult(t.value).alt ?? formatResult(t.value).main}</span>
+                        <span className="fig c-fg">{formatResult(t.value).alt ?? formatResult(t.value).main}</span>
                       </button>
                     </li>
                   ))}
