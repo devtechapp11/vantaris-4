@@ -11,6 +11,8 @@ import Mascot from '../components/Mascot';
 import { group, item } from '../design/motion';
 import { stagger } from '../design/tokens';
 import { ModuleIcon } from '../lib/modules';
+import { rememberShared } from '../app/fluid';
+import { prefetchProps } from '../app/routes';
 import './Practice.css';
 
 const FILTERS = [
@@ -104,7 +106,12 @@ export default function Practice() {
                       variants={item}
                       type="button"
                       className={`prow card--interactive ${locked ? 'prow--locked' : ''}`}
-                      onClick={() => (locked ? openPaywall('level', { level: m.level }) : navigate(`/practice/${p.id}`))}
+                      onClick={(e) => {
+                        if (locked) return openPaywall('level', { level: m.level });
+                        rememberShared(`deal-${p.id}`, e.currentTarget.querySelector('.t-headline'));
+                        return navigate(`/practice/${p.id}`);
+                      }}
+                      {...prefetchProps(`/practice/${p.id}`)}
                     >
                       <ProblemStatus status={p.status} locked={locked} />
                       <span className="grow stack-4">

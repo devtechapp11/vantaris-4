@@ -1,5 +1,5 @@
 import { useEffect, useId } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, animate, motion, useDragControls, useMotionValue, useReducedMotion, useTransform } from 'motion/react';
 import { ChevronLeft, X, CheckCircle2, AlertCircle, Info } from 'lucide-react';
 import { useApp } from '../app/AppContext';
@@ -46,10 +46,12 @@ export function LargeTitle({ eyebrow, title, right, children }) {
 
 export function NavBar({ back = 'Back', to, title, right }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  // A real "back" (history pop) restores the previous page's scroll position;
+  // fall back to `to` when this page was opened directly.
   const goBack = () => {
-    if (to) navigate(to);
-    else if (window.history.length > 1) navigate(-1);
-    else navigate('/');
+    if (location.key !== 'default') navigate(-1);
+    else navigate(to ?? '/');
   };
   return (
     <div className="navbar glass">
@@ -187,3 +189,18 @@ export function CountUp({ to, from = 0, duration: d = duration.count, delay = 0,
   }, [to, d, delay, reduce, mv]);
   return <motion.span className={className}>{text}</motion.span>;
 }
+
+/** Pull-to-refresh indicator: a thin ring that fills as you pull, then spins. */
+export function PullIndicator({ pull, busy }) {
+  if (!pull && !busy) return null;
+  const c = 2 * Math.PI * 9;
+  return (
+    <div className="ptr glass" style={{ opacity: Math.min(1, pull * 1.4), transform: `translate(-50%, ${pull * 56}px)` }} role="status" aria-label={busy ? 'Refreshing' : undefined}>
+      <svg width="22" height="22" viewBox="0 0 22 22" className={busy ? 'spin' : ''} aria-hidden="true">
+        <circle cx="11" cy="11" r="9" fill="none" stroke="var(--aluminium-dark)" strokeWidth="1.5" />
+        <circle cx="11" cy="11" r="9" fill="none" stroke="var(--platinum)" strokeWidth="1.5" strokeDasharray={c} strokeDashoffset={c * (1 - (busy ? 0.3 : pull))} transform="rotate(-90 11 11)" />
+      </svg>
+    </div>
+  );
+}
+

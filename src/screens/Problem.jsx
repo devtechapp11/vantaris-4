@@ -20,6 +20,7 @@ import { termToToken } from '../lib/calc';
 import { clock, isFigure, weekday } from '../lib/format';
 import { shake } from '../design/motion';
 import { duration, ease, spring } from '../design/tokens';
+import { useSharedEnter } from '../app/fluid';
 import './Problem.css';
 
 const KEYS = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -43,6 +44,8 @@ export default function Problem() {
   const [thinking, setThinking] = useState(false);
   const [promotion, setPromotion] = useState(null);
   const calc = useRef(null);
+  const titleRef = useRef(null);
+  useSharedEnter(titleRef, `deal-${id}`, Boolean(data));
   const termsRef = useRef(null);
   const resultRef = useRef(null);
 
@@ -190,7 +193,7 @@ export default function Problem() {
             <header className="stack-12">
               <div className="stack-8">
                 <p className="t-eyebrow">{p.kind}</p>
-                <h1 className="t-h1" data-shared={`deal-${p.id}`}>{p.title}</h1>
+                <h1 ref={titleRef} className="t-h1">{p.title}</h1>
                 <p className="t-foot prob-meta">{p.module_name} · <DifficultyBadge value={p.difficulty} /> · <span className="fig">{p.minutes}</span> min</p>
               </div>
               <p className="t-lead c-fg prob-scenario">{p.scenario}</p>

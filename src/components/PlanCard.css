@@ -9,15 +9,11 @@
   .plans-grid .plan + .plan { border-left: var(--hairline) solid var(--line); }
 }
 
-.plan {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-4);
-  padding: var(--sp-8) var(--sp-1);
-  border-bottom: var(--hairline) solid var(--line);
-}
-@media (min-width: 900px) { .plan { padding: var(--sp-8) var(--sp-6); border-bottom: 0; } }
+.plan { position: relative; border-bottom: var(--hairline) solid var(--line); }
+@media (min-width: 900px) { .plan { border-bottom: 0; } }
+.plan-inner { position: relative; height: 100%; display: flex; flex-direction: column; gap: var(--sp-4); padding: var(--sp-8) var(--sp-1); border-radius: 0; }
+@media (min-width: 900px) { .plan-inner { padding: var(--sp-8) var(--sp-6); } }
+.plan .spotlight-card__border { display: none; }
 .plan--featured { box-shadow: inset 0 1px 0 var(--platinum); }
 .plan-name { font-family: var(--font-display); font-size: var(--fs-3xl); font-weight: 400; margin: 0; }
 .plan-price { display: flex; align-items: baseline; gap: var(--sp-1); min-height: calc(var(--fs-4xl) * 1.1); }
@@ -42,7 +38,7 @@
 
 .billing { display: inline-flex; align-items: center; gap: var(--sp-3); position: relative; }
 .billing-track { display: inline-grid; grid-auto-flow: column; padding: 2px; border-radius: var(--r-md); border: var(--hairline) solid var(--line-strong); }
-.billing-track button { position: relative; min-height: 40px; padding: 0 var(--sp-5); border: 0; background: none; border-radius: var(--r-sm); font-size: var(--fs-sm); font-weight: var(--fw-medium); color: var(--fg-3); transition: color var(--dur-fast); }
+.billing-track button { position: relative; min-height: var(--tap); padding: 0 var(--sp-5); border: 0; background: none; border-radius: var(--r-sm); font-size: var(--fs-sm); font-weight: var(--fw-medium); color: var(--fg-3); transition: color var(--dur-fast); }
 .billing-label { position: relative; z-index: var(--z-raised); }
 .billing-track button[aria-pressed='true'] { color: var(--fg); }
 .billing-thumb { position: absolute; inset: 0; border-radius: inherit; background: var(--surface-2); box-shadow: var(--edge-highlight); }

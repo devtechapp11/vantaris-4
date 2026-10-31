@@ -267,7 +267,7 @@ button.chip { cursor: pointer; min-height: var(--chip-h); transition: border-col
 
 /* Segmented control */
 .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 2px; border-radius: var(--r-md); border: var(--hairline) solid var(--line-strong); position: relative; }
-.seg button { position: relative; min-height: 40px; border: 0; background: none; border-radius: var(--r-sm); font-size: var(--fs-sm); font-weight: var(--fw-medium); color: var(--fg-3); z-index: var(--z-raised); transition: color var(--dur-fast); padding: 0 var(--sp-3); white-space: nowrap; }
+.seg button { position: relative; min-height: var(--tap); border: 0; background: none; border-radius: var(--r-sm); font-size: var(--fs-sm); font-weight: var(--fw-medium); color: var(--fg-3); z-index: var(--z-raised); transition: color var(--dur-fast); padding: 0 var(--sp-3); white-space: nowrap; }
 .seg button:hover { color: var(--fg-2); }
 .seg button[aria-pressed='true'] { color: var(--fg); }
 .seg-thumb { position: absolute; inset: 0; border-radius: var(--r-sm); background: var(--surface-2); box-shadow: var(--edge-highlight); z-index: var(--z-bg); }
@@ -465,3 +465,10 @@ button.chip { cursor: pointer; min-height: var(--chip-h); transition: border-col
 .rt { display: flex; flex-direction: column; gap: var(--sp-3); }
 .rt-p { margin: 0; }
 .rt strong { color: var(--fg); font-weight: var(--fw-semibold); }
+
+/* Pull to refresh */
+.ptr { position: fixed; left: 50%; top: calc(var(--safe-top) + 4px); z-index: var(--z-toast); width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; pointer-events: none; }
+
+/* Small controls keep a 44px hit area without growing visually */
+button.chip, a.chip, .copy-btn, .term-val { position: relative; }
+button.chip::after, a.chip::after, .copy-btn::after, .term-val::after { content: ''; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: max(100%, 44px); translate: -50% -50%; }

@@ -3,6 +3,7 @@ import { money } from '../lib/format';
 import { group } from '../design/motion';
 import { duration, ease, spring, stagger } from '../design/tokens';
 import { Spinner } from './bits';
+import { Spotlight } from './effects';
 import './PlanCard.css';
 
 const check = {
@@ -41,6 +42,7 @@ export default function PlanCard({ tier, plan, monthly, featured = false, curren
       viewport={{ once: true, amount: 0.3 }}
       variants={group(stagger.list, 0.15)}
     >
+      <Spotlight className="plan-inner">
       {featured && <span className="plan-flag">Most popular</span>}
       {current && <span className="plan-flag plan-flag--current">Current plan</span>}
       <header className="stack-4">
@@ -100,6 +102,7 @@ export default function PlanCard({ tier, plan, monthly, featured = false, curren
         {busy ? <><Spinner /> {busyLabel}</> : current ? 'Your current plan' : cta ?? `Continue with ${tier.name}`}
       </button>
       {note && <p className="t-cap center">{note}</p>}
+      </Spotlight>
     </motion.article>
   );
 }

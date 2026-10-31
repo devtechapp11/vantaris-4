@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Check, Lock } from 'lucide-react';
 import { useApp } from '../app/AppContext';
 import { useRank } from '../app/useRank';
-import { CountUp, Item, Page } from '../components/chrome';
+import { CountUp, Item, Page, PullIndicator } from '../components/chrome';
 import { Skeleton, TIER_LABEL } from '../components/bits';
 import { ProgressBar } from '../components/ui';
 import Mascot from '../components/Mascot';
@@ -10,6 +10,8 @@ import { Magnetic } from '../components/effects';
 import { LEVEL_TIER } from '../app/usePlans';
 import { isLocked } from '../lib/modules';
 import { greeting, number, todayLine, weekday } from '../lib/format';
+import { rememberShared, usePullToRefresh } from '../app/fluid';
+import { prefetchProps } from '../app/routes';
 import './Home.css';
 
 /**
@@ -18,7 +20,8 @@ import './Home.css';
  * and three numbers. Everything else lives one tap away (Deals, Rank, Profile).
  */
 export default function Home() {
-  const { me, openPaywall } = useApp();
+  const { me, openPaywall, refreshMe } = useApp();
+  const ptr = usePullToRefresh(refreshMe);
   const navigate = useNavigate();
   const rank = useRank(me?.profile?.points);
 
@@ -42,6 +45,7 @@ export default function Home() {
 
   return (
     <Page wide className="screen home">
+      <PullIndicator {...ptr} />
       <Item as="header" className="home-head">
         <div className="stack-8 grow">
           <p className="t-eyebrow">{todayLine()}</p>
@@ -61,7 +65,15 @@ export default function Home() {
                   <p className="t-foot">{target.kind} · {target.module_name} · <span className="fig">{target.minutes}</span> min</p>
                 </div>
                 <Magnetic className="home-cta-wrap">
-                  <button type="button" className="btn btn--primary btn--lg home-cta" onClick={() => navigate(`/practice/${target.id}`)}>
+                  <button
+                    type="button"
+                    className="btn btn--primary btn--lg home-cta"
+                    {...prefetchProps(`/practice/${target.id}`)}
+                    onClick={() => {
+                      rememberShared(`deal-${target.id}`, document.querySelector('.home-today .t-h2'));
+                      navigate(`/practice/${target.id}`);
+                    }}
+                  >
                     {label} <ArrowRight size={18} aria-hidden="true" />
                   </button>
                 </Magnetic>

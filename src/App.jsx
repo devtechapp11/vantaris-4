@@ -9,26 +9,21 @@ import Paywall from './components/Paywall';
 import { LogoLoader } from './components/Logo';
 import Mascot from './components/Mascot';
 import { IS_DEMO } from './lib/config';
+import { loaders } from './app/routes';
+import { useScrollMemory, useSwipeBack } from './app/fluid';
 
 // Every screen is its own chunk, so the landing page never downloads the app
 // and the app never downloads the landing page's 3D scene.
-const auth = () => import('./screens/Auth');
-const Landing = lazy(() => import('./screens/Landing'));
-const AuthScreen = lazy(auth);
-const ResetPassword = lazy(() => auth().then((m) => ({ default: m.ResetPassword })));
-const Onboarding = lazy(() => import('./screens/Onboarding'));
-const home = () => import('./screens/Home');
-const practice = () => import('./screens/Practice');
-const problem = () => import('./screens/Problem');
-const ranking = () => import('./screens/Ranking');
-const profile = () => import('./screens/Profile');
-const plans = () => import('./screens/Plans');
-const Home = lazy(home);
-const Practice = lazy(practice);
-const Problem = lazy(problem);
-const Ranking = lazy(ranking);
-const Profile = lazy(profile);
-const Plans = lazy(plans);
+const Landing = lazy(loaders.landing);
+const AuthScreen = lazy(loaders.auth);
+const ResetPassword = lazy(() => loaders.auth().then((m) => ({ default: m.ResetPassword })));
+const Onboarding = lazy(loaders.onboarding);
+const Home = lazy(loaders.home);
+const Practice = lazy(loaders.practice);
+const Problem = lazy(loaders.problem);
+const Ranking = lazy(loaders.ranking);
+const Profile = lazy(loaders.profile);
+const Plans = lazy(loaders.plans);
 
 // The preview build runs inside a sandboxed frame, so it keeps its route in memory.
 const Router = IS_DEMO ? MemoryRouter : BrowserRouter;
@@ -59,13 +54,15 @@ function Gate() {
   const { session, me, meError, refreshMe } = useApp();
   const location = useLocation();
   const signedIn = Boolean(session && me?.profile?.onboarded);
+  const restoreScroll = useScrollMemory();
+  useSwipeBack(signedIn && !TAB_PATHS.has(location.pathname));
 
   // Warm the main screens once the app is idle, so tab switches are instant.
   useEffect(() => {
     if (!signedIn) return undefined;
     const idle = window.requestIdleCallback ?? ((cb) => setTimeout(cb, 1200));
     const cancel = window.cancelIdleCallback ?? clearTimeout;
-    const h = idle(() => [home, practice, problem, ranking, profile, plans].forEach((load) => load().catch(() => {})));
+    const h = idle(() => ['home', 'practice', 'problem', 'ranking', 'profile', 'plans'].forEach((k) => loaders[k]().catch(() => {})));
     return () => cancel(h);
   }, [signedIn]);
 
@@ -113,7 +110,7 @@ function Gate() {
       {signedIn && <Sidebar />}
       <div className="app-main">
         <Suspense fallback={<LogoLoader />}>
-          <AnimatePresence mode="wait" initial={false} onExitComplete={() => window.scrollTo(0, 0)}>
+          <AnimatePresence mode="wait" initial={false} onExitComplete={restoreScroll}>
             <Routes location={location} key={routeKey(location.pathname)}>{routes}</Routes>
           </AnimatePresence>
         </Suspense>

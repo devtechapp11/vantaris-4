@@ -3,7 +3,8 @@ import { motion, useReducedMotion } from 'motion/react';
 import { Crown } from 'lucide-react';
 import { api } from '../lib/api';
 import { useApp } from '../app/AppContext';
-import { CountUp, Item, LargeTitle, Page, Segmented } from '../components/chrome';
+import { usePullToRefresh } from '../app/fluid';
+import { CountUp, Item, LargeTitle, Page, PullIndicator, Segmented } from '../components/chrome';
 import { Avatar, Skeleton, TierBadge } from '../components/bits';
 import Mascot from '../components/Mascot';
 import { group, item } from '../design/motion';
@@ -21,6 +22,8 @@ export default function Ranking() {
   const { showToast, me } = useApp();
   const [scope, setScope] = useState('week');
   const [board, setBoard] = useState({});
+  const [nonce, setNonce] = useState(0);
+  const ptr = usePullToRefresh(() => new Promise((done) => { setNonce((n) => n + 1); setTimeout(done, 600); }));
 
   useEffect(() => {
     let alive = true;
@@ -28,7 +31,7 @@ export default function Ranking() {
     return () => {
       alive = false;
     };
-  }, [scope, showToast, me?.profile?.points]);
+  }, [scope, showToast, me?.profile?.points, nonce]);
 
   const data = board[scope];
   const rows = data?.rows ?? [];
@@ -38,6 +41,7 @@ export default function Ranking() {
 
   return (
     <Page wide>
+      <PullIndicator {...ptr} />
       <LargeTitle title="Rank" eyebrow={data ? `${number(data.players)} players ranked` : 'Leaderboard'} />
       <Item className="rank-scope"><Segmented value={scope} onChange={setScope} options={SCOPES} label="Time range" /></Item>
 
