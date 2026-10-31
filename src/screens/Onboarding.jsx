@@ -13,6 +13,7 @@ import Mascot from '../components/Mascot';
 import { step as stepVariants } from '../design/motion';
 import { duration, ease, spring } from '../design/tokens';
 import './Onboarding.css';
+import { useMeta } from '../app/useMeta';
 
 const GOALS = [
   { id: 'ib', label: 'Investment banking', detail: 'M&A, valuation, pitch work', Icon: Landmark, tier: 'Analyst' },
@@ -24,6 +25,7 @@ const GOALS = [
 const STEPS = 3;
 
 export default function Onboarding() {
+  useMeta({ title: 'Welcome', noindex: true });
   const navigate = useNavigate();
   const { me, setMe, showToast } = useApp();
   const [[step, dir], setStep] = useState([0, 1]);

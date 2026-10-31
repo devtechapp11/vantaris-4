@@ -9,6 +9,7 @@ import { stagger } from '../design/tokens';
 import { Sheet } from './chrome';
 import { DrawCheck } from './PlanCard';
 import Mascot from './Mascot';
+import { track } from '../lib/analytics';
 
 const COPY = {
   quota: (me) => ({
@@ -48,6 +49,7 @@ export default function Paywall() {
 
   const go = (highlight) => {
     closePaywall();
+    track('upgrade_click', { source: 'paywall' });
     navigate('/plans', { state: { highlight } });
   };
 

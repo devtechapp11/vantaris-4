@@ -10,6 +10,8 @@ export const loaders = {
   ranking: () => import('../screens/Ranking'),
   profile: () => import('../screens/Profile'),
   plans: () => import('../screens/Plans'),
+  legal: () => import('../screens/Legal'),
+  notFound: () => import('../screens/NotFound'),
 };
 
 const BY_PATH = [
@@ -20,6 +22,7 @@ const BY_PATH = [
   [/^\/profile$/, 'profile'],
   [/^\/plans$/, 'plans'],
   [/^\/(signin|signup|forgot)$/, 'auth'],
+  [/^\/(terms|privacy|refund|cookies|disclaimer|acceptable-use|subscription-terms|contact)$/, 'legal'],
 ];
 
 const started = new Set();

@@ -138,3 +138,6 @@ hr.sep { border: 0; border-top: var(--hairline) solid var(--line); margin: 0; wi
   transition-duration: 0.01ms !important;
   scroll-behavior: auto !important;
 }
+
+/* 404, error and account-error pages */
+.status-page { min-height: 100dvh; justify-content: center; align-items: center; text-align: center; gap: var(--sp-6); }

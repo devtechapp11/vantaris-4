@@ -11,6 +11,7 @@ import { group, item } from '../design/motion';
 import { duration, ease, spring, stagger } from '../design/tokens';
 import { number } from '../lib/format';
 import './Ranking.css';
+import { useMeta } from '../app/useMeta';
 
 const SCOPES = [
   { value: 'week', label: 'This week' },
@@ -19,6 +20,7 @@ const SCOPES = [
 ];
 
 export default function Ranking() {
+  useMeta({ title: 'Rank', noindex: true });
   const { showToast, me } = useApp();
   const [scope, setScope] = useState('week');
   const [board, setBoard] = useState({});

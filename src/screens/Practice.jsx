@@ -14,6 +14,7 @@ import { ModuleIcon } from '../lib/modules';
 import { rememberShared } from '../app/fluid';
 import { prefetchProps } from '../app/routes';
 import './Practice.css';
+import { useMeta } from '../app/useMeta';
 
 const FILTERS = [
   { value: 'all', label: 'All' },
@@ -22,6 +23,7 @@ const FILTERS = [
 ];
 
 export default function Practice() {
+  useMeta({ title: 'Deals', noindex: true });
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const focus = params.get('m');

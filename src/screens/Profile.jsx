@@ -18,6 +18,7 @@ import { stagger } from '../design/tokens';
 import { BRAND, IS_DEMO } from '../lib/config';
 import { longDate, money, number, relative } from '../lib/format';
 import './Profile.css';
+import { useMeta } from '../app/useMeta';
 
 const BADGE_ICON = { 'first-deal': CircleCheck, 'hat-trick': Zap, 'on-fire': Flame, 'fast-hands': Clock, 'module-clear': BookOpen, associate: Trophy };
 
@@ -34,6 +35,7 @@ const TABS = [
 ];
 
 export default function Profile() {
+  useMeta({ title: 'Profile', noindex: true });
   const { me, openPaywall, refreshMe, showToast } = useApp();
   const navigate = useNavigate();
   const prefs = usePrefs();

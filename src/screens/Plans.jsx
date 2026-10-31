@@ -17,6 +17,8 @@ import { shower } from '../lib/celebrate';
 import { money } from '../lib/format';
 import { IS_DEMO } from '../lib/config';
 import './Plans.css';
+import { track } from '../lib/analytics';
+import { useMeta } from '../app/useMeta';
 
 const LEVEL_SCOPE = { Analyst: 'Analyst', Associate: 'Up to Associate', VP: 'Up to VP', MD: 'All four, up to MD' };
 
@@ -31,6 +33,7 @@ const ROWS = [
 ];
 
 export default function Plans() {
+  useMeta({ title: 'Plans', noindex: true });
   const navigate = useNavigate();
   const location = useLocation();
   const { me, refreshMe, showToast } = useApp();
@@ -46,6 +49,7 @@ export default function Plans() {
   const start = async (plan) => {
     if (stage) return;
     setStage({ planId: plan.id, step: 'starting' });
+    track('upgrade_click', { plan: plan.tier, interval: plan.interval, source: 'plans' });
     try {
       const checkout = await api.startCheckout(plan.id);
       if (checkout.demo) {

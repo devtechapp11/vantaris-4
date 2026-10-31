@@ -17,6 +17,7 @@ import { BRAND } from '../lib/config';
 import { track } from '../lib/analytics';
 import LegalLinks from '../components/LegalLinks';
 import './Landing.css';
+import { useMeta } from '../app/useMeta';
 
 const YEAR = new Date().getFullYear();
 
@@ -48,6 +49,7 @@ export default function Landing() {
   const prefs = usePrefs();
   const reduce = useReducedMotion() || prefs.reduceMotion;
   useLenis(!reduce);
+  useMeta({ path: '/' });
   return (
     <motion.div className="landing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: duration.slow }}>
       <LandingNav />
@@ -68,7 +70,7 @@ function LandingNav() {
   return (
     <header className={`lnav ${solid ? 'lnav--solid glass' : ''}`}>
       <div className="lnav-inner">
-        <Link to="/welcome" className="lnav-brand" aria-label={`${BRAND.name}, home`}><Logo size={26} /></Link>
+        <Link to="/" className="lnav-brand" aria-label={`${BRAND.name}, home`}><Logo size={26} /></Link>
         <nav className="lnav-links" aria-label="Website">
           <a href="#film">How it works</a>
           <a href="#pricing">Pricing</a>

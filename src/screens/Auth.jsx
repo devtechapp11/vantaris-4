@@ -13,6 +13,7 @@ import { duration, ease, spring } from '../design/tokens';
 import { number } from '../lib/format';
 import { track } from '../lib/analytics';
 import './Auth.css';
+import { useMeta } from '../app/useMeta';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -43,6 +44,7 @@ export default function AuthScreen() {
   const [sentTo, setSentTo] = useState(null);
   const copy = COPY[mode];
   const vale = useValeFeed();
+  useMeta({ title: mode === 'signup' ? 'Create your account' : mode === 'forgot' ? 'Reset your password' : 'Sign in', description: copy.sub, path: pathname, noindex: mode === 'forgot' });
 
   return (
     <AuthLayout vale={sentTo ? { state: 'success' } : vale.props}>

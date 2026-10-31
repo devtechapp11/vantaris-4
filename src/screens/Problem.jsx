@@ -22,6 +22,8 @@ import { shake } from '../design/motion';
 import { duration, ease, spring } from '../design/tokens';
 import { useSharedEnter } from '../app/fluid';
 import './Problem.css';
+import { track } from '../lib/analytics';
+import { useMeta } from '../app/useMeta';
 
 const KEYS = ['A', 'B', 'C', 'D', 'E', 'F'];
 const STEPS = ['Brief', 'Terms', 'Answer', 'Review'];
@@ -45,6 +47,7 @@ export default function Problem() {
   const [promotion, setPromotion] = useState(null);
   const calc = useRef(null);
   const titleRef = useRef(null);
+  useMeta({ title: data?.problem?.title ?? 'Deal', noindex: true });
   useSharedEnter(titleRef, `deal-${id}`, Boolean(data));
   const termsRef = useRef(null);
   const resultRef = useRef(null);
@@ -60,6 +63,7 @@ export default function Problem() {
       // Clock offset so the timer follows the server's start time, not the phone's clock.
       setData({ ...res, offset: Date.now() - Date.parse(res.server_now) });
       if (res.result) setOutcome({ result: res.result, fresh: false });
+      else track('start_deal', { module: res.problem?.module_id ?? res.problem?.module });
       api.getMe().then(setMe, () => {});
     } catch (err) {
       if (err.code === 'QUOTA_REACHED' || err.code === 'LEVEL_LOCKED') setLock(err);
@@ -93,6 +97,7 @@ export default function Problem() {
       setMe(res.me);
       const fresh = !res.already_submitted;
       setOutcome({ result: res.result, level_up: res.level_up, fresh, before, after: res.me.profile.points });
+      track('complete_deal', { correct: Boolean(res.result.correct) });
       haptic(res.result.correct ? [12, 40, 18] : [24, 50, 24]);
       requestAnimationFrame(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
       if (fresh && res.result.correct) setTimeout(() => burst(originOf(resultRef.current?.querySelector('.score')) ?? undefined), 350);

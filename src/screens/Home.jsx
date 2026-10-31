@@ -13,6 +13,7 @@ import { greeting, number, todayLine, weekday } from '../lib/format';
 import { rememberShared, usePullToRefresh } from '../app/fluid';
 import { prefetchProps } from '../app/routes';
 import './Home.css';
+import { useMeta } from '../app/useMeta';
 
 /**
  * Home has one job: get you into today's deal.
@@ -20,6 +21,7 @@ import './Home.css';
  * and three numbers. Everything else lives one tap away (Deals, Rank, Profile).
  */
 export default function Home() {
+  useMeta({ title: 'Home', noindex: true });
   const { me, openPaywall, refreshMe } = useApp();
   const ptr = usePullToRefresh(refreshMe);
   const navigate = useNavigate();
