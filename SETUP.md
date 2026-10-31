@@ -16,7 +16,6 @@ src/                     the app (React)
   screens/               Welcome, sign in/up, onboarding, Home, Practice, Problem, Tutor, Ranking, Profile, Plans
   lib/api/real.js        talks to Supabase (live app)
   lib/api/demo.js        in-browser stand-in used only for the shareable preview
-  mascot/manifest.js     where the Higgsfield clips plug in (written by `npm run mascot`)
   content/landing.js     landing page copy, sample deal and testimonials
   styles/tokens.css      design tokens: every colour, size, shadow and duration
 supabase/
@@ -25,7 +24,7 @@ supabase/
   functions/razorpay-webhook/   Razorpay events (renewals, failures, cancellations)
   functions/tutor/       AI tutor (Gemini)
   tests/                 database security tests
-src/mascot/README.md     how to export the mascot videos (files go in public/mascot/)
+docs/higgsfield-prompts.md  mascot asset brief: prompts, budget, filenames (files go in public/mascot/)
 vercel.json              security headers for the website
 ```
 
@@ -223,13 +222,7 @@ npm run test:sql         # 96 checks + race tests against a local Postgres (Linu
    looks complete. The live build hides the Reviews section while any quote is
    still marked `sample: true`. Replace them with real quotes you have
    permission to use, remove the flag, and the section appears.
-4. **Vale's video clips** are optional: the app ships an animated SVG Vale for
-   every expression. To add Higgsfield clips, follow `src/mascot/README.md`
-   (prompts included), drop the exports in `mascot-src/` and run `npm run mascot`.
-5. **3D** (landing sculpture, level-up medal, trophy shelf) loads only on
-   desktops and laptops that can run it, after the page is idle. Phones,
-   low-power devices and anyone with reduced motion get 2D animated versions.
-   Players can also switch 3D, confetti, haptics and motion off in Profile → Settings.
-6. Nothing in `vercel.json` needs to change: everything new is self-hosted and
-   fits the existing Content Security Policy.
+4. **Vale's Higgsfield assets** are optional: the app ships an original chrome
+   mascot in SVG and WebGL. To add a hero video or a GLB, follow
+   `docs/higgsfield-prompts.md`, then run `npm run mascot` for the video.
 

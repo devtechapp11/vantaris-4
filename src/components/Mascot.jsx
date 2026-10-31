@@ -1,71 +1,43 @@
-import { useEffect, useRef, useState } from 'react';
-import { useReducedMotion } from 'motion/react';
-import { MASCOT, ONE_SHOT } from '../mascot/manifest';
-import Vale from './Vale';
+import MascotSVG from './MascotSVG';
+import Scene3D from './three/Scene3D';
 
-const VIDEO_MIN_SIZE = 64;
+/** Older call sites pass a `mood`; each maps onto one of Vale's states. */
+const MOOD_STATE = {
+  welcome: 'idle',
+  idle: 'idle',
+  streak: 'idle',
+  think: 'thinking',
+  correct: 'success',
+  wrong: 'curious',
+  levelup: 'celebrate',
+};
+
+export const MASCOT_STATES = ['idle', 'curious', 'typing', 'privacy', 'success', 'error', 'thinking', 'celebrate'];
 
 /**
- * Vale in a slot. Plays the Higgsfield clip for `mood` when one exists (pausing
- * off screen), otherwise renders the animated SVG Vale. Small sizes and
- * reduced motion always use the SVG (or the clip's poster frame).
+ * <Mascot state lookAt /> — Vale, the chrome mascot.
+ *
+ * In the app it is a light SVG. With `mode="3d"` (website hero, sign-in) it
+ * loads the WebGL version on capable devices and crossfades over the SVG,
+ * which stays as the fallback (low power, Save-Data, no WebGL, reduced motion).
+ *
+ *   state        idle | curious | typing | privacy | success | error | thinking | celebrate
+ *   lookAt       'pointer' | { x, y } in -1..1 | null
+ *   pulse        bump to nod once (typing)
+ *   interactive  tap to squash; drag to spin (3D)
  */
-export default function Mascot({ mood = 'welcome', size = 96, variant = 'bust', label = 'Vale, your Vantaris tutor', className = '', decorative = false }) {
-  const reduce = useReducedMotion();
-  const [failed, setFailed] = useState({});
-  const [current, setCurrent] = useState(mood);
-  const wrapRef = useRef(null);
-  const videoRef = useRef(null);
-
-  // Follow the mood prop; one-shot clips fall back to idle when they end.
-  const [lastMood, setLastMood] = useState(mood);
-  if (mood !== lastMood) {
-    setLastMood(mood);
-    setCurrent(mood);
-  }
-
-  const clip = size >= VIDEO_MIN_SIZE && !failed[current] ? MASCOT[current] ?? null : null;
-
-  useEffect(() => {
-    const el = wrapRef.current;
-    const video = videoRef.current;
-    if (!el || !video || reduce || typeof IntersectionObserver === 'undefined') return undefined;
-    const io = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) video.play().catch(() => {});
-      else video.pause();
-    });
-    io.observe(el);
-    return () => io.disconnect();
-  }, [clip, reduce]);
-
+export default function Mascot({
+  state, mood, lookAt = null, pulse = 0, size = 96, mode = '2d', interactive = false,
+  label = 'Vale, the Vantaris mascot', decorative = false, className = '', style,
+}) {
+  const s = state ?? MOOD_STATE[mood] ?? 'idle';
   const a11y = decorative ? { 'aria-hidden': true } : { role: 'img', 'aria-label': label };
-
+  const svg = <MascotSVG state={s} lookAt={lookAt} pulse={pulse} interactive={interactive} style={{ width: '100%', height: '100%' }} />;
   return (
-    <div ref={wrapRef} {...a11y} className={`mascot ${clip ? 'mascot--video' : ''} ${className}`} style={{ width: size, height: size }}>
-      {clip ? (
-        reduce ? (
-          <img src={clip.poster} alt="" />
-        ) : (
-          <video
-            key={current}
-            ref={videoRef}
-            autoPlay
-            muted
-            playsInline
-            loop={clip.loop ?? !ONE_SHOT.has(current)}
-            preload="metadata"
-            poster={clip.poster}
-            onEnded={() => ONE_SHOT.has(current) && MASCOT.idle && setCurrent('idle')}
-            onError={() => setFailed((f) => ({ ...f, [current]: true }))}
-            disablePictureInPicture
-          >
-            {clip.webm && <source src={clip.webm} type="video/webm" />}
-            {clip.mp4 && <source src={clip.mp4} type="video/mp4" />}
-          </video>
-        )
-      ) : (
-        <Vale mood={current} variant={variant} style={{ width: '100%', height: '100%' }} />
-      )}
+    <div {...a11y} className={`mascot ${className}`} style={{ width: size, height: size * 1.18, ...style }}>
+      {mode === '3d' ? (
+        <Scene3D scene="mascot" fallback={svg} state={s} lookAt={lookAt} pulse={pulse} interactive={interactive} />
+      ) : svg}
     </div>
   );
 }

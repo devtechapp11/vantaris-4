@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowLeft, MailCheck, ShieldCheck } from 'lucide-react';
@@ -42,13 +42,14 @@ export default function AuthScreen() {
   const mode = pathname === '/signup' ? 'signup' : pathname === '/forgot' ? 'forgot' : 'signin';
   const [sentTo, setSentTo] = useState(null);
   const copy = COPY[mode];
+  const vale = useValeFeed();
 
   return (
-    <AuthLayout mood={sentTo ? 'correct' : copy.mood}>
+    <AuthLayout vale={sentTo ? { state: 'success' } : vale.props}>
       {sentTo ? (
         <CheckInbox email={sentTo} />
       ) : (
-        <motion.div layout className="auth-panel" transition={spring.snappy}>
+        <motion.div layout className="auth-panel" transition={spring.snappy} onFocus={vale.focus} onBlur={vale.blur} onInput={vale.input}>
           {mode !== 'forgot' && (
             <div className="auth-tabs" role="tablist" aria-label="Account">
               {[['signin', 'Sign in', '/signin'], ['signup', 'Create account', '/signup']].map(([m, label, to]) => (
@@ -65,8 +66,8 @@ export default function AuthScreen() {
                 <h1 className="t-h1">{copy.title}</h1>
                 <p className="t-body">{copy.sub}</p>
               </header>
-              {mode === 'signup' && <SignUpForm onSent={setSentTo} />}
-              {mode === 'signin' && <SignInForm />}
+              {mode === 'signup' && <SignUpForm onSent={setSentTo} onResult={vale.result} />}
+              {mode === 'signin' && <SignInForm onResult={vale.result} />}
               {mode === 'forgot' && <ForgotForm />}
             </motion.div>
           </AnimatePresence>
@@ -76,7 +77,68 @@ export default function AuthScreen() {
   );
 }
 
-function AuthLayout({ children, mood }) {
+/**
+ * Drives Vale from the form: eyes follow the caret, a nod per keystroke, the
+ * visor dims and looks away for passwords, a head shake on an error, a nod on
+ * success. Events bubble up from the inputs, so the forms stay unaware.
+ */
+function useValeFeed() {
+  const [state, setState] = useState('idle');
+  const [lookAt, setLookAt] = useState('pointer');
+  const [pulse, setPulse] = useState(0);
+  const timer = useRef(0);
+
+  const aim = useCallback((el) => {
+    const marks = [...document.querySelectorAll('.auth .mascot')].map((m) => m.getBoundingClientRect()).filter((r) => r.width > 0);
+    const m = marks[0];
+    if (!m || !el) return;
+    const r = el.getBoundingClientRect();
+    const caret = Math.min(r.width - 24, 16 + (el.value?.length ?? 0) * 8.5);
+    const x = r.left + caret;
+    const y = r.top + r.height / 2;
+    setLookAt({
+      x: Math.max(-1, Math.min(1, (x - (m.left + m.width / 2)) / (window.innerWidth / 2))),
+      y: Math.max(-1, Math.min(1, (y - (m.top + m.height * 0.4)) / (window.innerHeight / 2))),
+    });
+  }, []);
+
+  const isSecret = (el) => el?.type === 'password' || /password/.test(el?.autocomplete ?? '');
+  const focus = useCallback((e) => {
+    const el = e.target;
+    if (el.tagName !== 'INPUT' || el.type === 'checkbox') return;
+    clearTimeout(timer.current);
+    if (isSecret(el)) {
+      setState('privacy');
+      setLookAt(null);
+    } else {
+      setState('curious');
+      aim(el);
+    }
+  }, [aim]);
+  const blur = useCallback(() => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      setState('idle');
+      setLookAt('pointer');
+    }, 160);
+  }, []);
+  const input = useCallback((e) => {
+    const el = e.target;
+    if (el.tagName !== 'INPUT' || isSecret(el)) return;
+    setState('typing');
+    setPulse((n) => n + 1);
+    aim(el);
+  }, [aim]);
+  const result = useCallback((kind) => {
+    clearTimeout(timer.current);
+    setState(kind === 'error' ? 'error' : 'success');
+    timer.current = setTimeout(() => setState('idle'), 1200);
+  }, []);
+  useEffect(() => () => clearTimeout(timer.current), []);
+  return { props: { state, lookAt, pulse }, focus, blur, input, result };
+}
+
+function AuthLayout({ children, vale }) {
   const stats = usePublicStats();
   return (
     <motion.main className="auth" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.98 }} transition={{ duration: duration.slow }}>
@@ -85,7 +147,7 @@ function AuthLayout({ children, mood }) {
           <Link to="/welcome" className="nav-back" aria-label="Back to the home page"><ArrowLeft size={18} aria-hidden="true" /> Home</Link>
           <Logo size={26} />
         </div>
-        <div className="auth-mobile-vale" aria-hidden="true"><Mascot mood={mood} size={112} decorative /></div>
+        <div className="auth-mobile-vale" aria-hidden="true"><Mascot {...vale} size={96} decorative /></div>
         <div className="auth-center">{children}</div>
         <p className="t-cap center row-8 auth-trust">
           <ShieldCheck size={14} aria-hidden="true" /> Passwords are encrypted and never visible to us.
@@ -94,7 +156,7 @@ function AuthLayout({ children, mood }) {
       <aside className="auth-right" aria-hidden="true">
         <div className="auth-stage">
           <div className="auth-stage-vale">
-            <Mascot mood={mood} size={340} decorative />
+            <Mascot {...vale} size={340} mode="3d" interactive decorative />
           </div>
           <div className="auth-quote">
             <p className="t-display auth-quote-line text-chrome">Don’t study finance. Do finance.</p>
@@ -121,7 +183,7 @@ export function SocialProof({ stats }) {
   );
 }
 
-function SignUpForm({ onSent }) {
+function SignUpForm({ onSent, onResult }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -146,14 +208,16 @@ function SignUpForm({ onSent }) {
     e.preventDefault();
     setError(null);
     setTouched({ name: true, email: true, password: true, agree: true });
-    if (Object.values(issues).some(Boolean)) return;
+    if (Object.values(issues).some(Boolean)) return onResult?.('error');
     if (trap) return onSent(email.trim().toLowerCase()); // bots get a quiet fake success
     setBusy(true);
     try {
       track('signup');
       const { needsConfirmation } = await api.signUp({ email: email.trim().toLowerCase(), password, displayName: name.trim() });
+      onResult?.('success');
       if (needsConfirmation) onSent(email.trim().toLowerCase());
     } catch (err) {
+      onResult?.('error');
       setError(err.message);
     } finally {
       setBusy(false);
@@ -183,7 +247,7 @@ function SignUpForm({ onSent }) {
   );
 }
 
-function SignInForm() {
+function SignInForm({ onResult }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -191,11 +255,16 @@ function SignInForm() {
   const submit = async (e) => {
     e.preventDefault();
     setError(null);
-    if (!EMAIL.test(email.trim()) || !password) return setError('Enter your email and password.');
+    if (!EMAIL.test(email.trim()) || !password) {
+      onResult?.('error');
+      return setError('Enter your email and password.');
+    }
     setBusy(true);
     try {
       await api.signIn({ email: email.trim().toLowerCase(), password });
+      onResult?.('success');
     } catch (err) {
+      onResult?.('error');
       setError(err.message);
       setBusy(false);
     }
@@ -333,7 +402,7 @@ export function ResetPassword() {
   };
 
   return (
-    <AuthLayout mood={session === null ? 'wrong' : 'think'}>
+    <AuthLayout vale={{ state: session === null ? 'curious' : 'thinking' }}>
       <div className="auth-panel stack-24">
         {session === null ? (
           <>

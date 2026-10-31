@@ -8,8 +8,9 @@
 .home-main { display: flex; flex-direction: column; gap: var(--sp-8); }
 
 .home-today { display: flex; flex-direction: column; gap: var(--sp-4); padding-top: var(--sp-5); border-top: var(--hairline) solid var(--line); }
+.home-cta-wrap { display: block !important; }
 .home-cta { width: 100%; }
-@media (min-width: 600px) { .home-cta { width: auto; align-self: flex-start; padding-inline: var(--sp-8); } }
+@media (min-width: 600px) { .home-cta-wrap { align-self: flex-start; display: inline-block !important; } .home-cta { width: auto; padding-inline: var(--sp-8); } }
 
 .home-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; border-top: var(--hairline) solid var(--line); border-bottom: var(--hairline) solid var(--line); }
 .home-stat { padding: var(--sp-4) 0 var(--sp-4) var(--sp-4); border-left: var(--hairline) solid var(--line); display: flex; flex-direction: column; gap: var(--sp-1); }

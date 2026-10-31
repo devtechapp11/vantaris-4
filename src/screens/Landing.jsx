@@ -8,8 +8,6 @@ import {
 } from 'lucide-react';
 import Logo from '../components/Logo';
 import Mascot from '../components/Mascot';
-import Scene3D from '../components/three/Scene3D';
-import { ConstellationFallback, SculptureFallback } from '../components/three/Fallbacks';
 import { Reveal, TiltCard } from '../components/ui';
 import { Avatar, TierBadge } from '../components/bits';
 import PlanCard, { BillingToggle } from '../components/PlanCard';
@@ -33,7 +31,6 @@ export default function Landing() {
   const can3D = useCan3D();
   return (
     <motion.div className="landing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.98 }} transition={{ duration: duration.slow }}>
-      <Scene3D scene="hero" variant="landing" className="landing-bg" fallback={<ConstellationFallback />} />
       <ScrollProgress />
       <LandingNav />
       <main id="top">
@@ -145,7 +142,6 @@ function Hero({ can3D }) {
       </motion.div>
 
       <motion.div className="hero-visual" style={{ y: visualY }}>
-        {!can3D && <SculptureFallback className="hero-sculpt" />}
         <motion.div
           className="hero-vale"
           initial={{ opacity: 0, y: 40, scale: 0.92 }}
@@ -153,7 +149,7 @@ function Hero({ can3D }) {
           transition={{ ...spring.gentle, delay: 0.35 }}
         >
           <div className="hero-vale-glow" aria-hidden="true" />
-          <Mascot mood="welcome" size={valeSize} label="Vale, the Vantaris fox, in a navy suit with a gold V tie pin" />
+          <Mascot state="idle" lookAt="pointer" interactive mode="3d" size={valeSize} label="Vale, the Vantaris mascot: a chrome pebble with a black glass visor" />
           <motion.div
             className="hero-bubble"
             initial={{ opacity: 0, scale: 0.8, y: 8 }}
@@ -345,7 +341,7 @@ function Peek() {
           viewport={{ once: true, amount: 0.6 }}
           transition={{ ...spring.bouncy, delay: 0.5 }}
         >
-          <Mascot mood="think" size={64} variant="face" decorative />
+          <Mascot mood="think" size={64} decorative />
           <p className="t-callout"><b className="c-fg">Vale:</b> {d.hint}</p>
         </motion.div>
       </Reveal>

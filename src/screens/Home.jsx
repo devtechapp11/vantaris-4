@@ -6,6 +6,7 @@ import { CountUp, Item, Page } from '../components/chrome';
 import { Skeleton, TIER_LABEL } from '../components/bits';
 import { ProgressBar } from '../components/ui';
 import Mascot from '../components/Mascot';
+import { Magnetic } from '../components/effects';
 import { LEVEL_TIER } from '../app/usePlans';
 import { isLocked } from '../lib/modules';
 import { greeting, number, todayLine, weekday } from '../lib/format';
@@ -59,9 +60,11 @@ export default function Home() {
                   <p className="t-h2">{target.title}</p>
                   <p className="t-foot">{target.kind} · {target.module_name} · <span className="fig">{target.minutes}</span> min</p>
                 </div>
-                <button type="button" className="btn btn--primary btn--lg home-cta" onClick={() => navigate(`/practice/${target.id}`)} data-magnetic>
-                  {label} <ArrowRight size={18} aria-hidden="true" />
-                </button>
+                <Magnetic className="home-cta-wrap">
+                  <button type="button" className="btn btn--primary btn--lg home-cta" onClick={() => navigate(`/practice/${target.id}`)}>
+                    {label} <ArrowRight size={18} aria-hidden="true" />
+                  </button>
+                </Magnetic>
               </>
             ) : (
               <>

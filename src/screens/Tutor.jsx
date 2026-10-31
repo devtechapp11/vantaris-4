@@ -131,7 +131,7 @@ function Chat({ titleId, problem, submitted, prompt, onPromptUsed, onClose, wide
   return (
     <div className="chat">
       <header className="chat-head">
-        <span className="chat-avatar"><Mascot mood={headMood} size={44} variant="face" decorative /></span>
+        <span className="chat-avatar"><Mascot mood={headMood} size={44} decorative /></span>
         <div className="grow stack-4" style={{ minWidth: 0 }}>
           <h2 id={titleId} className="t-headline">Vale <span className="chip chip--strong chat-badge">AI tutor</span></h2>
           <p className="t-cap ellipsis">
@@ -149,7 +149,7 @@ function Chat({ titleId, problem, submitted, prompt, onPromptUsed, onClose, wide
         <AnimatePresence>
           {busy && (
             <motion.div className="msg msg--ai" {...bubble} exit={{ opacity: 0, y: 6 }} aria-label="Vale is typing">
-              <span className="msg-avatar"><Mascot mood="think" size={30} variant="face" decorative /></span>
+              <span className="msg-avatar"><Mascot mood="think" size={30} decorative /></span>
               <span className="bubble bubble--ai typing">
                 {[0, 1, 2].map((i) => (
                   <motion.i key={i} animate={reduce ? undefined : { y: [0, -6, 0] }} transition={{ duration: 0.75, repeat: Infinity, delay: i * 0.14, ease: 'easeInOut' }} />
@@ -211,7 +211,7 @@ function Message({ m }) {
   }
   return (
     <motion.div className="msg msg--ai" {...bubble}>
-      <span className="msg-avatar"><Mascot mood={moodFor(m)} size={30} variant="face" decorative /></span>
+      <span className="msg-avatar"><Mascot mood={moodFor(m)} size={30} decorative /></span>
       <span className={`bubble bubble--ai ${m.error ? 'bubble--error' : ''}`}><RichText text={m.text} /></span>
     </motion.div>
   );
@@ -235,7 +235,7 @@ export function TutorFab({ onClick, locked, hidden }) {
           transition={spring.bouncy}
         >
           <span className="vale-fab-ring" aria-hidden="true" />
-          <Mascot mood="welcome" size={40} variant="face" decorative />
+          <Mascot mood="welcome" size={40} decorative />
           <span className="vale-fab-tip" aria-hidden="true">{locked ? 'Vale · Pro' : 'Ask Vale'}</span>
           {locked && <span className="vale-fab-lock" aria-hidden="true">PRO</span>}
         </motion.button>

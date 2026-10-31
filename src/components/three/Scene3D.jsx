@@ -4,9 +4,7 @@ import { useCan3D } from '../../app/useDevice';
 // Three.js + React Three Fiber live in their own chunk and only download on
 // devices that can render them, after the page is idle.
 const SCENES = {
-  hero: lazy(() => import('./HeroScene')),
-  medal: lazy(() => import('./MedalScene')),
-  shelf: lazy(() => import('./ShelfScene')),
+  mascot: lazy(() => import('./MascotScene')),
 };
 
 const START_DELAY_MS = 1100;
