@@ -4,24 +4,31 @@ import { Eye, EyeOff } from 'lucide-react';
 import { group, inView, item } from '../design/motion';
 import { duration, ease } from '../design/tokens';
 
-/** Text input with a label that floats up on focus or once it has a value. */
-export function FloatingField({ label, id: idProp, action, hint, error, className = '', ...input }) {
+/**
+ * Text input with a label that floats up on focus or once it has a value.
+ * Pass `placeholder` to keep the label up and show example text instead.
+ * A string `error` is shown under the field and announced.
+ */
+export function FloatingField({ label, id: idProp, action, hint, error, placeholder, className = '', ...input }) {
   const auto = useId();
   const id = idProp ?? auto;
+  const msg = typeof error === 'string' && error ? error : null;
+  const described = [msg && `${id}-err`, hint && `${id}-hint`].filter(Boolean).join(' ') || undefined;
   return (
-    <div className={`ffield ${action ? 'ffield--action' : ''} ${className}`}>
+    <div className={`ffield ${action ? 'ffield--action' : ''} ${placeholder ? 'ffield--ph' : ''} ${className}`}>
       <div className="ffield-box">
         <input
           id={id}
           className="ffield-input"
-          placeholder=" "
+          placeholder={placeholder ?? ' '}
           aria-invalid={error ? 'true' : undefined}
-          aria-describedby={hint ? `${id}-hint` : undefined}
+          aria-describedby={described}
           {...input}
         />
         <label className="ffield-label" htmlFor={id}>{label}</label>
         {action}
       </div>
+      {msg && <span id={`${id}-err`} className="field-error" role="alert">{msg}</span>}
       {hint && <span id={`${id}-hint`} className="hint">{hint}</span>}
     </div>
   );

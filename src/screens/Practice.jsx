@@ -53,7 +53,7 @@ export default function Practice() {
 
   return (
     <Page wide>
-      <LargeTitle title="Practice" eyebrow={totals ? `${totals.solved} of ${totals.total} solved · ${totals.modules} modules` : 'Deal library'} />
+      <LargeTitle title="Deals" eyebrow={totals ? `${totals.solved} of ${totals.total} solved · ${totals.modules} modules` : 'Deal library'} />
       <Item className="practice-bar">
         <div className="practice-filter"><Segmented value={filter} onChange={setFilter} options={FILTERS} label="Filter deals" /></div>
         {catalog && (

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { ArrowRight, Check, ChevronDown, Clock, Lightbulb, Lock, Share2, Sigma, Sparkles, X } from 'lucide-react';
+import { ArrowRight, Check, ChevronDown, Lightbulb, Lock, Share2, Sigma, Sparkles, X } from 'lucide-react';
 import { api } from '../lib/api';
 import { useApp } from '../app/AppContext';
 import { haptic } from '../app/prefs';
@@ -161,7 +161,7 @@ export default function Problem() {
   if (error) {
     return (
       <>
-        <NavBar back="Practice" to="/practice" />
+        <NavBar back="Deals" to="/practice" />
         <Page className="screen screen--bare">
           <div className="card stack-12 center-x center">
             <Mascot mood="wrong" size={110} />
@@ -181,7 +181,7 @@ export default function Problem() {
   return (
     <>
       <NavBar
-        back="Practice"
+        back="Deals"
         to="/practice"
         title={<Stepper step={step} />}
         right={answered ? <span className="chip chip--pos"><Check size={12} aria-hidden="true" /> Submitted</span> : <Timer openedAt={data.opened_at} minutes={p.minutes} offset={data.offset} />}
@@ -190,15 +190,10 @@ export default function Problem() {
         <div className="prob-layout">
           <motion.section className="prob-brief stack-24" variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: duration.slow, ease: ease.out } } }}>
             <header className="stack-12">
-              <div className="row-8 wrap">
-                <span className="chip">{p.module_name}</span>
-                <TierBadge level={p.level} />
-                <DifficultyBadge value={p.difficulty} />
-                <span className="chip"><Clock size={12} aria-hidden="true" /> {p.minutes} min</span>
-              </div>
-              <div className="stack-4">
-                <h1 className="t-h1">{p.title}</h1>
-                <p className="t-eyebrow t-eyebrow--cyan">{p.kind}</p>
+              <div className="stack-8">
+                <p className="t-eyebrow">{p.kind}</p>
+                <h1 className="t-h1" data-shared={`deal-${p.id}`}>{p.title}</h1>
+                <p className="t-foot prob-meta">{p.module_name} · <DifficultyBadge value={p.difficulty} /> · <span className="fig">{p.minutes}</span> min</p>
               </div>
               <p className="t-lead c-fg prob-scenario">{p.scenario}</p>
             </header>
@@ -229,7 +224,7 @@ export default function Problem() {
               </dl>
             </section>
 
-            {desktop && !answered && <Calculator ref={calc} />}
+            {desktop && !answered && <Calculator ref={calc} defaultOpen={false} />}
           </motion.section>
 
           <motion.section
@@ -266,7 +261,7 @@ export default function Problem() {
 
             {!desktop && !answered && <Calculator ref={calc} defaultOpen={false} />}
             {answered && <Breakdown result={outcome.result} onSteps={() => openPaywall('steps')} />}
-            {answered && <Link to="/practice" className="btn btn--ghost">Back to practice</Link>}
+            {answered && <Link to="/practice" className="btn btn--ghost">Back to deals</Link>}
           </motion.section>
         </div>
       </Page>
@@ -458,7 +453,7 @@ function Result({ outcome, me, nextId, onNext, onShare, onTutor }) {
 function Breakdown({ result: r, onSteps }) {
   return (
     <section className="breakdown stack-8" aria-label="Solution">
-      <Accordion title="Step-by-step solution" icon={<Sigma size={17} className="c-gold" aria-hidden="true" />} defaultOpen meta={`${r.steps_total} steps`}>
+      <Accordion title="Step-by-step solution" icon={<Sigma size={17} aria-hidden="true" />} meta={`${r.steps_total} steps`}>
         <ol className="steps">
           {r.steps.map(([label, text], i) => (
             <motion.li key={label} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.08, duration: duration.base }}>
@@ -483,10 +478,10 @@ function Breakdown({ result: r, onSteps }) {
           </div>
         )}
       </Accordion>
-      <Accordion title="Why it matters" icon={<Lightbulb size={17} className="c-cyan" aria-hidden="true" />}>
+      <Accordion title="Why it matters" icon={<Lightbulb size={17} aria-hidden="true" />}>
         <p className="t-callout">{r.concept}</p>
       </Accordion>
-      <Accordion title="The formula" icon={<span className="tk-op fig" aria-hidden="true">ƒ</span>} defaultOpen>
+      <Accordion title="The formula" icon={<span className="tk-op fig" aria-hidden="true">ƒ</span>}>
         <FormulaBlock text={r.formula} />
       </Accordion>
     </section>
@@ -555,7 +550,7 @@ function Locked({ lock }) {
   const tier = TIER_LABEL[LEVEL_TIER[lock.detail]] ?? 'a paid plan';
   return (
     <>
-      <NavBar back="Practice" to="/practice" />
+      <NavBar back="Deals" to="/practice" />
       <Page className="screen screen--bare">
         <div className="card stack-16 center center-x locked-card">
           <Mascot mood="think" size={150} />
@@ -580,7 +575,7 @@ function ProblemSkeleton() {
   return (
     <>
       <LoadBar />
-      <NavBar back="Practice" to="/practice" />
+      <NavBar back="Deals" to="/practice" />
       <Page wide className="screen problem">
         <div className="prob-layout">
           <div className="stack-16">

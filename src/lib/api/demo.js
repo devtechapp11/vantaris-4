@@ -30,13 +30,13 @@ const PLANS = [
 
 // Example players for the preview leaderboard (week, month, all-time points).
 const PLAYERS = [
-  ['Sarah Chen', 'MIT', 412, 1480, 3010], ['Marcus Adeyemi', 'LSE', 388, 1402, 2860],
-  ['Yuki Tanaka', 'Keio', 351, 1290, 2604], ['Priya Sharma', 'SRCC Delhi', 334, 1205, 2470],
-  ['Lucas Martin', 'HEC Paris', 301, 1122, 2302], ['Anna Kowalska', 'Bocconi', 276, 1015, 2110],
-  ['James Liu', 'Wharton', 254, 948, 1987], ['Sofia Ruiz', 'IE Madrid', 221, 870, 1730],
-  ['Chen Wei', 'Tsinghua', 198, 760, 1588], ['Omar Haddad', 'AUB Beirut', 160, 610, 1290],
-  ['Grace Okafor', 'Lagos Business School', 133, 512, 1044], ['Léa Dubois', 'Sciences Po', 97, 388, 802],
-  ['Arjun Mehta', 'NMIMS Mumbai', 64, 251, 560], ['Noah Fischer', 'St. Gallen', 38, 140, 310],
+  ['Rowan A.', 'Northfield Academy', 412, 1480, 3010], ['Ines T.', 'Harbor College', 388, 1402, 2860],
+  ['Kai M.', 'Westmere School', 351, 1290, 2604], ['Noor S.', 'Linden Institute', 334, 1205, 2470],
+  ['Eli B.', 'Calder High', 301, 1122, 2302], ['Mara K.', 'Ashgrove College', 276, 1015, 2110],
+  ['Theo L.', 'Brightwater School', 254, 948, 1987], ['Zara P.', 'Elmstead Academy', 221, 870, 1730],
+  ['Jun H.', 'Kingsmere College', 198, 760, 1588], ['Sami R.', 'Ravenhill School', 160, 610, 1290],
+  ['Ada O.', 'Stonebridge Institute', 133, 512, 1044], ['Lea D.', 'Oakhaven School', 97, 388, 802],
+  ['Ravi N.', 'Northfield Academy', 64, 251, 560], ['Finn W.', 'Harbor College', 38, 140, 310],
 ];
 
 const MODULES = content.modules.map((m, i) => ({ id: m.id, name: m.name, short: SHORT[m.id] ?? m.name, level: m.tier, blurb: m.blurb, sort: i + 1 }));

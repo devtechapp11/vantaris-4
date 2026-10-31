@@ -13,6 +13,7 @@ import Scene3D from '../components/three/Scene3D';
 import { ConstellationFallback, SculptureFallback } from '../components/three/Fallbacks';
 import { duration, ease, spring } from '../design/tokens';
 import { number } from '../lib/format';
+import { track } from '../lib/analytics';
 import './Auth.css';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -137,19 +138,32 @@ function SignUpForm({ onSent }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [agree, setAgree] = useState(false);
+  const [trap, setTrap] = useState(''); // honeypot: people never see or fill it
+  const [touched, setTouched] = useState({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const stats = usePublicStats();
 
+  // Forgiving validation: a field only complains after you leave it (or press submit).
+  const issues = {
+    name: name.trim() ? null : 'Enter your first name.',
+    email: EMAIL.test(email.trim()) ? null : 'Enter a valid email, like you@example.com.',
+    password: passwordIssues(password).length ? `Needs ${passwordIssues(password).join(', ')}.` : null,
+    agree: agree ? null : 'Please accept the Terms and Privacy Policy to continue.',
+  };
+  const show = (k) => (touched[k] ? issues[k] : null);
+  const blur = (k) => () => setTouched((t) => ({ ...t, [k]: true }));
+
   const submit = async (e) => {
     e.preventDefault();
     setError(null);
-    if (!name.trim()) return setError('Enter your first name.');
-    if (!EMAIL.test(email.trim())) return setError('Enter a valid email address.');
-    const issues = passwordIssues(password);
-    if (issues.length) return setError(`Your password needs ${issues.join(', ')}.`);
+    setTouched({ name: true, email: true, password: true, agree: true });
+    if (Object.values(issues).some(Boolean)) return;
+    if (trap) return onSent(email.trim().toLowerCase()); // bots get a quiet fake success
     setBusy(true);
     try {
+      track('signup');
       const { needsConfirmation } = await api.signUp({ email: email.trim().toLowerCase(), password, displayName: name.trim() });
       if (needsConfirmation) onSent(email.trim().toLowerCase());
     } catch (err) {
@@ -161,9 +175,20 @@ function SignUpForm({ onSent }) {
 
   return (
     <form className="stack-16" onSubmit={submit} noValidate>
-      <FloatingField label="First name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" maxLength={40} required />
-      <FloatingField label="Email" type="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" autoCapitalize="none" spellCheck="false" required />
-      <PasswordField value={password} onChange={setPassword} autoComplete="new-password" showMeter />
+      <FloatingField label="First name" value={name} onChange={(e) => setName(e.target.value)} onBlur={blur('name')} error={show('name')} autoComplete="given-name" maxLength={40} required />
+      <FloatingField label="Email" type="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} onBlur={blur('email')} error={show('email')} autoComplete="email" autoCapitalize="none" spellCheck="false" required />
+      <PasswordField value={password} onChange={setPassword} onBlur={blur('password')} invalid={show('password')} autoComplete="new-password" showMeter />
+      <div className="hp" aria-hidden="true">
+        <label htmlFor="su-company">Company</label>
+        <input id="su-company" name="company" tabIndex={-1} autoComplete="off" value={trap} onChange={(e) => setTrap(e.target.value)} />
+      </div>
+      <div className="stack-4">
+        <label className="consent">
+          <input type="checkbox" checked={agree} onChange={(e) => { setAgree(e.target.checked); setTouched((t) => ({ ...t, agree: true })); }} aria-invalid={show('agree') ? 'true' : undefined} aria-describedby={show('agree') ? 'su-agree-err' : undefined} />
+          <span>I agree to the <Link to="/terms" target="_blank">Terms</Link> and <Link to="/privacy" target="_blank">Privacy Policy</Link>. If I am under 18, a parent or guardian agrees too.</span>
+        </label>
+        {show('agree') && <span id="su-agree-err" className="field-error" role="alert">{show('agree')}</span>}
+      </div>
       <FormError error={error} />
       <button className="btn btn--gold" disabled={busy}>{busy ? <Spinner /> : 'Create free account'}</button>
       <SocialProof stats={stats} />

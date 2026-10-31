@@ -39,11 +39,12 @@ export default function Onboarding() {
     setStep([to, to > step ? 1 : -1]);
   };
 
+  // Every answer is optional: skipping keeps the name from sign-up and leaves the rest empty.
   const finish = async () => {
     setBusy(true);
     setError(null);
     try {
-      const updated = await api.saveProfile({ displayName: name.trim(), school: school.trim(), goal, timezone: timeZone(), completeOnboarding: true });
+      const updated = await api.saveProfile({ displayName: name.trim() || undefined, school: school.trim() || undefined, goal: goal ?? undefined, timezone: timeZone(), completeOnboarding: true });
       setMe(updated);
       haptic(18);
       showToast(`Welcome to the desk, ${updated.profile.display_name}`, 'success');
@@ -69,7 +70,7 @@ export default function Onboarding() {
         <div className="onb-progress" role="progressbar" aria-valuemin={1} aria-valuemax={STEPS} aria-valuenow={step + 1} aria-label={`Step ${step + 1} of ${STEPS}`}>
           <motion.i animate={{ scaleX: (step + 1) / STEPS }} transition={{ duration: duration.slower, ease: ease.out }} />
         </div>
-        <span className="t-foot fig">{step + 1}/{STEPS}</span>
+        <button type="button" className="btn btn--ghost btn--sm btn--auto onb-skip" onClick={finish} disabled={busy}>Skip</button>
       </header>
 
       <div className="onb-body">
@@ -108,7 +109,6 @@ export default function Onboarding() {
                   className="stack-24"
                   onSubmit={(e) => {
                     e.preventDefault();
-                    if (!name.trim()) return setError('Enter your first name.');
                     go(2);
                   }}
                 >
@@ -117,8 +117,8 @@ export default function Onboarding() {
                     <h1 className="t-h1">What should we call you?</h1>
                   </header>
                   <div className="stack-16">
-                    <FloatingField label="First name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" maxLength={40} autoFocus />
-                    <FloatingField label="School (optional)" value={school} onChange={(e) => setSchool(e.target.value)} autoComplete="organization" maxLength={80} hint="Shown next to your name on the leaderboard." />
+                    <FloatingField label="First name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" maxLength={40} />
+                    <FloatingField label="School (optional)" placeholder="Your school" value={school} onChange={(e) => setSchool(e.target.value)} autoComplete="organization" maxLength={80} hint="Shown next to your name on the leaderboard. Leave it empty to hide it." />
                   </div>
                   {error && <div className="alert" role="alert">{error}</div>}
                   <div className="onb-actions">
@@ -141,7 +141,7 @@ export default function Onboarding() {
                   {error && <div className="alert" role="alert">{error}</div>}
                   <div className="onb-actions">
                     <button type="button" className="btn btn--glass btn--icon" onClick={() => go(1)} aria-label="Back"><ArrowLeft size={18} /></button>
-                    <button type="button" className="btn btn--gold" disabled={!goal || busy} onClick={finish}>
+                    <button type="button" className="btn btn--gold" disabled={busy} onClick={finish}>
                       {busy ? <Spinner /> : <>Start practicing <ArrowRight size={18} aria-hidden="true" /></>}
                     </button>
                   </div>

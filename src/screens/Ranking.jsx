@@ -38,7 +38,7 @@ export default function Ranking() {
 
   return (
     <Page wide>
-      <LargeTitle title="Ranking" eyebrow={data ? `${number(data.players)} players ranked` : 'Leaderboard'} />
+      <LargeTitle title="Rank" eyebrow={data ? `${number(data.players)} players ranked` : 'Leaderboard'} />
       <Item className="rank-scope"><Segmented value={scope} onChange={setScope} options={SCOPES} label="Time range" /></Item>
 
       {!data ? (

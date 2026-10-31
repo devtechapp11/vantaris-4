@@ -187,8 +187,8 @@ Your to-dos:
 ## 8. Going live with real money
 
 1. **Razorpay activation (KYC).** Razorpay needs the account holder's PAN, bank
-   account and business details, and the account holder must be an adult. If
-   the account isn't in your father's name like the domain, sort that out first.
+   account and business details, and the account holder must be an adult. Make
+   sure the account holder matches the legal owner of the business and domain.
 2. Razorpay reviews the website. Add these pages before applying: **Terms and
    Conditions**, **Privacy Policy**, **Cancellation and Refund Policy**, **Contact Us**
    (with `devs@vantaris.finance`) and visible pricing.

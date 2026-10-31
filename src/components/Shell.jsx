@@ -9,8 +9,8 @@ import StreakFlame from './StreakFlame';
 
 export const TABS = [
   { to: '/', label: 'Home', Icon: House, end: true },
-  { to: '/practice', label: 'Practice', Icon: LayoutGrid },
-  { to: '/ranking', label: 'Ranking', Icon: Trophy },
+  { to: '/practice', label: 'Deals', Icon: LayoutGrid },
+  { to: '/ranking', label: 'Rank', Icon: Trophy },
   { to: '/profile', label: 'Profile', Icon: CircleUserRound },
 ];
 

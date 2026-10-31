@@ -67,12 +67,12 @@ select t.ok((public.get_me() -> 'daily') is not null, 'daily deal picked');
 select t.ok((select count(*) from public.points_ledger) = 1, 'one ledger entry');
 
 -- Profile edits
-select t.ok((public.save_profile('  Dev  ', 'LFIM Mumbai', 'pe', 'Asia/Kolkata', true) -> 'profile' ->> 'display_name') = 'Dev', 'save_profile trims');
+select t.ok((public.save_profile('  Player A  ', 'Example School', 'pe', 'Asia/Kolkata', true) -> 'profile' ->> 'display_name') = 'Player A', 'save_profile trims');
 select t.expect_error($$select public.save_profile(null, null, 'hacker')$$, 'INVALID_GOAL');
 select t.expect_error($$select public.save_profile(null, null, null, 'Mars/Olympus')$$, 'INVALID_TIMEZONE');
 select t.expect_error($$select public.save_profile('     ')$$, 'INVALID_NAME');
 select t.ok((public.save_profile(null, '') -> 'profile' ->> 'school') is null, 'school can be cleared');
-select public.save_profile(null, 'LFIM Mumbai') is not null;
+select public.save_profile(null, 'Example School') is not null;
 
 -- Leaderboard
 select t.ok((public.get_leaderboard('week') -> 'me' ->> 'rank')::int = 1, 'A ranks first this week');
@@ -84,7 +84,7 @@ set request.jwt.claim.sub = '00000000-0000-0000-0000-00000000000b';
 select t.ok((select count(*) from public.problem_attempts) = 0, 'B cannot see A''s attempts');
 select t.ok((select count(*) from public.points_ledger) = 0, 'B cannot see A''s points');
 select t.ok((select count(*) from public.profiles) = 1, 'B sees only own profile');
-select t.ok((public.get_leaderboard('week') -> 'rows' -> 0 ->> 'name') = 'Dev', 'B sees A on leaderboard by name');
+select t.ok((public.get_leaderboard('week') -> 'rows' -> 0 ->> 'name') = 'Player A', 'B sees A on leaderboard by name');
 select t.ok((public.get_leaderboard('week') -> 'me' ->> 'rank') is null, 'B not ranked yet');
 
 -- ===================== Anonymous =====================

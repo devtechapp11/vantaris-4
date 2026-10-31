@@ -275,6 +275,13 @@ button.chip { cursor: pointer; transition: transform var(--dur-fast) var(--ease-
 .ffield-input:focus + .ffield-label,
 .ffield-input:not(:placeholder-shown) + .ffield-label { transform: translateY(-118%) scale(0.76); color: var(--gold-bright); font-weight: var(--fw-semibold); }
 .ffield-input:not(:focus):not(:placeholder-shown) + .ffield-label { color: var(--fg-3); }
+.ffield--ph .ffield-input::placeholder { color: var(--fg-3); }
+.ffield--ph .ffield-label { transform: translateY(-118%) scale(0.76); font-weight: var(--fw-semibold); }
+.field-error { font-size: var(--fs-sm); color: var(--neg); padding-left: var(--sp-1); }
+.consent { display: flex; align-items: flex-start; gap: var(--sp-3); min-height: var(--tap); font-size: var(--fs-sm); color: var(--fg-2); line-height: 1.5; cursor: pointer; }
+.consent input { flex: none; width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--fg); }
+.consent a { color: var(--fg); text-decoration: underline; text-underline-offset: 2px; }
+.hp { position: absolute !important; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 .ffield--action .ffield-input { padding-right: calc(var(--tap) + var(--sp-2)); }
 .ffield-action {
   position: absolute; right: var(--sp-2); top: calc((var(--field-h) - var(--tap)) / 2);
