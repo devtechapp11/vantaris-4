@@ -226,3 +226,11 @@ npm run test:sql         # 96 checks + race tests against a local Postgres (Linu
    mascot in SVG and WebGL. To add a hero video or a GLB, follow
    `docs/higgsfield-prompts.md`, then run `npm run mascot` for the video.
 
+## Design pass notes (branch design/chrome-overhaul)
+
+- Report: `docs/CHROME_OVERHAUL.md`. Third-party code and licences: `THIRD_PARTY.md`.
+- Legal pages live in `src/content/legal.js` (drafts with placeholders; lawyer review needed).
+- Optional analytics: set `VITE_ANALYTICS_ENDPOINT` (a cookieless, first-party collector) and
+  add its origin to `connect-src` in `vercel.json`. Nothing is sent without consent.
+- `public/boot.js` shows the pre-rendered hero to signed-out visitors (same-origin, CSP-safe).
+- `npm run og` re-renders `public/og-image.png`; `npm run icons` re-renders the app icons.
