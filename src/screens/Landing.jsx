@@ -1,351 +1,366 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-  AnimatePresence, motion, useInView, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform,
-} from 'motion/react';
-import {
-  ArrowRight, Briefcase, ChevronLeft, ChevronRight, Clock, ListChecks, Quote, Sparkles, Timer, TrendingUp, Trophy,
-} from 'lucide-react';
+import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'motion/react';
+import { ArrowRight, Check } from 'lucide-react';
 import Logo from '../components/Logo';
 import Mascot from '../components/Mascot';
-import { Reveal, TiltCard } from '../components/ui';
-import { Avatar, TierBadge } from '../components/bits';
+import { Magnetic, Spotlight } from '../components/effects';
+import { TierBadge } from '../components/bits';
 import PlanCard, { BillingToggle } from '../components/PlanCard';
-import { useCan3D, useMedia, BREAKPOINT } from '../app/useDevice';
+import Scene3D from '../components/three/Scene3D';
+import { useCan3D, useMedia } from '../app/useDevice';
 import { usePlans } from '../app/usePlans';
-import { SOCIAL_PROOF_MIN, usePublicModules, usePublicStats } from '../app/usePublic';
-import { FEATURES, LADDER, SAMPLE_DEAL, TESTIMONIALS, TICKER } from '../content/landing';
-import { item } from '../design/motion';
-import { duration, ease, parallax, spring, stagger } from '../design/tokens';
-import { BRAND, IS_DEMO } from '../lib/config';
+import { usePrefs } from '../app/prefs';
+import { CHAPTERS, HERO_LOOP, LADDER, SAMPLE_DEAL } from '../content/landing';
+import { duration, ease, spring } from '../design/tokens';
+import { BRAND } from '../lib/config';
+import { track } from '../lib/analytics';
+import LegalLinks from '../components/LegalLinks';
 import './Landing.css';
 
-const ICONS = { briefcase: Briefcase, trending: TrendingUp, sparkles: Sparkles, timer: Timer, trophy: Trophy, steps: ListChecks };
-const SECTIONS = [['how', 'How it works'], ['ladder', 'Career path'], ['pricing', 'Pricing'], ['reviews', 'Reviews']];
-const SHOW_REVIEWS = IS_DEMO || TESTIMONIALS.every((t) => !t.sample);
 const YEAR = new Date().getFullYear();
 
-const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+/** Lenis smooth scrolling, on the public website only, loaded on demand. */
+function useLenis(enabled) {
+  useEffect(() => {
+    if (!enabled) return undefined;
+    let lenis = null;
+    let raf = 0;
+    let alive = true;
+    import('lenis').then(({ default: Lenis }) => {
+      if (!alive) return;
+      lenis = new Lenis({ lerp: 0.12, smoothWheel: true, anchors: true });
+      const loop = (t) => {
+        lenis.raf(t);
+        raf = requestAnimationFrame(loop);
+      };
+      raf = requestAnimationFrame(loop);
+    });
+    return () => {
+      alive = false;
+      cancelAnimationFrame(raf);
+      lenis?.destroy();
+    };
+  }, [enabled]);
+}
 
 export default function Landing() {
-  const can3D = useCan3D();
+  const prefs = usePrefs();
+  const reduce = useReducedMotion() || prefs.reduceMotion;
+  useLenis(!reduce);
   return (
-    <motion.div className="landing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.98 }} transition={{ duration: duration.slow }}>
-      <ScrollProgress />
+    <motion.div className="landing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: duration.slow }}>
       <LandingNav />
-      <main id="top">
-        <Hero can3D={can3D} />
-        <Ticker />
-        <Features />
-        <Ladder />
-        <Peek />
+      <main id="main" tabIndex={-1}>
+        {reduce ? <StillFilm /> : <Film />}
         <Pricing />
-        {SHOW_REVIEWS && <Reviews />}
-        <FinalCta />
       </main>
       <Footer />
     </motion.div>
   );
 }
 
-/* ---------- Chrome ---------- */
-function ScrollProgress() {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
-  return <motion.div className="scroll-progress" style={{ scaleX }} aria-hidden="true" />;
-}
-
+/* ---------- Top bar (glass) ---------- */
 function LandingNav() {
   const { scrollY } = useScroll();
   const [solid, setSolid] = useState(false);
-  useMotionValueEvent(scrollY, 'change', (y) => setSolid(y > 24));
-  const visible = SECTIONS.filter(([id]) => id !== 'reviews' || SHOW_REVIEWS);
+  useMotionValueEvent(scrollY, 'change', (v) => setSolid(v > 24));
   return (
-    <header className={`lnav ${solid ? 'lnav--solid' : ''}`}>
+    <header className={`lnav ${solid ? 'lnav--solid glass' : ''}`}>
       <div className="lnav-inner">
-        <button type="button" className="lnav-brand" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Vantaris, back to top">
-          <Logo size={28} />
-        </button>
-        <nav className="lnav-links" aria-label="Sections">
-          {visible.map(([id, label]) => (
-            <button key={id} type="button" onClick={() => scrollTo(id)}>{label}</button>
-          ))}
+        <Link to="/welcome" className="lnav-brand" aria-label={`${BRAND.name}, home`}><Logo size={26} /></Link>
+        <nav className="lnav-links" aria-label="Website">
+          <a href="#film">How it works</a>
+          <a href="#pricing">Pricing</a>
+          <Link to="/signin">Sign in</Link>
         </nav>
-        <div className="lnav-actions">
-          <Link to="/signin" className="btn btn--ghost btn--auto lnav-signin">Sign in</Link>
-          <span className="cta-conic"><Link to="/signup" className="btn btn--md btn--auto lnav-cta">Get started</Link></span>
-        </div>
       </div>
     </header>
   );
 }
 
-/* ---------- Hero ---------- */
-const word = {
-  hidden: { y: '110%', opacity: 0, rotateX: -40 },
-  show: { y: '0%', opacity: 1, rotateX: 0, transition: { duration: duration.reveal, ease: ease.out } },
-};
+/* ---------- The scroll film ---------- */
 
-function WordReveal({ text, delay = 0, gold = false }) {
-  const words = text.split(' ');
-  return (
-    <motion.span
-      className="words"
-      aria-hidden="true"
-      initial="hidden"
-      animate="show"
-      variants={{ hidden: {}, show: { transition: { staggerChildren: stagger.words, delayChildren: delay } } }}
-    >
-      {words.map((w, i) => (
-        <span key={`${w}-${i}`} className="word-mask">
-          <motion.span className={`word ${gold ? 'text-gold' : ''}`} variants={word}>{w}</motion.span>
-          {i < words.length - 1 ? ' ' : ''}
-        </span>
-      ))}
-    </motion.span>
-  );
-}
-
-function Hero({ can3D }) {
+/**
+ * Chapters scroll natively (nothing is pinned or hijacked). A sticky stage
+ * behind them shows the mascot and one visual per chapter; `t` is the
+ * fractional chapter under the reading line, so visuals scrub with the scroll.
+ */
+function Film() {
   const ref = useRef(null);
-  const desktop = useMedia(BREAKPOINT.desktop);
-  const tablet = useMedia(BREAKPOINT.tablet);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
-  const copyY = useTransform(scrollYProgress, [0, 1], ['0%', `${parallax.subtle * 100}%`]);
-  const visualY = useTransform(scrollYProgress, [0, 1], ['0%', `${parallax.deep * 100}%`]);
-  const fade = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
-  const valeSize = desktop ? 360 : tablet ? 300 : 230;
+  const chapters = useRef([]);
+  const t = useMotionValue(0);
+  const [index, setIndex] = useState(0);
+  const mobile = !useMedia('(min-width: 900px)');
+  const { scrollY } = useScroll();
+
+  useMotionValueEvent(scrollY, 'change', () => {
+    const line = window.innerHeight * (mobile ? 0.72 : 0.5);
+    const els = chapters.current;
+    let next = 0;
+    for (let i = 0; i < els.length; i++) {
+      const r = els[i]?.getBoundingClientRect();
+      if (!r) continue;
+      if (r.top <= line) next = i + Math.min(1, (line - r.top) / r.height) - 0.5;
+    }
+    t.set(Math.max(0, next));
+    const i = Math.max(0, Math.min(CHAPTERS.length - 1, Math.round(next)));
+    if (i !== index) setIndex(i);
+  });
 
   return (
-    <section ref={ref} className="hero" aria-labelledby="hero-title">
-      <motion.div className="hero-copy" style={{ y: copyY, opacity: fade }}>
-        <motion.span className="chip chip--strong hero-chip" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: duration.slow, delay: 0.05 }}>
-          <Sparkles size={13} aria-hidden="true" /> The LeetCode of investment banking
-        </motion.span>
-        <h1 id="hero-title" className="t-display hero-title">
-          <span className="sr-only">{BRAND.tagline}</span>
-          <WordReveal text="Don't study finance." delay={0.05} />
-          <br aria-hidden="true" />
-          <WordReveal text="Do finance." delay={0.28} gold />
-        </h1>
-        <motion.p className="t-lead hero-lead" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: duration.reveal, delay: 0.4, ease: ease.out }}>
-          Solve real M&amp;A, LBO and DCF deal simulations in minutes. Climb from Analyst to MD with Vale, your AI tutor, in your corner.
-        </motion.p>
-        <motion.div className="hero-ctas" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: duration.reveal, delay: 0.5, ease: ease.out }}>
-          <span className="cta-conic"><Link to="/signup" className="btn btn--lg btn--auto">Start free <ArrowRight size={18} aria-hidden="true" /></Link></span>
-          <button type="button" className="btn btn--secondary btn--lg btn--auto" onClick={() => scrollTo('peek')}>See a deal</button>
-        </motion.div>
-        <motion.p className="t-foot hero-note" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
-          Free plan, no card needed. Three deals a week, forever.
-        </motion.p>
-        <HeroStats />
-      </motion.div>
-
-      <motion.div className="hero-visual" style={{ y: visualY }}>
-        <motion.div
-          className="hero-vale"
-          initial={{ opacity: 0, y: 40, scale: 0.92 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ ...spring.gentle, delay: 0.35 }}
-        >
-          <div className="hero-vale-glow" aria-hidden="true" />
-          <Mascot state="idle" lookAt="pointer" interactive mode="3d" size={valeSize} label="Vale, the Vantaris mascot: a chrome pebble with a black glass visor" />
-          <motion.div
-            className="hero-bubble"
-            initial={{ opacity: 0, scale: 0.8, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ ...spring.bouncy, delay: 1 }}
-          >
-            Let’s close this deal.
-          </motion.div>
-        </motion.div>
-      </motion.div>
-
-      <button type="button" className="scroll-cue" onClick={() => scrollTo('how')} aria-label="Scroll to how it works">
-        <span /><i />
-      </button>
+    <section ref={ref} id="film" className="film" aria-label="How Vantaris works">
+      <Stage index={index} t={t} mobile={mobile} />
+      <div className="film-chapters">
+        {CHAPTERS.map((c, i) => (
+          <article key={c.id} ref={(el) => { chapters.current[i] = el; }} className={`chapter chapter--${c.id} ${i === index ? 'is-active' : ''}`} aria-labelledby={`ch-${c.id}`}>
+            <div className="chapter-copy">
+              <p className="t-eyebrow">{c.eyebrow}</p>
+              {i === 0 ? (
+                <h1 id={`ch-${c.id}`} className="t-display hero-title text-chrome">{c.title}</h1>
+              ) : (
+                <h2 id={`ch-${c.id}`} className="chapter-title">{c.title}</h2>
+              )}
+              <p className="t-lead">{c.body}</p>
+              {i === 0 && <StartCta source="hero" />}
+            </div>
+          </article>
+        ))}
+      </div>
     </section>
   );
 }
 
-function SpringNumber({ value }) {
-  const reduce = useReducedMotion();
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true });
-  const mv = useSpring(0, { stiffness: 38, damping: 18, mass: 1 });
-  const text = useTransform(mv, (v) => Math.round(v).toLocaleString('en-US'));
+/** Mascot poses per chapter: fractions of the half viewport (3D) and CSS for the SVG. */
+const POSE = {
+  hero: { xf: 0.42, yf: -0.05, scale: 1.05, bg: 1 },
+  rest: { xf: 0.8, yf: 0.5, scale: 0.3, bg: 0 },
+  heroMobile: { xf: 0, yf: 0.32, scale: 0.62, bg: 1 },
+  restMobile: { xf: 0.62, yf: -0.1, scale: 0.22, bg: 0 },
+};
+
+function Stage({ index, t, mobile }) {
+  const c = CHAPTERS[index];
+  const can3D = useCan3D();
+  const hero = c.visual === 'hero';
+  const pose = useRef({ ...POSE.hero });
   useEffect(() => {
-    if (!inView) return;
-    if (reduce) mv.jump(value);
-    else mv.set(value);
-  }, [inView, value, reduce, mv]);
-  return <motion.span ref={ref} className="fig">{text}</motion.span>;
-}
+    pose.current = { ...(hero ? (mobile ? POSE.heroMobile : POSE.hero) : (mobile ? POSE.restMobile : POSE.rest)) };
+  }, [hero, mobile]);
+  const lookAt = hero ? 'pointer' : { x: -0.9, y: 0.5 };
+  const local = useTransform(t, (v) => Math.max(0, Math.min(1, v - index + 0.5)));
+  // The SVG fallback follows the same poses with CSS transforms.
+  const svgPose = hero
+    ? (mobile ? { left: '50%', top: '10%', width: 200, x: '-50%' } : { left: '62%', top: '22%', width: 380, x: '0%' })
+    : (mobile ? { left: '78%', top: '54%', width: 64, x: '0%' } : { left: '84%', top: '10%', width: 120, x: '0%' });
+  const state = c.vale;
 
-function HeroStats() {
-  const stats = usePublicStats();
-  const items = [
-    stats?.deals_solved >= SOCIAL_PROOF_MIN && { value: stats.deals_solved, label: 'deals solved' },
-    stats?.players >= SOCIAL_PROOF_MIN && { value: stats.players, label: 'future analysts' },
-    stats?.problems && { value: stats.problems, label: 'real deal problems' },
-    { value: 4, label: 'career tiers' },
-  ].filter(Boolean).slice(0, 3);
   return (
-    <AnimatePresence>
-      {stats !== undefined && (
-        <motion.dl className="hero-stats" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65, duration: duration.slow }}>
-          {items.map((s) => (
-            <div key={s.label} className="hero-stat">
-              <dt className="t-foot">{s.label}</dt>
-              <dd><SpringNumber value={s.value} /></dd>
-            </div>
-          ))}
-        </motion.dl>
+    <div className="film-stage" aria-hidden="true">
+      <div className="stage-scrim" />
+      {can3D ? (
+        <div className="stage-canvas">
+          <Scene3D scene="mascot" state={state} lookAt={lookAt} interactive background="liquid" poseRef={pose} camera={7} fallback={null} />
+        </div>
+      ) : (
+        <motion.div className="stage-svg" initial={false} animate={svgPose} transition={spring.gentle}>
+          {HERO_LOOP && hero && !mobile ? <HeroVideo /> : <Mascot state={state} lookAt={lookAt} size={svgPose.width} decorative />}
+        </motion.div>
       )}
-    </AnimatePresence>
-  );
-}
-
-/* ---------- Terminal ticker ---------- */
-function Ticker() {
-  const row = [...TICKER, ...TICKER];
-  return (
-    <div className="ticker" aria-hidden="true">
-      <div className="ticker-track">
-        {row.map(([k, v], i) => (
-          <span key={`${k}-${i}`} className="ticker-item">
-            <span className="ticker-k">{k}</span>
-            <span className={`ticker-v fig ${i % 3 === 0 ? 'c-fg' : 'c-fg'}`}>{v}</span>
-            <span className={i % 4 === 1 ? 'c-neg' : 'c-pos'}>{i % 4 === 1 ? '▼' : '▲'}</span>
-          </span>
-        ))}
-      </div>
+      <AnimatePresence mode="wait">
+        {!hero && (
+          <motion.div
+            key={c.visual}
+            className="stage-panel"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: duration.slow, ease: ease.out } }}
+            exit={{ opacity: 0, y: -16, transition: { duration: duration.fast } }}
+          >
+            <Visual kind={c.visual} p={local} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
-/* ---------- Sections ---------- */
-function SectionHead({ eyebrow, title, lead, id }) {
+function Visual({ kind, p }) {
+  if (kind === 'deal') return <DealSheet p={p} />;
+  if (kind === 'answer') return <AnswerSheet p={p} />;
+  if (kind === 'chart') return <ReturnsChart p={p} />;
+  if (kind === 'ladder') return <RankLadder p={p} />;
+  if (kind === 'tutor') return <TutorBubble p={p} />;
+  return null;
+}
+
+/** A motion value as React state, rounded to a few steps (keeps re-renders rare). */
+function useStep(mv, steps) {
+  const [v, setV] = useState(() => Math.round(mv.get() * steps));
+  useMotionValueEvent(mv, 'change', (x) => {
+    const n = Math.round(x * steps);
+    if (n !== v) setV(n);
+  });
+  return v;
+}
+
+function DealSheet({ p }) {
+  const shown = useStep(p, SAMPLE_DEAL.terms.length + 1);
   return (
-    <Reveal gap={stagger.children} className="lsec-head">
-      <motion.p variants={item} className="t-eyebrow">{eyebrow}</motion.p>
-      <motion.h2 variants={item} id={id} className="lsec-title">{title}</motion.h2>
-      {lead && <motion.p variants={item} className="t-lead lsec-lead">{lead}</motion.p>}
-    </Reveal>
+    <Spotlight className="sheet-panel">
+      <p className="t-eyebrow">{SAMPLE_DEAL.kind}</p>
+      <p className="panel-title">{SAMPLE_DEAL.title}</p>
+      <dl className="ledger">
+        {SAMPLE_DEAL.terms.map(([k, v], i) => (
+          <div key={k} className={`ledger-row ${i < Math.max(2, shown) ? 'is-in' : ''}`}>
+            <dt>{k}</dt><dd className="fig">{v}</dd>
+          </div>
+        ))}
+      </dl>
+    </Spotlight>
   );
 }
 
-function Features() {
+function AnswerSheet({ p }) {
+  const step = useStep(p, 10);
+  const picked = step >= 4;
+  const scored = step >= 7;
+  const ring = useTransform(p, [0, 1], [0, 1]);
   return (
-    <section id="how" className="lsec" aria-labelledby="how-title">
-      <SectionHead id="how-title" eyebrow="How it works" title={<>A deal desk in your pocket.</>} lead="Every problem is a real-world deal: read the brief, work the numbers, beat the clock. Then see exactly how a banker would do it." />
-      <Reveal gap={stagger.list} className="feature-grid" amount={0.1}>
-        {FEATURES.map((f) => {
-          const Icon = ICONS[f.icon] ?? Sparkles;
+    <Spotlight className="sheet-panel">
+      <div className="between">
+        <p className="t-eyebrow">Question</p>
+        <svg width="28" height="28" viewBox="0 0 28 28" className="mini-timer" aria-hidden="true">
+          <circle cx="14" cy="14" r="12" className="mini-timer-track" />
+          <motion.circle cx="14" cy="14" r="12" className="mini-timer-fill" style={{ pathLength: useTransform(ring, (v) => 1 - v * 0.8) }} />
+        </svg>
+      </div>
+      <p className="panel-q">{SAMPLE_DEAL.question}</p>
+      <ul className="opts">
+        {SAMPLE_DEAL.options.map((o, i) => (
+          <li key={o} className={`opt ${picked && i === SAMPLE_DEAL.pick ? (scored ? 'is-right' : 'is-picked') : ''}`}>
+            <span className="opt-key">{'ABCD'[i]}</span><span className="fig">{o}</span>
+            {scored && i === SAMPLE_DEAL.pick && <Check size={16} className="c-pos opt-check" aria-hidden="true" />}
+          </li>
+        ))}
+      </ul>
+      <p className={`panel-score fig ${scored ? 'is-in' : ''}`}><span className="c-pos">+18</span> <span className="c-3">pts · speed bonus</span></p>
+    </Spotlight>
+  );
+}
+
+// Sponsor equity compounding at the sample deal's IRR (23.0%), year 0 → 5.
+const EQUITY = [160, 197, 242, 298, 366, 450];
+
+function ReturnsChart({ p }) {
+  const W = 420, H = 220, L = 40, R = 16, T = 18, B = 30;
+  const x = (i) => L + (i * (W - L - R)) / (EQUITY.length - 1);
+  const y = (v) => T + (H - T - B) * (1 - (v - 100) / 400);
+  const d = EQUITY.map((v, i) => `${i ? 'L' : 'M'}${x(i)},${y(v)}`).join(' ');
+  const draw = useTransform(p, [0.1, 0.85], [0, 1]);
+  const done = useStep(p, 10) >= 8;
+  const steps = ['Exit EV  8.0x × $70M = $560M', 'Exit equity  $560M − $110M = $450M', 'MOIC  $450M ÷ $160M = 2.81x', 'IRR  2.81^(1/5) − 1 = 23.0%'];
+  const shown = useStep(p, steps.length + 1);
+  return (
+    <Spotlight className="sheet-panel">
+      <div className="between">
+        <p className="t-eyebrow">Sponsor equity, $M</p>
+        <p className={`fig panel-irr ${done ? 'is-in' : ''}`}><span className="c-pos">+23.0%</span> <span className="c-3">IRR</span></p>
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" className="returns" role="img" aria-label="Sponsor equity grows from $160M to $450M over five years, a 23% IRR.">
+        {[100, 300, 500].map((v) => (
+          <g key={v}>
+            <line x1={L} x2={W - R} y1={y(v)} y2={y(v)} className="chart-grid" />
+            <text x={L - 8} y={y(v)} textAnchor="end" dominantBaseline="middle" className="chart-tick">{v}</text>
+          </g>
+        ))}
+        {EQUITY.map((_, i) => <text key={i} x={x(i)} y={H - 8} textAnchor="middle" className="chart-tick">Y{i}</text>)}
+        <motion.path d={d} fill="none" stroke="var(--platinum)" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" style={{ pathLength: draw }} />
+      </svg>
+      <ol className="mini-steps">
+        {steps.map((s, i) => <li key={s} className={`fig ${i < shown ? 'is-in' : ''}`}>{s}</li>)}
+      </ol>
+    </Spotlight>
+  );
+}
+
+function RankLadder({ p }) {
+  const lit = Math.min(LADDER.length, 1 + useStep(p, LADDER.length));
+  return (
+    <Spotlight className="sheet-panel">
+      <p className="t-eyebrow">Your career</p>
+      <ol className="rungs">
+        {[...LADDER].reverse().map((l) => {
+          const n = LADDER.findIndex((x) => x.level === l.level);
           return (
-            <motion.div key={f.title} variants={item} style={{ height: '100%' }}>
-              <TiltCard className="feature-card">
-                <span className="feature-icon"><Icon size={22} aria-hidden="true" /></span>
-                <h3 className="t-title">{f.title}</h3>
-                <p className="t-callout">{f.body}</p>
-              </TiltCard>
-            </motion.div>
+            <li key={l.level} className={`rung ${n < lit ? 'is-lit' : ''} ${n === lit - 1 ? 'is-now' : ''}`}>
+              <TierBadge level={l.level} />
+              <span className="grow t-foot">{l.line}</span>
+              <span className="fig t-cap">{l.points}+ pts</span>
+            </li>
           );
         })}
-      </Reveal>
+      </ol>
+    </Spotlight>
+  );
+}
+
+function TutorBubble({ p }) {
+  const step = useStep(p, 6);
+  return (
+    <Spotlight className="sheet-panel">
+      <p className="t-eyebrow">Vale · tutor</p>
+      <div className="bubbles">
+        <p className={`bub bub--me ${step >= 1 ? 'is-in' : ''}`}>Where do I start with the IRR?</p>
+        <div className={`bub bub--ai ${step >= 2 ? 'is-in' : ''}`}>
+          <p>{SAMPLE_DEAL.hint}</p>
+          <p className="c-3">Want the formula for exit equity?</p>
+        </div>
+      </div>
+    </Spotlight>
+  );
+}
+
+/** Desktop browsers without WebGL can show the Higgsfield loop (never on Save-Data or reduced motion). */
+function HeroVideo() {
+  const saveData = typeof navigator !== 'undefined' && navigator.connection?.saveData;
+  const base = import.meta.env.BASE_URL;
+  if (saveData) return <img src={`${base}mascot/hero-loop.webp`} alt="" width="380" height="380" />;
+  return (
+    <video autoPlay muted loop playsInline preload="metadata" poster={`${base}mascot/hero-loop.webp`} width="380" height="380">
+      <source src={`${base}mascot/hero-loop.webm`} type="video/webm" />
+      <source src={`${base}mascot/hero-loop.mp4`} type="video/mp4" />
+    </video>
+  );
+}
+
+/** Reduced motion: the same story as plain sections, nothing scrubbed. */
+function StillFilm() {
+  const still = useMotionValue(1);
+  return (
+    <section id="film" className="still" aria-label="How Vantaris works">
+      {CHAPTERS.map((c, i) => (
+        <article key={c.id} className={`still-ch ${i === 0 ? 'still-ch--hero' : ''}`} aria-labelledby={`ch-${c.id}`}>
+          <div className="chapter-copy">
+            <p className="t-eyebrow">{c.eyebrow}</p>
+            {i === 0 ? <h1 id={`ch-${c.id}`} className="t-display hero-title text-chrome">{c.title}</h1> : <h2 id={`ch-${c.id}`} className="chapter-title">{c.title}</h2>}
+            <p className="t-lead">{c.body}</p>
+            {i === 0 && <StartCta source="hero" />}
+          </div>
+          {i === 0 ? <Mascot state="idle" size={220} decorative /> : <div className="still-visual"><Visual kind={c.visual} p={still} /></div>}
+        </article>
+      ))}
     </section>
   );
 }
 
-function Ladder() {
-  const modules = usePublicModules();
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 80%', 'end 60%'] });
-  const fill = useSpring(scrollYProgress, { stiffness: 80, damping: 24 });
+/* ---------- Pricing + the one call to action ---------- */
+function StartCta({ source }) {
   return (
-    <section id="ladder" className="lsec" aria-labelledby="ladder-title" ref={ref}>
-      <SectionHead id="ladder-title" eyebrow="Career path" title="From Analyst to MD." lead="Every first-time correct answer earns points. Points move you up the ladder, and each promotion unlocks a harder desk." />
-      <div className="ladder">
-        <div className="ladder-rail" aria-hidden="true"><motion.i style={{ scaleX: fill }} /></div>
-        <Reveal gap={stagger.list} className="ladder-grid" amount={0.15}>
-          {LADDER.map((l) => {
-            const mods = modules?.filter((m) => m.level === l.level) ?? [];
-            return (
-              <motion.div key={l.level} variants={item} className="ladder-card" data-tier={l.level}>
-                <span className="ladder-node" aria-hidden="true" />
-                <TierBadge level={l.level} />
-                <div className="fig ladder-pts">{l.points.toLocaleString('en-US')}<span className="t-foot"> pts</span></div>
-                <p className="t-callout">{l.line}</p>
-                {mods.length > 0 && (
-                  <div className="row-8 wrap">
-                    {mods.map((m) => <span key={m.id} className="chip">{m.short}</span>)}
-                  </div>
-                )}
-              </motion.div>
-            );
-          })}
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-function Peek() {
-  const d = SAMPLE_DEAL;
-  return (
-    <section id="peek" className="lsec peek" aria-labelledby="peek-title">
-      <div className="peek-copy">
-        <SectionHead id="peek-title" eyebrow="Inside a deal" title="Built like a terminal. Plays like a game." lead="Five inputs, one question, a clock. Tap any figure to drop it into the calculator, ask Vale for a nudge, and lock in your answer." />
-        <Reveal gap={stagger.list} className="peek-points">
-          {[
-            [Clock, 'Speed bonus', 'Up to +50% points for answering inside the time.'],
-            [Sparkles, 'Hints, not answers', 'Vale nudges you forward without spoiling the solve.'],
-            [ListChecks, 'Full walkthrough', 'Every step and formula, the moment you submit.'],
-          ].map(([Icon, t, b]) => (
-            <motion.div key={t} variants={item} className="row" style={{ alignItems: 'flex-start' }}>
-              <span className="feature-icon feature-icon--sm"><Icon size={18} aria-hidden="true" /></span>
-              <span className="stack-4"><span className="t-headline">{t}</span><span className="t-callout">{b}</span></span>
-            </motion.div>
-          ))}
-        </Reveal>
-      </div>
-      <Reveal className="terminal" amount={0.3}>
-        <div className="terminal-bar">
-          <span className="terminal-dots" aria-hidden="true"><i /><i /><i /></span>
-          <span className="t-cap fig">VANTARIS · DEAL DESK</span>
-          <span className="timer-pill fig"><Clock size={12} aria-hidden="true" /> 04:12</span>
-        </div>
-        <div className="terminal-body">
-          <div className="stack-4">
-            <span className="t-eyebrow">{d.kind}</span>
-            <h3 className="t-h3">{d.title}</h3>
-          </div>
-          <dl className="terminal-terms">
-            {d.terms.map(([k, v]) => (
-              <div key={k} className="between"><dt className="t-callout">{k}</dt><dd className="fig">{v}</dd></div>
-            ))}
-          </dl>
-          <p className="t-headline">{d.question}</p>
-          <div className="terminal-options">
-            {d.options.map((o, i) => (
-              <div key={o} className={`terminal-option ${i === d.pick ? 'is-picked' : ''}`}>
-                <span className="terminal-key">{'ABCD'[i]}</span><span className="fig">{o}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <motion.div
-          className="terminal-vale"
-          initial={{ opacity: 0, y: 20, scale: 0.9 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ ...spring.bouncy, delay: 0.5 }}
-        >
-          <Mascot mood="think" size={64} decorative />
-          <p className="t-callout"><b className="c-fg">Vale:</b> {d.hint}</p>
-        </motion.div>
-      </Reveal>
-    </section>
+    <Magnetic className="cta-wrap">
+      <Link to="/signup" className="btn btn--primary btn--lg btn--auto" onClick={() => track('upgrade_click', { source: `landing-${source}` })}>
+        Start free <ArrowRight size={18} aria-hidden="true" />
+      </Link>
+    </Magnetic>
   );
 }
 
@@ -356,98 +371,35 @@ function Pricing() {
   const tiers = data?.tiers.filter((t) => t.id !== 'free') ?? [];
   return (
     <section id="pricing" className="lsec" aria-labelledby="pricing-title">
-      <SectionHead id="pricing-title" eyebrow="Pricing" title="Start free. Go pro when you're ready." lead="Every plan includes the leaderboard, streaks and the full Analyst desk. Cancel anytime." />
-      <div className="center" style={{ marginBottom: 'var(--sp-10)' }}><BillingToggle cycle={cycle} onChange={setCycle} /></div>
+      <header className="lsec-head">
+        <p className="t-eyebrow">Pricing</p>
+        <h2 id="pricing-title" className="chapter-title">Start free. Go further when you’re ready.</h2>
+        <p className="t-lead">Three deals a week are free, forever. Paid plans add unlimited deals, harder desks and Vale. Cancel anytime.</p>
+      </header>
+      <BillingToggle cycle={cycle} onChange={setCycle} />
       {data ? (
         <div className="plans-grid">
           {tiers.map((t) => {
-            const plan = data.plans.find((p) => p.tier === t.id && p.interval === cycle);
-            const monthly = data.plans.find((p) => p.tier === t.id && p.interval === 'monthly');
+            const plan = data.plans.find((x) => x.tier === t.id && x.interval === cycle);
+            const monthly = data.plans.find((x) => x.tier === t.id && x.interval === 'monthly');
             if (!plan) return null;
-            return <PlanCard key={t.id} tier={t} plan={plan} monthly={monthly} featured={t.id === 'pro'} onSelect={() => navigate('/signup')} cta={`Start with ${t.name}`} />;
+            return (
+              <PlanCard
+                key={t.id} tier={t} plan={plan} monthly={monthly} featured={t.id === 'pro'}
+                onSelect={() => { track('upgrade_click', { plan: t.id, interval: cycle, source: 'landing' }); navigate('/signup'); }}
+                cta={`Start with ${t.name}`}
+              />
+            );
           })}
         </div>
       ) : (
         <div className="plans-grid">{[0, 1, 2].map((i) => <div key={i} className="skeleton" style={{ height: 460 }} />)}</div>
       )}
-      <p className="t-foot center" style={{ marginTop: 'var(--sp-6)' }}>Prices in Indian rupees. Payments processed securely by Razorpay.</p>
-    </section>
-  );
-}
-
-function Reviews() {
-  const track = useRef(null);
-  const reduce = useReducedMotion();
-  const [paused, setPaused] = useState(false);
-  const step = (dir) => {
-    const el = track.current;
-    if (!el) return;
-    const card = el.querySelector('.review');
-    const w = card ? card.getBoundingClientRect().width + 20 : el.clientWidth * 0.8;
-    const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
-    if (dir > 0 && atEnd) el.scrollTo({ left: 0, behavior: 'smooth' });
-    else el.scrollBy({ left: dir * w, behavior: 'smooth' });
-  };
-  useEffect(() => {
-    if (reduce || paused) return undefined;
-    const t = setInterval(() => step(1), 5200);
-    return () => clearInterval(t);
-  }, [reduce, paused]);
-  return (
-    <section id="reviews" className="lsec" aria-labelledby="reviews-title">
-      <div className="between reviews-head">
-        <SectionHead id="reviews-title" eyebrow="Reviews" title="Future dealmakers, on Vantaris." />
-        <div className="row-8">
-          <button type="button" className="icon-btn" onClick={() => step(-1)} aria-label="Previous review"><ChevronLeft size={20} /></button>
-          <button type="button" className="icon-btn" onClick={() => step(1)} aria-label="Next review"><ChevronRight size={20} /></button>
-        </div>
+      <p className="t-foot">Prices in Indian rupees, taxes as applicable. Payments by Razorpay. See the <Link className="link" to="/subscription-terms">subscription terms</Link> and <Link className="link" to="/refund">refund policy</Link>.</p>
+      <div className="final">
+        <p className="final-line">Your first deal takes five minutes.</p>
+        <StartCta source="final" />
       </div>
-      <div
-        ref={track}
-        className="reviews"
-        onPointerEnter={() => setPaused(true)}
-        onPointerLeave={() => setPaused(false)}
-        onFocus={() => setPaused(true)}
-        onBlur={() => setPaused(false)}
-        tabIndex={0}
-        aria-label="Reviews, scroll horizontally"
-      >
-        {TESTIMONIALS.map((t, i) => (
-          <figure key={i} className="review card card--glass">
-            <div className="between">
-              <Quote size={26} className="c-fg" aria-hidden="true" />
-              {t.sample && <span className="chip">Sample quote</span>}
-            </div>
-            <blockquote className="review-quote">{t.quote}</blockquote>
-            <figcaption className="row">
-              <Avatar name={t.name} variant="me" />
-              <span className="grow stack-4">
-                <span className="t-label c-fg">{t.name}</span>
-                <span className="t-cap">{t.role}</span>
-              </span>
-            </figcaption>
-          </figure>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function FinalCta() {
-  return (
-    <section className="lsec final" aria-labelledby="final-title">
-      <Reveal className="final-card">
-        <div className="final-glow" aria-hidden="true" />
-        <Mascot mood="levelup" size={180} decorative />
-        <div className="stack-16 final-copy">
-          <h2 id="final-title" className="lsec-title">Your first deal is waiting.</h2>
-          <p className="t-lead">Five minutes. One question. A banker’s walkthrough the moment you answer.</p>
-          <div className="hero-ctas">
-            <span className="cta-conic"><Link to="/signup" className="btn btn--lg btn--auto">Create free account <ArrowRight size={18} aria-hidden="true" /></Link></span>
-            <Link to="/signin" className="btn btn--ghost btn--lg btn--auto">I have an account</Link>
-          </div>
-        </div>
-      </Reveal>
     </section>
   );
 }
@@ -456,15 +408,13 @@ function Footer() {
   return (
     <footer className="lfoot">
       <div className="lfoot-inner">
-        <Logo size={24} />
-        <nav className="row-16 wrap" aria-label="Footer">
-          <button type="button" onClick={() => scrollTo('pricing')}>Pricing</button>
-          <Link to="/signin">Sign in</Link>
-          <Link to="/signup">Create account</Link>
-          <a href={`mailto:${BRAND.support}`}>{BRAND.support}</a>
-        </nav>
-        <p className="t-cap">© {YEAR} {BRAND.name}. Built for future dealmakers.</p>
+        <div className="stack-12">
+          <Logo size={24} />
+          <p className="t-cap">© {YEAR} {BRAND.name}. Practice problems for education; not investment advice.</p>
+        </div>
+        <LegalLinks />
       </div>
     </footer>
   );
 }
+

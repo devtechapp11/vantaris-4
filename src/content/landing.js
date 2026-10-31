@@ -1,5 +1,21 @@
 // Landing page copy. Edit freely; the layout adapts to the number of items.
 
+// The scroll film: one chapter per screen. `visual` picks what the sticky stage
+// shows while the chapter is in view; `vale` is the mascot's state.
+export const CHAPTERS = [
+  { id: 'hero', visual: 'hero', vale: 'idle', eyebrow: 'Deal practice for future bankers', title: 'Don’t study finance. Do finance.', body: 'Real DCF, LBO and M&A problems, the way interviewers ask them. Solve one in five minutes.' },
+  { id: 'deal', visual: 'deal', vale: 'curious', eyebrow: '01 · The deal', title: 'Real deals, not flashcards.', body: 'Every problem is a term sheet: a company, the numbers that matter and one question a banker would ask.' },
+  { id: 'answer', visual: 'answer', vale: 'thinking', eyebrow: '02 · Your call', title: 'Pick an answer. Beat the clock.', body: 'Tap a figure to drop it into the calculator. Answer inside the time and earn up to 50% more points.' },
+  { id: 'steps', visual: 'chart', vale: 'success', eyebrow: '03 · The walkthrough', title: 'See how a banker gets there.', body: 'After every deal, a step-by-step solution, the formula and why it matters. Open only what you need.' },
+  { id: 'ladder', visual: 'ladder', vale: 'celebrate', eyebrow: '04 · The ladder', title: 'Analyst to MD.', body: 'First-time solves earn points. Climb four tiers and unlock harder desks on the way.' },
+  { id: 'tutor', visual: 'tutor', vale: 'idle', eyebrow: '05 · Your tutor', title: 'Stuck? Ask Vale.', body: 'Hints, formulas and the idea behind a step. Vale never gives the answer away before you submit.' },
+];
+
+// Set to true after `npm run mascot` has produced public/mascot/hero-loop.*
+// (see docs/higgsfield-prompts.md). Desktop browsers without WebGL then show the
+// video in the hero; phones keep the light SVG.
+export const HERO_LOOP = false;
+
 export const FEATURES = [
   { icon: 'briefcase', title: 'Real deal simulations', body: 'DCF, LBO, comps and M&A problems shaped like the deals interviewers actually ask about.' },
   { icon: 'trending', title: 'Analyst to MD', body: 'Earn points on every first-time solve, climb four tiers and unlock harder modules as you go.' },

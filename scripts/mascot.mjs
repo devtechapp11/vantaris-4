@@ -43,4 +43,4 @@ if (over) {
   console.error('Over the 2.5 MB budget: raise -crf or shorten the clip.');
   process.exit(1);
 }
-console.log('Done. Set HERO_LOOP = true in src/content/landing.js to use it.');
+console.log('Done. Set HERO_LOOP = true in src/content/landing.js to use it in the hero.');

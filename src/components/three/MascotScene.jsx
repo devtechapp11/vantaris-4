@@ -278,9 +278,13 @@ function Vale({ state, lookAt, pulse, interactive, poseRef, onReady, colors }) {
       }
     }
 
+    // Pose from the page (the landing film): xf/yf are fractions of the half viewport.
     const pose = poseRef?.current;
-    g.position.x = MathUtils.damp(g.position.x, pose?.x ?? 0, 5, dt);
-    g.position.y = MathUtils.damp(g.position.y, (pose?.y ?? 0) + py, 7, dt);
+    const vp = three.viewport;
+    const tx = pose?.xf != null ? pose.xf * vp.width / 2 : pose?.x ?? 0;
+    const ty = pose?.yf != null ? pose.yf * vp.height / 2 : pose?.y ?? 0;
+    g.position.x = MathUtils.damp(g.position.x, tx, 4, dt);
+    g.position.y = MathUtils.damp(g.position.y, ty + py, 5, dt);
     const sc = pose?.scale ?? 1;
     g.scale.set(MathUtils.damp(g.scale.x, sc * sx, 10, dt), MathUtils.damp(g.scale.y, sc * sy, 10, dt), MathUtils.damp(g.scale.z, sc * sx, 10, dt));
     g.rotation.x = MathUtils.damp(g.rotation.x, rx, 7, dt);
@@ -298,11 +302,11 @@ function Vale({ state, lookAt, pulse, interactive, poseRef, onReady, colors }) {
     u.uEyeGlow.value = MathUtils.damp(u.uEyeGlow.value, glow, 8, dt);
 
     if (floorRef.current) {
-      const lift = g.position.y - (pose?.y ?? 0);
+      const lift = g.position.y - ty;
       floorRef.current.material.opacity = MathUtils.clamp(0.9 - lift * 1.2, 0.35, 0.9);
       floorRef.current.position.x = g.position.x;
-      floorRef.current.position.y = (pose?.y ?? 0) - 1.5 * sc;
-      floorRef.current.scale.setScalar(sc);
+      floorRef.current.position.y = g.position.y - py - 1.5 * g.scale.y;
+      floorRef.current.scale.setScalar(g.scale.x);
     }
 
     if (!ready.current) {
