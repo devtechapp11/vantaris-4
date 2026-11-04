@@ -1,0 +1,27 @@
+.mcard-wrap { perspective: 1000px; display: block; width: 100%; }
+.mcard-button { background: none; border: 0; padding: 0; position: relative; }
+/* Black card, 1px top-edge highlight, chrome wordmark */
+.mcard {
+  position: relative; overflow: hidden;
+  width: 100%; max-width: 420px; aspect-ratio: 1.586;
+  border-radius: var(--r-md);
+  color: var(--fg);
+  background: var(--black);
+  border: var(--hairline) solid var(--aluminium-dark);
+  box-shadow: var(--edge-highlight);
+  transform-style: preserve-3d;
+  touch-action: pan-y;
+}
+.mcard--locked { opacity: 0.55; }
+.mcard-rings { position: absolute; inset: 0; width: 100%; height: 100%; }
+.mcard-rings circle { fill: none; stroke: var(--line); stroke-width: 1; }
+.mcard-sheen { display: none; }
+.mcard-body { position: absolute; inset: 0; padding: 7% 7.5%; display: flex; flex-direction: column; }
+.mcard-brand { display: inline-flex; align-items: center; gap: var(--sp-2); font-weight: var(--fw-semibold); font-size: clamp(13px, 3.6vw, 16px); letter-spacing: var(--tracking-wider); }
+.mcard-tier { font-size: clamp(10px, 2.6vw, 12px); letter-spacing: var(--tracking-wide); color: var(--fg-2); border: var(--hairline) solid var(--aluminium-dark); border-radius: var(--r-xs); padding: 2px var(--sp-2); }
+.mcard-chip { margin-top: 9%; width: 15%; aspect-ratio: 1.35; border-radius: var(--r-xs); border: var(--hairline) solid var(--aluminium); }
+.mcard-foot { margin-top: auto; display: flex; flex-direction: column; gap: var(--sp-1); }
+.mcard-meta { font-size: clamp(10px, 2.8vw, 12px); color: var(--fg-3); letter-spacing: var(--tracking-wide); }
+.mcard-name { font-family: var(--font-display); font-size: clamp(22px, 6vw, 30px); font-weight: 400; line-height: 1.1; }
+.mcard-lock { position: absolute; inset: 0; display: grid; place-items: center; }
+.mcard-lock .chip { height: 36px; padding: 0 var(--sp-4); font-size: var(--fs-sm); background: var(--bg); }

@@ -1,0 +1,33 @@
+.rank-scope { max-width: 420px; }
+.rank-layout { display: grid; gap: var(--sp-8); grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 1000px) { .rank-layout { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: var(--sp-12); } .rank-layout > :first-child { position: sticky; top: var(--sp-8); } }
+
+/* Podium: three flat columns, height is the only emphasis */
+.podium { position: relative; padding: var(--sp-6) 0 0; border-top: var(--hairline) solid var(--line); }
+.podium-row { position: relative; display: grid; align-items: end; gap: var(--sp-2); }
+.podium-col { display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); min-width: 0; }
+.podium-crown { color: var(--fg-2); }
+.podium-you { position: absolute; bottom: calc(var(--sp-2) * -1); left: 50%; translate: -50% 0; height: 20px; font-size: var(--fs-2xs); padding: 0 var(--sp-2); background: var(--bg); }
+.podium-step {
+  width: 100%; border-radius: var(--r-xs) var(--r-xs) 0 0;
+  transform-origin: 50% 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: var(--sp-1); padding-top: var(--sp-3);
+  border: var(--hairline) solid var(--line-strong); border-bottom: 0;
+  box-shadow: var(--edge-highlight);
+  color: var(--fg-2);
+}
+.podium-step[data-place='1'] { border-color: var(--aluminium); color: var(--fg); }
+.podium-rank { font-size: var(--fs-2xl); font-weight: var(--fw-medium); line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.podium-pts { font-size: var(--fs-xs); font-weight: var(--fw-medium); color: var(--fg-3); font-variant-numeric: tabular-nums; }
+
+.rank-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-top: var(--hairline) solid var(--line); }
+.rank-row {
+  display: flex; align-items: center; gap: var(--sp-3);
+  min-height: 60px; padding: var(--sp-2) var(--sp-1);
+  border-bottom: var(--hairline) solid var(--line);
+  transition: background-color var(--dur-fast);
+}
+@media (hover: hover) { .rank-row:hover { background: var(--hover); } }
+.rank-row.is-me { background: var(--hover); box-shadow: inset 1px 0 0 var(--platinum); }
+.rank-pos { width: var(--sp-8); text-align: right; color: var(--fg-3); font-weight: var(--fw-medium); flex: none; font-variant-numeric: tabular-nums; }
+.rank-pts { font-weight: var(--fw-medium); color: var(--fg); font-variant-numeric: tabular-nums; }

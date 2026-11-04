@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="c" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#E7E8E5"/><stop offset="0.16" stop-color="#B9BEC0"/><stop offset="0.3" stop-color="#343A3E"/>
+      <stop offset="0.38" stop-color="#858D92"/><stop offset="0.52" stop-color="#E7E8E5"/><stop offset="0.7" stop-color="#858D92"/>
+      <stop offset="0.86" stop-color="#343A3E"/><stop offset="1" stop-color="#B9BEC0"/>
+    </linearGradient>
+    <radialGradient id="s" cx="0.32" cy="0.18" r="0.42"><stop offset="0" stop-color="#E7E8E5" stop-opacity="0.9"/><stop offset="1" stop-color="#E7E8E5" stop-opacity="0"/></radialGradient>
+    <linearGradient id="v" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#171A1D"/><stop offset="0.6" stop-color="#090A0B"/></linearGradient>
+    <filter id="g" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="3"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#090A0B"/>
+  <g transform="translate(116 92) scale(1.4)">
+    <path d="M100 10 C152 10 188 36 188 84 C188 126 156 170 122 203 C110 215 90 215 78 203 C44 170 12 126 12 84 C12 36 48 10 100 10 Z" fill="url(#c)"/>
+    <path d="M100 10 C152 10 188 36 188 84 C188 126 156 170 122 203 C110 215 90 215 78 203 C44 170 12 126 12 84 C12 36 48 10 100 10 Z" fill="url(#s)"/>
+    <path d="M28 84 C28 62 58 54 100 54 C142 54 172 62 172 84 C172 106 144 116 100 116 C56 116 28 106 28 84 Z" fill="url(#v)"/>
+    <g filter="url(#g)" fill="#E7E8E5"><circle cx="75" cy="85" r="8"/><circle cx="125" cy="85" r="8"/></g>
+  </g>
+</svg>

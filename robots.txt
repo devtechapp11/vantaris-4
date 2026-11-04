@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /reset-password
+
+Sitemap: https://vantaris.finance/sitemap.xml
