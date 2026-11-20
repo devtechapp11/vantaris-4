@@ -97,7 +97,8 @@
 .result--win { box-shadow: var(--lift), 0 0 48px -22px color-mix(in srgb, var(--gain) 70%, transparent); }
 .result--win::before { background: linear-gradient(135deg, color-mix(in srgb, var(--gain) 70%, var(--platinum)) 0%, color-mix(in srgb, var(--platinum) 18%, transparent) 40%, color-mix(in srgb, var(--aluminium-dark) 70%, transparent) 75%, color-mix(in srgb, var(--silver) 40%, transparent) 100%); }
 .result-top { position: relative; display: flex; align-items: center; gap: var(--sp-4); }
-@media (max-width: 420px) { .result-top { gap: var(--sp-3); } }
+/* Phones: Vale above the verdict, so the text gets the full width */
+@media (max-width: 559px) { .result-top { flex-direction: column; align-items: flex-start; gap: var(--sp-3); } }
 .result-vale { flex: none; }
 .score { display: flex; align-items: baseline; gap: var(--sp-1); line-height: 1; }
 .score-plus, .score-num { font-family: var(--font-mono); font-weight: var(--fw-semibold); letter-spacing: -0.06em; font-size: clamp(44px, 13vw, var(--fs-5xl)); color: var(--pos); font-variant-numeric: tabular-nums; text-shadow: 0 0 28px color-mix(in srgb, var(--gain) 45%, transparent); }

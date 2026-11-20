@@ -49,13 +49,16 @@ function useLenis(enabled) {
 export default function Landing() {
   const prefs = usePrefs();
   const reduce = useReducedMotion() || prefs.reduceMotion;
+  // Side-by-side film from 900px; phones and small tablets get a stacked film
+  // where every panel sits in the flow under its chapter (nothing pinned, nothing overlaid).
+  const wide = useMedia('(min-width: 900px)');
   useLenis(!reduce);
   useMeta({ path: '/' });
   return (
     <motion.div className="landing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: duration.slow }}>
       <LandingNav />
       <main id="main" tabIndex={-1}>
-        {reduce ? <StillFilm /> : <Film />}
+        {reduce ? <StillFilm /> : wide ? <Film /> : <MobileFilm />}
         <Pricing />
       </main>
       <Footer />
@@ -187,14 +190,15 @@ function Stage({ index, t, mobile }) {
   );
 }
 
-function Visual({ kind, p }) {
+function Visual({ kind, p, metal = false }) {
   if (kind === 'deal') return <DealSheet p={p} />;
-  if (kind === 'answer') return <AnswerSheet p={p} />;
-  if (kind === 'chart') return <ReturnsChart p={p} />;
-  if (kind === 'ladder') return <RankLadder p={p} />;
-  if (kind === 'tutor') return <TutorBubble p={p} />;
+  if (kind === 'answer') return <AnswerSheet p={p} metal={metal} />;
+  if (kind === 'chart') return <ReturnsChart p={p} metal={metal} />;
+  if (kind === 'ladder') return <RankLadder p={p} metal={metal} />;
+  if (kind === 'tutor') return <TutorBubble p={p} metal={metal} />;
   return null;
 }
+const sheet = (metal) => `sheet-panel${metal ? ' metal' : ''}`;
 
 /** A motion value as React state, rounded to a few steps (keeps re-renders rare). */
 function useStep(mv, steps) {
@@ -223,13 +227,13 @@ function DealSheet({ p }) {
   );
 }
 
-function AnswerSheet({ p }) {
+function AnswerSheet({ p, metal }) {
   const step = useStep(p, 10);
   const picked = step >= 4;
   const scored = step >= 7;
   const ring = useTransform(p, [0, 1], [0, 1]);
   return (
-    <Spotlight className="sheet-panel">
+    <Spotlight className={sheet(metal)}>
       <div className="between">
         <p className="t-eyebrow">Question</p>
         <svg width="28" height="28" viewBox="0 0 28 28" className="mini-timer" aria-hidden="true">
@@ -254,7 +258,7 @@ function AnswerSheet({ p }) {
 // Sponsor equity compounding at the sample deal's IRR (23.0%), year 0 → 5.
 const EQUITY = [160, 197, 242, 298, 366, 450];
 
-function ReturnsChart({ p }) {
+function ReturnsChart({ p, metal }) {
   const W = 420, H = 220, L = 40, R = 16, T = 18, B = 30;
   const x = (i) => L + (i * (W - L - R)) / (EQUITY.length - 1);
   const y = (v) => T + (H - T - B) * (1 - (v - 100) / 400);
@@ -264,7 +268,7 @@ function ReturnsChart({ p }) {
   const steps = ['Exit EV  8.0x × $70M = $560M', 'Exit equity  $560M − $110M = $450M', 'MOIC  $450M ÷ $160M = 2.81x', 'IRR  2.81^(1/5) − 1 = 23.0%'];
   const shown = useStep(p, steps.length + 1);
   return (
-    <Spotlight className="sheet-panel">
+    <Spotlight className={sheet(metal)}>
       <div className="between">
         <p className="t-eyebrow">Sponsor equity, $M</p>
         <p className={`fig panel-irr ${done ? 'is-in' : ''}`}><span className="c-pos">+23.0%</span> <span className="c-3">IRR</span></p>
@@ -286,10 +290,10 @@ function ReturnsChart({ p }) {
   );
 }
 
-function RankLadder({ p }) {
+function RankLadder({ p, metal }) {
   const lit = Math.min(LADDER.length, 1 + useStep(p, LADDER.length));
   return (
-    <Spotlight className="sheet-panel">
+    <Spotlight className={sheet(metal)}>
       <p className="t-eyebrow">Your career track</p>
       <ol className="rungs">
         {[...LADDER].reverse().map((l) => {
@@ -307,10 +311,10 @@ function RankLadder({ p }) {
   );
 }
 
-function TutorBubble({ p }) {
+function TutorBubble({ p, metal }) {
   const step = useStep(p, 6);
   return (
-    <Spotlight className="sheet-panel">
+    <Spotlight className={sheet(metal)}>
       <p className="t-eyebrow">Vale · your coach</p>
       <div className="bubbles">
         <p className={`bub bub--me ${step >= 1 ? 'is-in' : ''}`}>Where do I start with the IRR?</p>
@@ -320,6 +324,57 @@ function TutorBubble({ p }) {
         </div>
       </div>
     </Spotlight>
+  );
+}
+
+/**
+ * Phones and small tablets: the same chapters, stacked. Each chapter's copy is
+ * followed by its panel in the normal flow, and the panel scrubs as it scrolls
+ * into view, so nothing is pinned behind or on top of the text.
+ */
+function MobileFilm() {
+  const hero = CHAPTERS[0];
+  return (
+    <section id="film" className="mfilm" aria-label="How Vantaris works">
+      <article className="mch mch--hero" aria-labelledby={`ch-${hero.id}`}>
+        <div className="mch-mascot" aria-hidden="true">
+          <Mascot state={hero.vale} lookAt="pointer" size={176} decorative />
+        </div>
+        <div className="chapter-copy">
+          <p className="t-eyebrow">{hero.eyebrow}</p>
+          <h1 id={`ch-${hero.id}`} className="t-display hero-title text-chrome text-chrome--live">{hero.title}</h1>
+          <p className="t-lead">{hero.body}</p>
+          <StartCta source="hero" />
+        </div>
+      </article>
+      {CHAPTERS.slice(1).map((c) => <MobileChapter key={c.id} c={c} />)}
+    </section>
+  );
+}
+
+function MobileChapter({ c }) {
+  const ref = useRef(null);
+  // 0 when the panel's top enters the screen, 1 once its middle reaches the upper half
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'center 0.5'] });
+  return (
+    <article className="mch" aria-labelledby={`ch-${c.id}`}>
+      <div className="chapter-copy">
+        <p className="t-eyebrow">{c.eyebrow}</p>
+        <h2 id={`ch-${c.id}`} className="chapter-title">{c.title}</h2>
+        <p className="t-lead">{c.body}</p>
+      </div>
+      <motion.div
+        ref={ref}
+        className="mch-visual"
+        aria-hidden="true"
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.25 }}
+        transition={{ duration: duration.slow, ease: ease.out }}
+      >
+        <Visual kind={c.visual} p={scrollYProgress} metal />
+      </motion.div>
+    </article>
   );
 }
 

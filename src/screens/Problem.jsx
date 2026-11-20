@@ -36,6 +36,7 @@ export default function Problem() {
   const navigate = useNavigate();
   const { me, setMe, openPaywall, showToast } = useApp();
   const desktop = useMedia(BREAKPOINT.desktop);
+  const tablet = useMedia(BREAKPOINT.tablet);
   const [data, setData] = useState(null);
   const [lock, setLock] = useState(null);
   const [error, setError] = useState(null);
@@ -288,7 +289,8 @@ export default function Problem() {
       )}
 
       <ValeThinking show={thinking} />
-      <TutorFab onClick={openTutor} locked={!tutorAllowed} hidden={tutorOpen || thinking || (!answered && !desktop)} />
+      {/* Phones reach Vale from the dock and the result card; a floating button would sit on the text */}
+      <TutorFab onClick={openTutor} locked={!tutorAllowed} hidden={tutorOpen || thinking || (!answered && !desktop) || !tablet} />
       {tutorAllowed && (
         <Tutor open={tutorOpen} onClose={() => setTutorOpen(false)} problem={p} submitted={answered} prompt={tutorPrompt} onPromptUsed={() => setTutorPrompt(null)} />
       )}

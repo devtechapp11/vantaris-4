@@ -96,7 +96,29 @@ html.lenis, html.lenis body { height: auto; }
   .panel-q { font-size: var(--fs-base); }
   .opt { min-height: 40px; }
   .rung { min-height: 44px; }
-  .mini-steps { display: none; }
+  .stage-panel .mini-steps { display: none; }
+
+  /* ---------- Stacked film (phones, small tablets) ----------
+     One column, normal flow: copy, then its panel. No sticky stage, no
+     absolute layers, no negative margins, so nothing can ride over anything. */
+  .mfilm { display: flex; flex-direction: column; }
+  .mch {
+    display: flex; flex-direction: column; gap: var(--sp-8);
+    width: 100%; max-width: 640px; margin: 0 auto;
+    padding: var(--sp-12) var(--gutter-r) var(--sp-10) var(--gutter);
+  }
+  .mch + .mch { border-top: var(--hairline) solid var(--line); }
+  .mch--hero { gap: var(--sp-6); padding-top: calc(var(--safe-top) + 64px + var(--sp-4)); padding-bottom: var(--sp-16); }
+  .mch .chapter-copy { max-width: none; pointer-events: auto; }
+  .mch-mascot { align-self: center; max-width: 100%; }
+  .mch-visual { width: 100%; min-width: 0; }
+  .mch-visual .sheet-panel { padding: var(--sp-5) var(--sp-4); gap: var(--sp-4); font-size: var(--fs-sm); overflow: hidden; }
+  .mch-visual .ledger-row { flex-wrap: wrap; gap: var(--sp-1) var(--sp-4); }
+  .mch-visual .ledger-row dt { min-width: 0; }
+  .mch-visual .ledger-row dd { margin-left: auto; }
+  .mch-visual .rung { flex-wrap: wrap; row-gap: var(--sp-1); padding-block: var(--sp-2); }
+  .mch-visual .rung .grow { flex-basis: 10ch; }
+  .mch-visual .bub--me { max-width: 88%; }
 }
 @media (max-width: 899px) and (max-height: 700px) {
   .stage-panel { transform: scale(0.86); transform-origin: top center; }
