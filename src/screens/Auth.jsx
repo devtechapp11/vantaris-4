@@ -194,6 +194,7 @@ function SignUpForm({ onSent, onResult }) {
   const [touched, setTouched] = useState({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
+  const [exists, setExists] = useState(false);
   const stats = usePublicStats();
 
   // Forgiving validation: a field only complains after you leave it (or press submit).
@@ -209,6 +210,7 @@ function SignUpForm({ onSent, onResult }) {
   const submit = async (e) => {
     e.preventDefault();
     setError(null);
+    setExists(false);
     setTouched({ name: true, email: true, password: true, agree: true });
     if (Object.values(issues).some(Boolean)) return onResult?.('error');
     if (trap) return onSent(email.trim().toLowerCase()); // bots get a quiet fake success
@@ -221,6 +223,7 @@ function SignUpForm({ onSent, onResult }) {
     } catch (err) {
       onResult?.('error');
       setError(err.message);
+      setExists(err.code === 'ACCOUNT_EXISTS');
     } finally {
       setBusy(false);
     }
@@ -243,6 +246,12 @@ function SignUpForm({ onSent, onResult }) {
         {show('agree') && <span id="su-agree-err" className="field-error" role="alert">{show('agree')}</span>}
       </div>
       <FormError error={error} />
+      {exists && (
+        <div className="between">
+          <Link to="/signin" replace className="link t-foot">Sign in</Link>
+          <Link to="/forgot" replace className="link t-foot">Forgot password?</Link>
+        </div>
+      )}
       <button className="btn btn--primary" disabled={busy}>{busy ? <Spinner /> : 'Create free account'}</button>
       <SocialProof stats={stats} />
     </form>

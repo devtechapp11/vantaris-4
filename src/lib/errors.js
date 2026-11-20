@@ -35,9 +35,21 @@ export function fromSupabase(error) {
   return new ApiError('UNKNOWN', 'Something went wrong. Try again in a moment.');
 }
 
-// Map Supabase Auth errors to wording that doesn't reveal whether an account exists.
+// Map Supabase Auth errors to wording people can act on. Sign-in and password
+// reset never reveal whether an account exists; sign-up can, because Supabase
+// itself answers "already registered" when email confirmation is off.
 export function fromAuth(error) {
   const raw = `${error?.message ?? ''}`;
+  const code = `${error?.code ?? ''}`;
+  if (code === 'user_already_exists' || /already registered|already been registered/i.test(raw)) {
+    return new ApiError('ACCOUNT_EXISTS', 'An account already uses this email. Sign in instead, or reset your password.');
+  }
+  if (code === 'email_address_invalid' || /email address .* is invalid|invalid email/i.test(raw)) {
+    return new ApiError('INVALID_EMAIL', 'That email address can’t be used. Check it or try another one.');
+  }
+  if (code === 'signup_disabled' || /signups not allowed/i.test(raw)) {
+    return new ApiError('SIGNUP_DISABLED', 'New accounts are paused for the moment. Try again later.');
+  }
   if (/invalid login credentials/i.test(raw)) return new ApiError('BAD_CREDENTIALS', 'That email and password don’t match.');
   if (/email not confirmed/i.test(raw)) return new ApiError('EMAIL_NOT_CONFIRMED', 'Confirm your email first. We sent you a link when you signed up.');
   if (/rate limit|too many|security purposes/i.test(raw)) return new ApiError('RATE_LIMITED', 'Too many attempts. Wait a minute and try again.');
