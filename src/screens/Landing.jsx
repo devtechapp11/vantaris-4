@@ -73,8 +73,8 @@ function LandingNav() {
       <div className="lnav-inner">
         <Link to="/" className="lnav-brand" aria-label={`${BRAND.name}, home`}><Logo size={26} /></Link>
         <nav className="lnav-links" aria-label="Website">
-          <a href="#film">How it works</a>
-          <a href="#pricing">Pricing</a>
+          <a href="#film">The method</a>
+          <a href="#pricing">Membership</a>
           <Link to="/signin">Sign in</Link>
         </nav>
       </div>
@@ -120,7 +120,7 @@ function Film() {
             <div className="chapter-copy">
               <p className="t-eyebrow">{c.eyebrow}</p>
               {i === 0 ? (
-                <h1 id={`ch-${c.id}`} className="t-display hero-title text-chrome">{c.title}</h1>
+                <h1 id={`ch-${c.id}`} className="t-display hero-title text-chrome text-chrome--live">{c.title}</h1>
               ) : (
                 <h2 id={`ch-${c.id}`} className="chapter-title">{c.title}</h2>
               )}
@@ -209,13 +209,13 @@ function useStep(mv, steps) {
 function DealSheet({ p }) {
   const shown = useStep(p, SAMPLE_DEAL.terms.length + 1);
   return (
-    <Spotlight className="sheet-panel">
+    <Spotlight className="sheet-panel metal">
       <p className="t-eyebrow">{SAMPLE_DEAL.kind}</p>
       <p className="panel-title">{SAMPLE_DEAL.title}</p>
       <dl className="ledger">
         {SAMPLE_DEAL.terms.map(([k, v], i) => (
           <div key={k} className={`ledger-row ${i < Math.max(2, shown) ? 'is-in' : ''}`}>
-            <dt>{k}</dt><dd className="fig">{v}</dd>
+            <dt>{k}</dt><dd className="fig-mono">{v}</dd>
           </div>
         ))}
       </dl>
@@ -241,12 +241,12 @@ function AnswerSheet({ p }) {
       <ul className="opts">
         {SAMPLE_DEAL.options.map((o, i) => (
           <li key={o} className={`opt ${picked && i === SAMPLE_DEAL.pick ? (scored ? 'is-right' : 'is-picked') : ''}`}>
-            <span className="opt-key">{'ABCD'[i]}</span><span className="fig">{o}</span>
+            <span className="opt-key">{'ABCD'[i]}</span><span className="fig-mono">{o}</span>
             {scored && i === SAMPLE_DEAL.pick && <Check size={16} className="c-pos opt-check" aria-hidden="true" />}
           </li>
         ))}
       </ul>
-      <p className={`panel-score fig ${scored ? 'is-in' : ''}`}><span className="c-pos">+18</span> <span className="c-3">pts · speed bonus</span></p>
+      <p className={`panel-score ${scored ? 'is-in' : ''}`}><span className="c-pos fig-mono">+18</span> <span className="c-3">pts · ahead of the clock</span></p>
     </Spotlight>
   );
 }
@@ -290,7 +290,7 @@ function RankLadder({ p }) {
   const lit = Math.min(LADDER.length, 1 + useStep(p, LADDER.length));
   return (
     <Spotlight className="sheet-panel">
-      <p className="t-eyebrow">Your career</p>
+      <p className="t-eyebrow">Your career track</p>
       <ol className="rungs">
         {[...LADDER].reverse().map((l) => {
           const n = LADDER.findIndex((x) => x.level === l.level);
@@ -311,7 +311,7 @@ function TutorBubble({ p }) {
   const step = useStep(p, 6);
   return (
     <Spotlight className="sheet-panel">
-      <p className="t-eyebrow">Vale · tutor</p>
+      <p className="t-eyebrow">Vale · your coach</p>
       <div className="bubbles">
         <p className={`bub bub--me ${step >= 1 ? 'is-in' : ''}`}>Where do I start with the IRR?</p>
         <div className={`bub bub--ai ${step >= 2 ? 'is-in' : ''}`}>
@@ -357,11 +357,11 @@ function StillFilm() {
 }
 
 /* ---------- Pricing + the one call to action ---------- */
-function StartCta({ source }) {
+function StartCta({ source, label = 'Start free' }) {
   return (
     <Magnetic className="cta-wrap">
       <Link to="/signup" className="btn btn--primary btn--lg btn--auto" onClick={() => track('upgrade_click', { source: `landing-${source}` })}>
-        Start free <ArrowRight size={18} aria-hidden="true" />
+        {label} <ArrowRight size={18} aria-hidden="true" />
       </Link>
     </Magnetic>
   );
@@ -375,9 +375,9 @@ function Pricing() {
   return (
     <section id="pricing" className="lsec" aria-labelledby="pricing-title">
       <header className="lsec-head">
-        <p className="t-eyebrow">Pricing</p>
-        <h2 id="pricing-title" className="chapter-title">Start free. Go further when you’re ready.</h2>
-        <p className="t-lead">Three deals a week are free, forever. Paid plans add unlimited deals, harder desks and Vale. Cancel anytime.</p>
+        <p className="t-eyebrow">Membership</p>
+        <h2 id="pricing-title" className="chapter-title">Start free. Scale when you’re ready.</h2>
+        <p className="t-lead">Three deals a week, free for as long as you like. Paid plans open every desk, the full debriefs and Vale. Cancel anytime.</p>
       </header>
       <BillingToggle cycle={cycle} onChange={setCycle} />
       {data ? (
@@ -400,8 +400,8 @@ function Pricing() {
       )}
       <p className="t-foot">Prices in Indian rupees, taxes as applicable. Payments by Razorpay. See the <Link className="link" to="/subscription-terms">subscription terms</Link> and <Link className="link" to="/refund">refund policy</Link>.</p>
       <div className="final">
-        <p className="final-line">Your first deal takes five minutes.</p>
-        <StartCta source="final" />
+        <p className="final-line">Five minutes. One deal. Your first rung.</p>
+        <StartCta source="final" label="Take your first deal" />
       </div>
     </section>
   );

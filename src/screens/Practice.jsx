@@ -18,8 +18,8 @@ import { useMeta } from '../app/useMeta';
 
 const FILTERS = [
   { value: 'all', label: 'All' },
-  { value: 'todo', label: 'To do' },
-  { value: 'done', label: 'Done' },
+  { value: 'todo', label: 'Open' },
+  { value: 'done', label: 'Closed' },
 ];
 
 export default function Practice() {
@@ -57,7 +57,7 @@ export default function Practice() {
 
   return (
     <Page wide>
-      <LargeTitle title="Deals" eyebrow={totals ? `${totals.solved} of ${totals.total} solved · ${totals.modules} modules` : 'Deal library'} />
+      <LargeTitle title="Deal library" eyebrow={totals ? `${totals.solved} of ${totals.total} closed · ${totals.modules} desks` : 'Every desk, every deal'} />
       <Item className="practice-bar">
         <div className="practice-filter"><Segmented value={filter} onChange={setFilter} options={FILTERS} label="Filter deals" /></div>
         {catalog && (
@@ -135,7 +135,7 @@ export default function Practice() {
       {empty && (
         <Item className="card empty">
           <Mascot mood={filter === 'done' ? 'welcome' : 'correct'} size={96} decorative />
-          <p className="t-callout">{filter === 'done' ? 'Nothing closed yet. Your answered deals collect here.' : 'You’ve answered every deal on your plan. More are on the way.'}</p>
+          <p className="t-callout">{filter === 'done' ? 'Nothing closed yet. Every deal you answer is filed here.' : 'You’ve cleared every deal on your plan. New deals are being structured.'}</p>
         </Item>
       )}
     </Page>

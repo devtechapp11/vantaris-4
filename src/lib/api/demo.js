@@ -11,13 +11,13 @@ const SHORT = { statements: 'Statements', dcf: 'DCF', comps: 'Comps', precedents
 
 const TIERS = [
   { id: 'free', name: 'Free', rank: 0, weekly_problem_limit: 3, max_level: 'Analyst', full_walkthroughs: false, tutor_daily_limit: 0,
-    tagline: 'Try the format', features: ['3 problems a week', 'Analyst modules', 'First two solution steps'] },
+    tagline: 'Take a seat on the floor', features: ['3 deals a week', 'Analyst desks', 'First two debrief steps'] },
   { id: 'core', name: 'Core', rank: 1, weekly_problem_limit: null, max_level: 'Associate', full_walkthroughs: true, tutor_daily_limit: 0,
-    tagline: 'Practice every day', features: ['Unlimited problems', 'Analyst and Associate modules', 'Full step-by-step solutions'] },
+    tagline: 'Build daily reflexes', features: ['Unlimited deals', 'Analyst and Associate desks', 'Full step-by-step debriefs'] },
   { id: 'pro', name: 'Pro', rank: 2, weekly_problem_limit: null, max_level: 'VP', full_walkthroughs: true, tutor_daily_limit: 40,
-    tagline: 'Learn with a tutor', features: ['Everything in Core', 'AI tutor, 40 messages a day', 'VP modules: M&A and restructuring'] },
+    tagline: 'Train with a coach at your side', features: ['Everything in Core', 'Vale, your AI coach: 40 messages a day', 'VP desks: M&A and restructuring'] },
   { id: 'elite', name: 'Elite', rank: 3, weekly_problem_limit: null, max_level: 'MD', full_walkthroughs: true, tutor_daily_limit: 300,
-    tagline: 'Interview-ready', features: ['Everything in Pro', 'Unlimited AI tutor', 'MD module: deal structuring', 'Elite member card'] },
+    tagline: 'Walk in interview-ready', features: ['Everything in Pro', 'Unlimited coaching with Vale', 'MD desk: deal structuring', 'The Elite member card'] },
 ];
 const PLANS = [
   { id: 'core_monthly', tier: 'core', interval: 'monthly', amount: 49900, currency: 'INR', sort: 1 },

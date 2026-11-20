@@ -4,12 +4,12 @@ import { useApp } from '../app/AppContext';
 import { useRank } from '../app/useRank';
 import { CountUp, Item, Page, PullIndicator } from '../components/chrome';
 import { Skeleton, TIER_LABEL } from '../components/bits';
-import { ProgressBar } from '../components/ui';
+import { RankGauge, StreakLine } from '../components/RankGauge';
 import Mascot from '../components/Mascot';
 import { Magnetic } from '../components/effects';
 import { LEVEL_TIER } from '../app/usePlans';
 import { isLocked } from '../lib/modules';
-import { greeting, number, todayLine, weekday } from '../lib/format';
+import { greeting, todayLine, weekday } from '../lib/format';
 import { rememberShared, usePullToRefresh } from '../app/fluid';
 import { prefetchProps } from '../app/routes';
 import './Home.css';
@@ -35,12 +35,8 @@ export default function Home() {
   const dailyOpen = daily && daily.status !== 'correct' && daily.status !== 'wrong';
   const target = dailyOpen ? daily : next;
   const label = dailyOpen
-    ? daily.status === 'opened' ? 'Continue today’s deal' : 'Start today’s deal'
-    : next ? (next.opened ? 'Continue your deal' : 'Start the next deal') : null;
-
-  const span = profile.next_level_at != null ? profile.next_level_at - profile.level_floor : 1;
-  const progress = profile.next_level_at != null ? (profile.points - profile.level_floor) / span : 1;
-  const toNext = profile.next_level_at != null ? profile.next_level_at - profile.points : 0;
+    ? daily.status === 'opened' ? 'Back to the deal' : 'Take today’s deal'
+    : next ? (next.opened ? 'Back to the deal' : 'Take the next deal') : null;
 
   const steps = me.skills.map((m) => ({ ...m, locked: isLocked(m.level, tier.max_level), done: m.total > 0 && m.solved >= m.total }));
   const nextStep = steps.find((m) => !m.locked && !m.done);
@@ -58,13 +54,16 @@ export default function Home() {
 
       <div className="home-grid">
         <div className="home-main">
-          <Item as="section" className="home-today" aria-labelledby="today">
-            <p id="today" className="t-eyebrow">{dailyOpen ? 'Today’s deal' : next ? 'Up next' : 'All caught up'}</p>
+          <Item as="section" className="home-today metal metal--pad" aria-labelledby="today">
+            <div className="between">
+              <p id="today" className="t-eyebrow">{dailyOpen ? 'On your desk today' : next ? 'Next on your desk' : 'Desk cleared'}</p>
+              {target && <span className="chip fig">{target.minutes} min</span>}
+            </div>
             {target ? (
               <>
                 <div className="stack-4">
                   <p className="t-h2">{target.title}</p>
-                  <p className="t-foot">{target.kind} · {target.module_name} · <span className="fig">{target.minutes}</span> min</p>
+                  <p className="t-foot">{target.kind} · {target.module_name}</p>
                 </div>
                 <Magnetic className="home-cta-wrap">
                   <button
@@ -82,45 +81,42 @@ export default function Home() {
               </>
             ) : (
               <>
-                <p className="t-callout">Every deal on your desk is closed. Harder modules open on the next plan.</p>
-                <Link to="/plans" className="btn btn--primary btn--lg home-cta">See plans <ArrowRight size={18} aria-hidden="true" /></Link>
+                <p className="t-callout">Every deal on your desk is closed. The harder desks, and the bigger tickets, open on the next plan.</p>
+                <Link to="/plans" className="btn btn--primary btn--lg home-cta">Open the next desk <ArrowRight size={18} aria-hidden="true" /></Link>
               </>
             )}
+            <StreakLine streak={profile.streak} activeToday={profile.active_today} />
             {tier.id === 'free' && quota.limit != null && (
               <p className="t-foot">
-                <span className="fig c-fg">{quota.remaining}</span> of <span className="fig">{quota.limit}</span> free deals left · resets {weekday(quota.resets_at)} · <Link to="/plans" className="link">Go unlimited</Link>
+                <span className="fig c-fg">{quota.remaining}</span> of <span className="fig">{quota.limit}</span> free deals left this week · back {weekday(quota.resets_at)} · <Link to="/plans" className="link">Go unlimited</Link>
               </p>
             )}
+          </Item>
+
+          <Item as="section" className="home-level" aria-label="Your career">
+            <RankGauge points={profile.points} level={profile.level} />
           </Item>
 
           <Item as="dl" className="home-stats" aria-label="Your numbers">
             <div className="home-stat">
               <dt>Streak</dt>
-              <dd className="fig"><CountUp to={profile.streak} /><span className="unit">{profile.streak === 1 ? 'day' : 'days'}</span></dd>
+              <dd className="fig-mono"><CountUp to={profile.streak} /><span className="unit">{profile.streak === 1 ? 'day' : 'days'}</span></dd>
             </div>
             <div className="home-stat">
               <dt>Score</dt>
-              <dd className="fig"><CountUp to={profile.points} /><span className="unit">pts</span></dd>
+              <dd className="fig-mono"><CountUp to={profile.points} /><span className="unit">pts</span></dd>
             </div>
             <div className="home-stat">
-              <dt>Rank</dt>
-              <dd className="fig">{rank ? <>#<CountUp to={rank} /></> : <span className="c-3">—</span>}</dd>
+              <dt>Desk rank</dt>
+              <dd className="fig-mono">{rank ? <>#<CountUp to={rank} /></> : <span className="c-3">—</span>}</dd>
             </div>
-          </Item>
-
-          <Item className="home-level stack-8">
-            <div className="between">
-              <span className="t-label">{profile.level}</span>
-              <span className="t-cap">{profile.next_level ? <><span className="fig c-fg">{number(toNext)}</span> pts to {profile.next_level}</> : 'Top of the ladder'}</span>
-            </div>
-            <ProgressBar value={progress} label={`Progress to ${profile.next_level ?? 'the top'}`} size="sm" />
           </Item>
         </div>
 
         <Item as="section" className="home-path" aria-labelledby="path">
           <div className="between">
-            <h2 id="path" className="t-eyebrow">Your path</h2>
-            <Link to="/practice" className="link t-foot">All deals</Link>
+            <h2 id="path" className="t-eyebrow">Your track to MD</h2>
+            <Link to="/practice" className="link t-foot tap-target">Deal library</Link>
           </div>
           <ol className="path">
             {steps.map((m) => {
@@ -140,7 +136,7 @@ export default function Home() {
                     </span>
                     <span className="path-text">
                       <span className="path-name">{m.name}</span>
-                      <span className="t-cap fig">{m.locked ? `${m.level} · ${TIER_LABEL[LEVEL_TIER[m.level]]}` : `${m.solved}/${m.total}`}{isNext ? ' · next' : ''}</span>
+                      <span className="t-cap fig">{m.locked ? `${m.level} desk · ${TIER_LABEL[LEVEL_TIER[m.level]]}` : `${m.solved}/${m.total} closed`}{isNext ? ' · your next move' : ''}</span>
                     </span>
                   </button>
                 </li>

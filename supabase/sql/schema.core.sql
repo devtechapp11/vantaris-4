@@ -1182,14 +1182,14 @@ grant execute on function public.user_tier(uuid)                                
 -- ---------------------------------------------------------------------
 insert into public.tiers (id, name, rank, weekly_problem_limit, max_level, full_walkthroughs, tutor_daily_limit, tagline, features)
 values
-  ('free',  'Free',  0, 3,    'Analyst',   false, 0,   'Try the format',
-     array['3 problems a week', 'Analyst modules', 'First two solution steps']),
-  ('core',  'Core',  1, null, 'Associate', true,  0,   'Practice every day',
-     array['Unlimited problems', 'Analyst and Associate modules', 'Full step-by-step solutions']),
-  ('pro',   'Pro',   2, null, 'VP',        true,  40,  'Learn with a tutor',
-     array['Everything in Core', 'AI tutor, 40 messages a day', 'VP modules: M&A and restructuring']),
-  ('elite', 'Elite', 3, null, 'MD',        true,  300, 'Interview-ready',
-     array['Everything in Pro', 'Unlimited AI tutor', 'MD module: deal structuring', 'Elite member card'])
+  ('free',  'Free',  0, 3,    'Analyst',   false, 0,   'Take a seat on the floor',
+     array['3 deals a week', 'Analyst desks', 'First two debrief steps']),
+  ('core',  'Core',  1, null, 'Associate', true,  0,   'Build daily reflexes',
+     array['Unlimited deals', 'Analyst and Associate desks', 'Full step-by-step debriefs']),
+  ('pro',   'Pro',   2, null, 'VP',        true,  40,  'Train with a coach at your side',
+     array['Everything in Core', 'Vale, your AI coach: 40 messages a day', 'VP desks: M&A and restructuring']),
+  ('elite', 'Elite', 3, null, 'MD',        true,  300, 'Walk in interview-ready',
+     array['Everything in Pro', 'Unlimited coaching with Vale', 'MD desk: deal structuring', 'The Elite member card'])
 on conflict (id) do update set
   name = excluded.name, rank = excluded.rank, weekly_problem_limit = excluded.weekly_problem_limit,
   max_level = excluded.max_level, full_walkthroughs = excluded.full_walkthroughs,

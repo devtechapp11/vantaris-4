@@ -45,7 +45,9 @@ and OG image scripts, not bundled).
 | Font | Package | Licence |
 |---|---|---|
 | Inter (variable, optical size) | @fontsource-variable/inter 5.3.0 | SIL Open Font License 1.1 |
-| Instrument Serif (400) | @fontsource/instrument-serif 5.2.8 | SIL Open Font License 1.1 |
+| Newsreader (variable, optical size) | @fontsource-variable/newsreader 5.3.0 | SIL Open Font License 1.1 |
+| JetBrains Mono (variable) | @fontsource-variable/jetbrains-mono 5.3.0 | SIL Open Font License 1.1 |
+| Instrument Serif (400), Open Graph image only | @fontsource/instrument-serif 5.2.8 | SIL Open Font License 1.1 |
 
 ## Mascot and imagery
 

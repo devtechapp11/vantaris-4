@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 // Preload the two font files every screen needs, so text paints in the right
 // face on first render (fontsource hashes the names, so this runs after bundling).
-const CRITICAL_FONTS = /(inter-latin-opsz-normal|instrument-serif-latin-400-normal)-[\w-]+\.woff2$/;
+const CRITICAL_FONTS = /(inter-latin-opsz-normal|newsreader-latin-opsz-normal)-[\w-]+\.woff2$/;
 function preloadFonts(base) {
   return {
     name: 'vantaris-preload-fonts',

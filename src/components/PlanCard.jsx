@@ -42,7 +42,7 @@ export default function PlanCard({ tier, plan, monthly, featured = false, curren
       viewport={{ once: true, amount: 0.3 }}
       variants={group(stagger.list, 0.15)}
     >
-      <Spotlight className="plan-inner">
+      <Spotlight className={`plan-inner metal metal--live ${featured ? 'is-active' : ''}`}>
       {featured && <span className="plan-flag">Most popular</span>}
       {current && <span className="plan-flag plan-flag--current">Current plan</span>}
       <header className="stack-4">

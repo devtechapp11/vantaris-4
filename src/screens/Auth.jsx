@@ -26,9 +26,9 @@ export function passwordIssues(pw) {
 }
 
 const COPY = {
-  signin: { title: 'Welcome back', sub: 'Pick up your streak where you left it.', mood: 'welcome' },
-  signup: { title: 'Open your desk', sub: 'Three free deals a week. Upgrade whenever you want more.', mood: 'welcome' },
-  forgot: { title: 'Reset your password', sub: 'We’ll email you a link to choose a new one.', mood: 'think' },
+  signin: { title: 'Back to the desk', sub: 'Your streak, your score and your title are exactly where you left them.', mood: 'welcome' },
+  signup: { title: 'Take your seat', sub: 'Three free deals a week. Your career starts at Analyst; how far it goes is up to you.', mood: 'welcome' },
+  forgot: { title: 'Reset your password', sub: 'We’ll email you a secure link to choose a new one.', mood: 'think' },
 };
 
 const formMotion = {
@@ -252,7 +252,7 @@ function SignUpForm({ onSent, onResult }) {
           <Link to="/forgot" replace className="link t-foot">Forgot password?</Link>
         </div>
       )}
-      <button className="btn btn--primary" disabled={busy}>{busy ? <Spinner /> : 'Create free account'}</button>
+      <button className="btn btn--primary" disabled={busy}>{busy ? <Spinner /> : 'Create my free account'}</button>
       <SocialProof stats={stats} />
     </form>
   );

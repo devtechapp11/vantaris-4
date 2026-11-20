@@ -52,18 +52,40 @@
 .btn:disabled { cursor: default; opacity: 0.4; }
 .btn svg { flex: none; }
 
+/* Primary: a bar of brushed platinum. Light sweeps across it on hover; it
+   presses in (darker, inner shadow) like a real metal key. */
 .btn--primary {
-  background: var(--platinum);
-  border-color: var(--platinum);
+  background: var(--brush), var(--metal-fill);
+  border-color: var(--white-metal);
   color: var(--fg-inverse);
   font-weight: var(--fw-semibold);
-  box-shadow: var(--edge-highlight);
+  letter-spacing: -0.01em;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 80%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--aluminium) 70%, transparent),
+    0 10px 28px -14px color-mix(in srgb, var(--platinum) 45%, transparent);
+  overflow: hidden;
+}
+.btn--primary::after {
+  content: '';
+  position: absolute; inset: 0; z-index: -1;
+  border-radius: inherit;
+  background: var(--specular-bright) no-repeat;
+  background-size: 260% 100%;
+  background-position: 130% 0;
+  pointer-events: none;
+  transition: background-position 760ms var(--ease-out);
 }
 @media (hover: hover) {
-  .btn--primary:hover:not(:disabled) { background: var(--silver); border-color: var(--silver); }
+  .btn--primary:hover:not(:disabled) { background: var(--brush), var(--metal-fill); border-color: var(--white-metal); box-shadow: inset 0 1px 0 white, inset 0 -1px 0 color-mix(in srgb, var(--aluminium) 70%, transparent), var(--glow-soft), 0 12px 30px -14px color-mix(in srgb, var(--platinum) 60%, transparent); }
+  .btn--primary:hover:not(:disabled)::after { background-position: -30% 0; }
 }
-.btn--primary:active:not(:disabled) { background: var(--silver); }
+.btn--primary:active:not(:disabled) {
+  background: var(--brush), var(--metal-fill-press);
+  box-shadow: inset 0 2px 5px color-mix(in srgb, var(--black) 38%, transparent), inset 0 -1px 0 color-mix(in srgb, white 40%, transparent);
+}
 .btn--secondary { background: transparent; }
+@media (hover: hover) { .btn--secondary:hover:not(:disabled) { border-color: var(--silver); box-shadow: var(--glow-soft); } }
 .btn--ghost { border-color: transparent; color: var(--fg-2); height: var(--control-h-md); }
 @media (hover: hover) { .btn--ghost:hover:not(:disabled) { border-color: transparent; color: var(--fg); } }
 .btn--danger { color: var(--neg); border-color: color-mix(in srgb, var(--loss) 40%, transparent); }
@@ -74,6 +96,8 @@
 .btn--auto { width: auto; }
 .btn--icon { width: var(--control-h); padding: 0; flex: none; }
 
+/* Standalone text link with a full 44px touch target */
+.tap-target { display: inline-flex; align-items: center; min-height: var(--tap); }
 .link { color: var(--fg); text-decoration: underline; text-decoration-color: var(--aluminium-dark); text-underline-offset: 3px; font-weight: var(--fw-medium); border-radius: var(--r-xs); transition: text-decoration-color var(--dur-fast); }
 @media (hover: hover) { .link:hover { text-decoration-color: var(--fg); } }
 
@@ -275,8 +299,33 @@ button.chip { cursor: pointer; min-height: var(--chip-h); transition: border-col
 /* =========================================================
    Progress, loaders, skeletons
    ========================================================= */
-.bar { height: var(--bar-h); background: var(--aluminium-dark); overflow: hidden; position: relative; }
-.bar > i { display: block; height: 100%; background: var(--fg); transform-origin: left center; }
+/* Progress: a recessed track and a bar of brushed platinum that glows and
+   carries a slow specular glint. */
+.bar {
+  height: var(--bar-h);
+  position: relative;
+  border-radius: var(--r-full);
+  background: color-mix(in srgb, var(--aluminium-dark) 75%, var(--black));
+  box-shadow: inset 0 1px 1px color-mix(in srgb, var(--black) 70%, transparent), 0 1px 0 color-mix(in srgb, var(--platinum) 6%, transparent);
+}
+.bar > i {
+  display: block; height: 100%;
+  border-radius: inherit;
+  background: var(--metal-bar);
+  box-shadow: 0 0 12px -1px color-mix(in srgb, var(--platinum) 55%, transparent);
+  transform-origin: left center;
+  position: relative;
+  overflow: hidden;
+}
+.bar > i::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, white 70%, transparent), transparent);
+  width: 40%;
+  transform: translateX(-120%);
+  animation: bar-glint 3.2s var(--ease-in-out) 1.2s infinite;
+}
+@keyframes bar-glint { 0% { transform: translateX(-120%); } 55%, 100% { transform: translateX(320%); } }
 .bar--sm { height: var(--bar-h-sm); }
 
 .loadbar { position: fixed; top: 0; left: 0; right: 0; z-index: var(--z-toast); height: 2px; overflow: hidden; pointer-events: none; }
@@ -426,7 +475,7 @@ button.chip { cursor: pointer; min-height: var(--chip-h); transition: border-col
 
 /* Stat row: figures separated by hairlines */
 .stat { display: flex; flex-direction: column; gap: var(--sp-1); padding: var(--sp-4) 0; }
-.stat-value { font-variant-numeric: tabular-nums; font-size: var(--fs-2xl); font-weight: var(--fw-medium); letter-spacing: -0.03em; line-height: 1.1; }
+.stat-value { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: var(--fs-2xl); font-weight: var(--fw-medium); letter-spacing: -0.03em; line-height: 1.1; }
 
 /* 3D slot: the 2D fallback sits underneath, the canvas fades in on its first frame */
 .s3d { position: relative; width: 100%; height: 100%; }
@@ -441,7 +490,7 @@ button.chip { cursor: pointer; min-height: var(--chip-h); transition: border-col
 .chart { position: relative; }
 .chart svg:focus-visible { outline-offset: var(--sp-1); }
 .chart-grid { stroke: var(--aluminium-dark); stroke-width: 1; }
-.chart-tick { fill: var(--fg-3); font-size: 11px; font-variant-numeric: tabular-nums; }
+.chart-tick { fill: var(--fg-3); font-family: var(--font-mono); font-size: 11px; font-variant-numeric: tabular-nums; }
 .chart-x { fill: var(--fg-3); font-size: 12px; font-weight: var(--fw-medium); }
 .chart-x.is-today { fill: var(--fg); }
 .chart-label { fill: var(--fg); font-size: 12px; font-weight: var(--fw-medium); font-variant-numeric: tabular-nums; }
@@ -456,7 +505,7 @@ button.chip { cursor: pointer; min-height: var(--chip-h); transition: border-col
 /* Formula / code blocks */
 .formula { margin: 0; border-radius: var(--r-sm); border: var(--hairline) solid var(--line-strong); overflow: hidden; }
 .formula-head { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-1) var(--sp-1) var(--sp-1) var(--sp-3); border-bottom: var(--hairline) solid var(--line); }
-.formula-body { margin: 0; padding: var(--sp-3) var(--sp-4); font-size: var(--fs-sm); line-height: 1.7; white-space: pre-wrap; overflow-x: auto; color: var(--fg); font-variant-numeric: tabular-nums; }
+.formula-body { margin: 0; padding: var(--sp-3) var(--sp-4); font-family: var(--font-mono); letter-spacing: -0.02em; font-size: var(--fs-sm); line-height: 1.7; white-space: pre-wrap; overflow-x: auto; color: var(--fg); font-variant-numeric: tabular-nums; }
 .tk-num { color: var(--fg); font-weight: var(--fw-medium); }
 .tk-op { color: var(--fg-3); }
 .tk-fn { color: var(--fg-2); font-style: italic; }
@@ -492,3 +541,94 @@ button.chip::after, a.chip::after, .copy-btn::after, .term-val::after { content:
 /* Skip link */
 .skip { position: fixed; left: var(--sp-3); top: calc(var(--safe-top) + var(--sp-3)); z-index: calc(var(--z-toast) + 1); padding: var(--sp-2) var(--sp-4); border-radius: var(--r-sm); background: var(--platinum); color: var(--black); font-weight: var(--fw-semibold); text-decoration: none; transform: translateY(-200%); transition: transform var(--dur-fast); }
 .skip:focus-visible { transform: none; }
+
+/* =========================================================
+   Metal cards. A 1px brushed platinum edge (gradient border drawn with a
+   mask, so it follows the radius), an anodised carbon surface, and a
+   specular sweep on hover. Both layers sit at z-index -1 inside the card's
+   own stacking context: above its background, below its content. Use `.metal` on any card; add `.metal--live`
+   when it is interactive.
+   ========================================================= */
+.metal {
+  position: relative;
+  isolation: isolate;
+  border-radius: var(--r-md);
+  background: var(--metal-surface);
+  box-shadow: var(--lift);
+}
+.metal::before {
+  content: '';
+  position: absolute; inset: 0; z-index: -1;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--metal-edge);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  transition: opacity var(--dur-base);
+}
+.metal--live::after {
+  content: '';
+  position: absolute; inset: 0; z-index: -1;
+  border-radius: inherit;
+  background: var(--specular) no-repeat;
+  background-size: 280% 100%;
+  background-position: 140% 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: background-position 900ms var(--ease-out), opacity var(--dur-slow) var(--ease-out);
+}
+@media (hover: hover) {
+  .metal--live:hover::after { opacity: 1; background-position: -40% 0; }
+  .metal--live:hover::before { background: var(--metal-edge-strong); opacity: 0.75; }
+}
+.metal--live:focus-visible::before { background: var(--metal-edge-strong); opacity: 1; }
+/* The brightest edge on the screen marks what is selected or active */
+.metal.is-active::before, .metal[aria-current]::before { background: var(--metal-edge-strong); opacity: 1; }
+.metal.is-active, .metal[aria-current] { box-shadow: var(--lift), var(--glow); }
+.metal--pad { padding: var(--sp-5); }
+@media (min-width: 768px) { .metal--pad { padding: var(--sp-6); } }
+/* One-shot sweep, e.g. when a deal is closed */
+.metal--flash::after {
+  content: '';
+  position: absolute; inset: 0; z-index: -1;
+  border-radius: inherit;
+  background: var(--specular) no-repeat;
+  background-size: 280% 100%;
+  pointer-events: none;
+  animation: metal-flash 1.6s var(--ease-out) 0.2s both;
+}
+@keyframes metal-flash { from { background-position: 140% 0; opacity: 1; } to { background-position: -40% 0; opacity: 0.2; } }
+
+/* =========================================================
+   Career gauge: Analyst → Associate → VP → Managing Director.
+   Four brushed segments; the current one fills and glows.
+   ========================================================= */
+.gauge { display: flex; flex-direction: column; gap: var(--sp-3); }
+.gauge-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-3); flex-wrap: wrap; }
+.gauge-now { display: flex; align-items: baseline; gap: var(--sp-2); min-width: 0; }
+.gauge-title { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: var(--fw-heading); letter-spacing: var(--tracking-tight); line-height: 1.1; color: var(--fg); }
+.gauge-pts { font-size: var(--fs-sm); color: var(--fg-3); }
+.gauge-next { font-size: var(--fs-sm); color: var(--fg-2); }
+.gauge-next b { color: var(--fg); font-weight: var(--fw-semibold); }
+.gauge-track { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-1); }
+.gauge-seg { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.gauge-seg .bar { height: var(--bar-h-sm); }
+.gauge-seg.is-future .bar > i { box-shadow: none; }
+.gauge-label { display: flex; align-items: center; gap: 6px; font-size: var(--fs-xs); font-weight: var(--fw-medium); color: var(--fg-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gauge-seg.is-done .gauge-label { color: var(--fg-2); }
+.gauge-seg.is-now .gauge-label { color: var(--fg); }
+.gauge-seg.is-now .bar { box-shadow: inset 0 1px 1px color-mix(in srgb, var(--black) 70%, transparent), var(--glow-soft); }
+.gauge-pip { width: 5px; height: 5px; border-radius: 50%; flex: none; background: var(--aluminium-dark); }
+.gauge-seg.is-done .gauge-pip { background: var(--silver); }
+.gauge-seg.is-now .gauge-pip { background: var(--white-metal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--platinum) 14%, transparent), 0 0 10px color-mix(in srgb, var(--platinum) 70%, transparent); animation: pip-pulse 2.4s var(--ease-in-out) infinite; }
+@keyframes pip-pulse { 50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--platinum) 6%, transparent), 0 0 14px color-mix(in srgb, var(--platinum) 90%, transparent); } }
+.gauge-long { display: none; }
+@media (min-width: 600px) { .gauge-long { display: inline; } .gauge-short { display: none; } }
+
+/* Streak: a platinum flame that lights up once today's deal is done */
+.streak { display: inline-flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-sm); color: var(--fg-2); }
+.streak-icon { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex: none; color: var(--fg-3); border: var(--hairline) solid var(--line-strong); }
+.streak.is-lit .streak-icon { color: var(--black); background: var(--metal-fill); border-color: var(--white-metal); box-shadow: var(--glow-soft); }
+.streak.is-due .streak-icon { color: var(--fg); border-color: var(--silver); animation: pip-pulse 2.4s var(--ease-in-out) infinite; }

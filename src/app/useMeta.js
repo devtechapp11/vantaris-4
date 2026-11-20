@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { BRAND } from '../lib/config';
 
 const DEFAULT_TITLE = `${BRAND.name}: ${BRAND.tagline}`;
-const DEFAULT_DESC = 'Practise real DCF, LBO and M&A deal problems in five minutes, with step-by-step solutions and an AI tutor. Climb from Analyst to MD.';
+const DEFAULT_DESC = 'Train like a Wall Street analyst: real DCF, LBO and M&A deals in five minutes, full debriefs and an AI coach. Climb from Analyst to Managing Director.';
 
 function tag(attr, key, content) {
   let el = document.head.querySelector(`meta[${attr}="${key}"]`);

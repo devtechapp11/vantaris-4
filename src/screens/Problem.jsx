@@ -13,6 +13,8 @@ import { ProgressBar } from '../components/ui';
 import Calculator from '../components/Calculator';
 import { FormulaBlock, highlight } from '../components/Formula';
 import Mascot from '../components/Mascot';
+import { StreakLine } from '../components/RankGauge';
+import { careerName } from '../lib/career';
 import Tutor, { TutorFab } from './Tutor';
 import { burst, originOf, shower } from '../lib/celebrate';
 import { shareCard } from '../lib/shareCard';
@@ -204,10 +206,10 @@ export default function Problem() {
               <p className="t-lead c-fg prob-scenario">{p.scenario}</p>
             </header>
 
-            <section ref={termsRef} className="terms" aria-label="Deal terms">
+            <section ref={termsRef} className="terms metal metal--pad" aria-label="Deal terms">
               <div className="terms-head">
-                <span className="t-label c-fg">Deal terms</span>
-                <span className="t-cap">{p.data.length} inputs · tap a figure to calculate</span>
+                <span className="t-eyebrow">Term sheet</span>
+                <span className="t-cap">{p.data.length} inputs · tap a figure to run it</span>
               </div>
               <dl>
                 {p.data.map(([label, value]) => {
@@ -217,11 +219,11 @@ export default function Problem() {
                       <dt>{label}</dt>
                       <dd>
                         {token && !answered ? (
-                          <button type="button" className="term-val fig" onClick={() => calc.current?.insert(token)} aria-label={`${label}: ${value}. Add to calculator`}>
+                          <button type="button" className="term-val fig-mono" onClick={() => calc.current?.insert(token)} aria-label={`${label}: ${value}. Add to calculator`}>
                             {value}
                           </button>
                         ) : (
-                          <span className="fig">{value}</span>
+                          <span className="fig-mono">{value}</span>
                         )}
                       </dd>
                     </div>
@@ -258,16 +260,16 @@ export default function Problem() {
                     {!tutorAllowed && <Lock size={12} aria-hidden="true" />}
                   </button>
                   <button type="button" className="btn btn--primary" disabled={!choice || submitting} onClick={submit}>
-                    {submitting ? <Spinner /> : <>Submit answer <span className="kbd kbd--dark">↵</span></>}
+                    {submitting ? <Spinner /> : <>Lock in answer <span className="kbd kbd--dark">↵</span></>}
                   </button>
                 </div>
               )}
-              {!answered && desktop && <p className="t-cap">Shortcuts: press A–{KEYS[p.options.length - 1]} to pick, Enter to submit.</p>}
+              {!answered && desktop && <p className="t-cap">Desk shortcuts: A–{KEYS[p.options.length - 1]} to pick, Enter to lock it in.</p>}
             </section>
 
             {!desktop && !answered && <Calculator ref={calc} defaultOpen={false} />}
             {answered && <Breakdown result={outcome.result} onSteps={() => openPaywall('steps')} />}
-            {answered && <Link to="/practice" className="btn btn--ghost">Back to deals</Link>}
+            {answered && <Link to="/practice" className="btn btn--ghost">Back to the deal library</Link>}
           </motion.section>
         </div>
       </Page>
@@ -279,7 +281,7 @@ export default function Problem() {
               <Lightbulb size={20} aria-hidden="true" />
             </button>
             <button type="button" className="btn btn--primary" disabled={!choice || submitting} onClick={submit}>
-              {submitting ? <Spinner /> : 'Submit answer'}
+              {submitting ? <Spinner /> : 'Lock in answer'}
             </button>
           </div>
         </div>
@@ -350,7 +352,7 @@ function Option({ o, index, choice, outcome, onPick }) {
       role={answered ? undefined : 'radio'}
       aria-checked={answered ? undefined : selected}
       disabled={answered}
-      className="option"
+      className={`option metal ${answered ? '' : 'metal--live'}`}
       data-state={state}
       onClick={onPick}
       animate={outcome?.fresh && isWrongPick && !reduce ? shake : undefined}
@@ -359,8 +361,8 @@ function Option({ o, index, choice, outcome, onPick }) {
       <span className="option-key">
         {isAnswer ? <Check size={15} strokeWidth={3} /> : isWrongPick ? <X size={15} strokeWidth={3} /> : KEYS[index]}
       </span>
-      <span className={`option-label ${isFigure(o.label) ? 'fig' : ''}`}>{o.label}</span>
-      {isAnswer && <span className="chip chip--pos option-tag">Answer</span>}
+      <span className={`option-label ${isFigure(o.label) ? 'fig-mono' : ''}`}>{o.label}</span>
+      {isAnswer && <span className="chip chip--pos option-tag">Correct</span>}
       {isWrongPick && <span className="chip chip--neg option-tag">Your pick</span>}
     </motion.button>
   );
@@ -396,37 +398,38 @@ function Result({ outcome, me, nextId, onNext, onShare, onTutor }) {
   const r = outcome.result;
   const fresh = outcome.fresh;
   const reduce = useReducedMotion();
+  const roomy = useMedia('(min-width: 560px)');
   const profile = me?.profile;
   const span = profile?.next_level_at != null ? profile.next_level_at - profile.level_floor : null;
   const from = span && outcome.before != null ? Math.max(0, (outcome.before - profile.level_floor) / span) : 0;
   const to = span ? (profile.points - profile.level_floor) / span : 1;
   return (
     <motion.section
-      className={`result ${r.correct ? 'result--win' : 'result--miss'}`}
+      className={`result metal metal--pad ${r.correct ? 'result--win' : 'result--miss'} ${r.correct && fresh && !reduce ? 'metal--flash' : ''}`}
       initial={reduce ? { opacity: 0 } : { opacity: 0, y: -16, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ ...spring.gentle }}
       aria-live="polite"
     >
       <div className="result-top">
-        <div className="result-vale share-vale"><Mascot mood={r.correct ? 'correct' : 'wrong'} size={124} label={r.correct ? 'Vale nods approvingly' : 'Vale, encouraging you to try again'} /></div>
+        <div className="result-vale share-vale"><Mascot mood={r.correct ? 'correct' : 'wrong'} size={roomy ? 124 : 76} label={r.correct ? 'Vale nods approvingly' : 'Vale, encouraging you to try again'} /></div>
         <div className="stack-8 grow">
-          <span className="t-eyebrow">{r.correct ? 'Deal closed' : 'Not quite'}</span>
+          <span className="t-eyebrow">{r.correct ? (r.time_ratio > 0 ? 'Deal closed · ahead of the clock' : 'Deal closed') : 'The numbers say otherwise'}</span>
           {r.correct ? (
             r.points > 0 ? (
               <motion.div className="score" initial={reduce ? false : { scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ ...spring.bouncy, delay: 0.15 }}>
                 <span className="score-plus">+</span>
-                <CountUp to={r.points} duration={fresh ? 1.4 : 0} delay={0.25} className="fig score-num" />
+                <CountUp to={r.points} duration={fresh ? 1.4 : 0} delay={0.25} className="fig-mono score-num" />
                 <span className="score-unit">pts</span>
               </motion.div>
             ) : (
-              <p className="t-h3">Already solved, no new points</p>
+              <p className="t-h3">Already closed. Points are paid once.</p>
             )
           ) : (
-            <p className="t-h3">The answer is <span className="fig c-pos">{r.answer_label}</span></p>
+            <p className="t-h3">The right call was <span className="fig-mono c-pos">{r.answer_label}</span></p>
           )}
           {r.correct && r.points > 0 && r.time_ratio > 0 && <span className="chip chip--strong">Speed bonus +{Math.round(r.time_ratio * 50)}%</span>}
-          {!r.correct && <p className="t-callout">Even senior analysts miss this one. Here’s how it works, step by step.</p>}
+          {!r.correct && <p className="t-callout">Every MD has mispriced a deal once. Walk the solution below and this trap won’t catch you twice.</p>}
         </div>
       </div>
 
@@ -434,9 +437,10 @@ function Result({ outcome, me, nextId, onNext, onShare, onTutor }) {
         <div className="stack-8 result-xp">
           <div className="between">
             <span className="t-label"><TierBadge level={profile.level} /></span>
-            <span className="t-cap fig">{profile.points} / {profile.next_level_at ?? '—'} pts{profile.next_level ? ` to ${profile.next_level}` : ''}</span>
+            <span className="t-cap fig">{profile.points} / {profile.next_level_at ?? '—'} pts{profile.next_level ? ` to ${careerName(profile.next_level)}` : ''}</span>
           </div>
           <ProgressBar value={to} from={from} size="sm" delay={0.6} label="Progress to the next tier" />
+          <StreakLine streak={profile.streak} activeToday={profile.active_today} />
         </div>
       )}
 
@@ -530,9 +534,9 @@ function Promotion({ level, onClose, onShare }) {
         <motion.div className="promo" role="dialog" aria-modal="true" aria-labelledby="promo-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <motion.div className="promo-card glass" data-tier={level} initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0 }} transition={spring.gentle}>
             <div className="promo-mascot share-vale"><Mascot mood="levelup" size={200} decorative /></div>
-            <p className="t-eyebrow">Promoted</p>
-            <h2 id="promo-title" className="t-h1">You’re now {level === 'Associate' ? 'an' : 'a'} {level}.</h2>
-            <p className="t-body">New modules are open to you on the right plan, and your tier shows on the leaderboard.</p>
+            <p className="t-eyebrow">Promotion confirmed</p>
+            <h2 id="promo-title" className="t-h1">You’re now {level === 'Associate' ? 'an' : 'a'} {careerName(level)}.</h2>
+            <p className="t-body">Earned, not given. Harder desks are open to you on the right plan, and your new title now shows on the leaderboard.</p>
             <div className="row-8 wrap" style={{ justifyContent: 'center' }}>
               <button type="button" className="btn btn--secondary btn--auto" onClick={onShare}><Share2 size={17} aria-hidden="true" /> Share</button>
               <button type="button" className="btn btn--primary btn--auto" onClick={onClose} autoFocus>Keep climbing <ArrowRight size={17} aria-hidden="true" /></button>
@@ -557,16 +561,16 @@ function Locked({ lock }) {
         <div className="card stack-16 center center-x locked-card">
           <Mascot mood="think" size={150} />
           <span className="pstat pstat--locked" style={{ width: 44, height: 44 }}><Lock size={20} /></span>
-          <h1 className="t-h2">{isQuota ? 'You’ve used this week’s free deals' : `This module is part of ${tier}`}</h1>
+          <h1 className="t-h2">{isQuota ? 'This week’s free deals are closed' : `This desk is reserved for ${tier}`}</h1>
           <p className="t-body" style={{ maxWidth: 400 }}>
             {isQuota
-              ? `Your free deals come back on ${me?.quota?.resets_at ? weekday(me.quota.resets_at) : 'Monday'}. Go unlimited to keep your streak alive today.`
-              : 'Unlock harder modules and the deals interviewers actually ask about.'}
+              ? `Your free deals return on ${me?.quota?.resets_at ? weekday(me.quota.resets_at) : 'Monday'}. Go unlimited and keep your streak alive today.`
+              : 'Bigger tickets, harder structures: the deals that separate analysts from the people who run them.'}
           </p>
           <button type="button" className="btn btn--primary" onClick={() => navigate('/plans', { state: { highlight: isQuota ? 'core' : LEVEL_TIER[lock.detail] } })}>
-            See plans
+            {isQuota ? 'Go unlimited' : 'Unlock this desk'}
           </button>
-          <Link to="/practice" className="btn btn--ghost">Back to practice</Link>
+          <Link to="/practice" className="btn btn--ghost">Back to the deal library</Link>
         </div>
       </Page>
     </>

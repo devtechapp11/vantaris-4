@@ -10,49 +10,49 @@
       "id": "statements",
       "name": "Financial statements",
       "tier": "Analyst",
-      "blurb": "Income statement, margins, cash flow"
+      "blurb": "Margins, cash flow, the story behind the P&L"
     },
     {
       "id": "dcf",
       "name": "DCF valuation",
       "tier": "Analyst",
-      "blurb": "WACC, terminal value, discounting"
+      "blurb": "WACC, terminal value, the price of time"
     },
     {
       "id": "comps",
       "name": "Trading comparables",
       "tier": "Analyst",
-      "blurb": "Multiples and the equity bridge"
+      "blurb": "Multiples and the bridge to equity value"
     },
     {
       "id": "precedents",
       "name": "Precedent transactions",
       "tier": "Associate",
-      "blurb": "Control premiums, deal multiples"
+      "blurb": "Control premiums and what buyers really paid"
     },
     {
       "id": "lbo",
       "name": "LBO modeling",
       "tier": "Associate",
-      "blurb": "Leverage, MOIC, IRR, paydown"
+      "blurb": "Leverage, paydown, MOIC and IRR"
     },
     {
       "id": "ma",
       "name": "M&A accretion / dilution",
       "tier": "VP",
-      "blurb": "EPS impact, synergies, exchange"
+      "blurb": "Accretion, dilution and synergies that pay"
     },
     {
       "id": "restructuring",
       "name": "Restructuring",
       "tier": "VP",
-      "blurb": "Recovery waterfalls, priority"
+      "blurb": "Waterfalls, priority and the fulcrum"
     },
     {
       "id": "structuring",
       "name": "Deal structuring",
       "tier": "MD",
-      "blurb": "Pricing a deal backwards from returns"
+      "blurb": "Price the deal backwards from the return"
     }
   ],
   "problems": [

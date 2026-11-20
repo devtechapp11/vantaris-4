@@ -1182,14 +1182,14 @@ grant execute on function public.user_tier(uuid)                                
 -- ---------------------------------------------------------------------
 insert into public.tiers (id, name, rank, weekly_problem_limit, max_level, full_walkthroughs, tutor_daily_limit, tagline, features)
 values
-  ('free',  'Free',  0, 3,    'Analyst',   false, 0,   'Try the format',
-     array['3 problems a week', 'Analyst modules', 'First two solution steps']),
-  ('core',  'Core',  1, null, 'Associate', true,  0,   'Practice every day',
-     array['Unlimited problems', 'Analyst and Associate modules', 'Full step-by-step solutions']),
-  ('pro',   'Pro',   2, null, 'VP',        true,  40,  'Learn with a tutor',
-     array['Everything in Core', 'AI tutor, 40 messages a day', 'VP modules: M&A and restructuring']),
-  ('elite', 'Elite', 3, null, 'MD',        true,  300, 'Interview-ready',
-     array['Everything in Pro', 'Unlimited AI tutor', 'MD module: deal structuring', 'Elite member card'])
+  ('free',  'Free',  0, 3,    'Analyst',   false, 0,   'Take a seat on the floor',
+     array['3 deals a week', 'Analyst desks', 'First two debrief steps']),
+  ('core',  'Core',  1, null, 'Associate', true,  0,   'Build daily reflexes',
+     array['Unlimited deals', 'Analyst and Associate desks', 'Full step-by-step debriefs']),
+  ('pro',   'Pro',   2, null, 'VP',        true,  40,  'Train with a coach at your side',
+     array['Everything in Core', 'Vale, your AI coach: 40 messages a day', 'VP desks: M&A and restructuring']),
+  ('elite', 'Elite', 3, null, 'MD',        true,  300, 'Walk in interview-ready',
+     array['Everything in Pro', 'Unlimited coaching with Vale', 'MD desk: deal structuring', 'The Elite member card'])
 on conflict (id) do update set
   name = excluded.name, rank = excluded.rank, weekly_problem_limit = excluded.weekly_problem_limit,
   max_level = excluded.max_level, full_walkthroughs = excluded.full_walkthroughs,
@@ -1212,14 +1212,14 @@ on conflict (id) do update set
 -- ---------------------------------------------------------------------
 insert into public.modules (id, name, short, level, blurb, sort)
 values
-  ($v$statements$v$, $v$Financial statements$v$, $v$Statements$v$, $v$Analyst$v$, $v$Income statement, margins, cash flow$v$, 1),
-  ($v$dcf$v$, $v$DCF valuation$v$, $v$DCF$v$, $v$Analyst$v$, $v$WACC, terminal value, discounting$v$, 2),
-  ($v$comps$v$, $v$Trading comparables$v$, $v$Comps$v$, $v$Analyst$v$, $v$Multiples and the equity bridge$v$, 3),
-  ($v$precedents$v$, $v$Precedent transactions$v$, $v$Precedents$v$, $v$Associate$v$, $v$Control premiums, deal multiples$v$, 4),
-  ($v$lbo$v$, $v$LBO modeling$v$, $v$LBO$v$, $v$Associate$v$, $v$Leverage, MOIC, IRR, paydown$v$, 5),
-  ($v$ma$v$, $v$M&A accretion / dilution$v$, $v$M&A$v$, $v$VP$v$, $v$EPS impact, synergies, exchange$v$, 6),
-  ($v$restructuring$v$, $v$Restructuring$v$, $v$Restructuring$v$, $v$VP$v$, $v$Recovery waterfalls, priority$v$, 7),
-  ($v$structuring$v$, $v$Deal structuring$v$, $v$Structuring$v$, $v$MD$v$, $v$Pricing a deal backwards from returns$v$, 8)
+  ($v$statements$v$, $v$Financial statements$v$, $v$Statements$v$, $v$Analyst$v$, $v$Margins, cash flow, the story behind the P&L$v$, 1),
+  ($v$dcf$v$, $v$DCF valuation$v$, $v$DCF$v$, $v$Analyst$v$, $v$WACC, terminal value, the price of time$v$, 2),
+  ($v$comps$v$, $v$Trading comparables$v$, $v$Comps$v$, $v$Analyst$v$, $v$Multiples and the bridge to equity value$v$, 3),
+  ($v$precedents$v$, $v$Precedent transactions$v$, $v$Precedents$v$, $v$Associate$v$, $v$Control premiums and what buyers really paid$v$, 4),
+  ($v$lbo$v$, $v$LBO modeling$v$, $v$LBO$v$, $v$Associate$v$, $v$Leverage, paydown, MOIC and IRR$v$, 5),
+  ($v$ma$v$, $v$M&A accretion / dilution$v$, $v$M&A$v$, $v$VP$v$, $v$Accretion, dilution and synergies that pay$v$, 6),
+  ($v$restructuring$v$, $v$Restructuring$v$, $v$Restructuring$v$, $v$VP$v$, $v$Waterfalls, priority and the fulcrum$v$, 7),
+  ($v$structuring$v$, $v$Deal structuring$v$, $v$Structuring$v$, $v$MD$v$, $v$Price the deal backwards from the return$v$, 8)
 on conflict (id) do update set
   name = excluded.name, short = excluded.short, level = excluded.level,
   blurb = excluded.blurb, sort = excluded.sort;

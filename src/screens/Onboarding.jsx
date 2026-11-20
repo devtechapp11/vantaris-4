@@ -19,7 +19,7 @@ const GOALS = [
   { id: 'ib', label: 'Investment banking', detail: 'M&A, valuation, pitch work', Icon: Landmark, tier: 'Analyst' },
   { id: 'pe', label: 'Private equity', detail: 'LBOs, returns, deal structuring', Icon: Briefcase, tier: 'VP' },
   { id: 'consulting', label: 'Consulting or corporate finance', detail: 'Strategy and financial analysis', Icon: ChartLine, tier: 'Associate' },
-  { id: 'self', label: 'Learning for myself', detail: 'Understand how deals work', Icon: BookOpen, tier: 'MD' },
+  { id: 'self', label: 'Mastering it for myself', detail: 'Understand how deals really get done', Icon: BookOpen, tier: 'MD' },
 ];
 
 const STEPS = 3;
@@ -91,7 +91,7 @@ export default function Onboarding() {
                   <header className="stack-8">
                     <p className="t-eyebrow">Welcome to Vantaris</p>
                     <h1 className="t-h1">Your career starts at Analyst.</h1>
-                    <p className="t-body">Solve deals, earn points, get promoted. Four tiers stand between you and MD.</p>
+                    <p className="t-body">Close deals, earn points, earn the title. Three promotions stand between you and Managing Director.</p>
                   </header>
                   <ol className="onb-ladder">
                     {['Analyst', 'Associate', 'VP', 'MD'].map((l, i) => (
@@ -101,7 +101,7 @@ export default function Onboarding() {
                       </motion.li>
                     ))}
                   </ol>
-                  <button type="button" className="btn btn--primary" onClick={() => go(1)}>Let’s go <ArrowRight size={18} aria-hidden="true" /></button>
+                  <button type="button" className="btn btn--primary" onClick={() => go(1)}>Take my seat <ArrowRight size={18} aria-hidden="true" /></button>
                 </>
               )}
               {step === 1 && (
@@ -114,7 +114,7 @@ export default function Onboarding() {
                 >
                   <header className="stack-8">
                     <p className="t-eyebrow">Your file</p>
-                    <h1 className="t-h1">What should we call you?</h1>
+                    <h1 className="t-h1">How should the desk address you?</h1>
                   </header>
                   <div className="stack-16">
                     <FloatingField label="First name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" maxLength={40} />
@@ -131,7 +131,7 @@ export default function Onboarding() {
                 <>
                   <header className="stack-8">
                     <p className="t-eyebrow">Your goal</p>
-                    <h1 className="t-h1">What are you aiming for?</h1>
+                    <h1 className="t-h1">Where are you headed?</h1>
                   </header>
                   <div className="goal-grid" role="radiogroup" aria-label="Goal">
                     {GOALS.map((g) => (
@@ -142,7 +142,7 @@ export default function Onboarding() {
                   <div className="onb-actions">
                     <button type="button" className="btn btn--secondary btn--icon" onClick={() => go(1)} aria-label="Back"><ArrowLeft size={18} /></button>
                     <button type="button" className="btn btn--primary" disabled={busy} onClick={finish}>
-                      {busy ? <Spinner /> : <>Start practicing <ArrowRight size={18} aria-hidden="true" /></>}
+                      {busy ? <Spinner /> : <>Open my desk <ArrowRight size={18} aria-hidden="true" /></>}
                     </button>
                   </div>
                 </>

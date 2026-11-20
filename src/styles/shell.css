@@ -17,7 +17,7 @@
 .tab:active svg { transform: scale(0.94); }
 .tab svg { transition: transform var(--dur-fast) var(--ease-out); }
 .tab[aria-current='page'] { color: var(--fg); }
-.tab-mark { position: absolute; top: 0; left: 34%; right: 34%; height: 1px; background: var(--platinum); }
+.tab-mark { position: absolute; top: 0; left: 30%; right: 30%; height: 2px; border-radius: 0 0 2px 2px; background: var(--metal-bar); box-shadow: 0 0 10px color-mix(in srgb, var(--platinum) 70%, transparent); }
 
 .sidebar { display: none; }
 
@@ -46,7 +46,7 @@
   }
   .side-link:hover { color: var(--fg); background: var(--hover); }
   .side-link[aria-current='page'] { color: var(--fg); }
-  .side-pill { position: absolute; left: 0; top: 10px; bottom: 10px; width: 1px; background: var(--platinum); }
+  .side-pill { position: absolute; left: 0; top: 10px; bottom: 10px; width: 2px; border-radius: 2px; background: var(--metal-fill); box-shadow: 0 0 10px color-mix(in srgb, var(--platinum) 60%, transparent); }
   .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: var(--sp-4); }
   .side-upgrade { display: flex; flex-direction: column; gap: var(--sp-1); padding: var(--sp-4) var(--sp-3) 0; border-top: var(--hairline) solid var(--line); text-decoration: none; }
   .side-upgrade:hover .t-label { text-decoration: underline; text-underline-offset: 3px; }

@@ -13,28 +13,28 @@ import { track } from '../lib/analytics';
 
 const COPY = {
   quota: (me) => ({
-    title: 'You’ve used this week’s free deals',
-    body: `Keep your streak going with unlimited practice. Your free deals come back on ${me?.quota?.resets_at ? weekday(me.quota.resets_at) : 'Monday'}.`,
+    title: 'This week’s free deals are closed',
+    body: `Keep your streak alive with unlimited deals. Your free deals return on ${me?.quota?.resets_at ? weekday(me.quota.resets_at) : 'Monday'}.`,
     tier: 'core',
   }),
   level: (_, extra) => ({
     title: `This desk opens with ${{ core: 'Core', pro: 'Pro', elite: 'Elite' }[LEVEL_TIER[extra.level]] ?? 'a paid plan'}`,
-    body: 'Unlock harder modules and the deals interviewers actually ask about.',
+    body: 'Bigger tickets and harder structures: the deals interviewers save for the final round.',
     tier: LEVEL_TIER[extra.level] ?? 'core',
   }),
   tutor: () => ({
-    title: 'Learn faster with Vale',
-    body: 'Hints, formulas and explanations on any deal, without the answer being spoiled.',
+    title: 'Train with Vale at your side',
+    body: 'Hints, formulas and the logic behind every step, on any deal, without ever spoiling the answer.',
     tier: 'pro',
   }),
   steps: () => ({
-    title: 'See every step of the solution',
-    body: 'Free shows the first two steps. Core and above show the full walkthrough on every deal.',
+    title: 'See the full debrief',
+    body: 'Free shows the first two steps. Core and above open the complete walkthrough on every deal.',
     tier: 'core',
   }),
   eliteCard: () => ({
     title: 'The Elite member card',
-    body: 'Your score and tier on a card worth showing off, plus everything else Vantaris offers.',
+    body: 'Your title and score on a card worth showing, plus everything else Vantaris offers.',
     tier: 'elite',
   }),
 };
