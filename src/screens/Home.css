@@ -50,3 +50,10 @@
 .is-next .path-node::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--fg); }
 .is-next .path-name { color: var(--fg); font-weight: var(--fw-semibold); }
 @media (hover: hover) { .path-btn:hover .path-name { color: var(--fg); } }
+
+/* Desk rank under the career gauge, sound switch in the header */
+.home-level { display: flex; flex-direction: column; gap: var(--sp-2); }
+.home-rank { align-self: flex-start; gap: var(--sp-2); color: var(--fg-2); text-decoration: none; font-size: var(--fs-sm); }
+.home-rank b { color: var(--fg); font-weight: var(--fw-semibold); }
+@media (hover: hover) { .home-rank:hover { color: var(--fg); } }
+.home-sound { align-self: flex-start; margin-top: calc(var(--sp-1) * -1); }

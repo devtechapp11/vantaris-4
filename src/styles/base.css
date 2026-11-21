@@ -31,6 +31,8 @@ h1, h2, h3, p, dd, dt, li { overflow-wrap: break-word; }
 img, video, svg, canvas { display: block; max-width: 100%; }
 button, input, textarea, select { font: inherit; color: inherit; letter-spacing: inherit; }
 button { cursor: pointer; }
+/* No double-tap zoom delay: presses respond on the first frame */
+button, a, [role="button"], [role="radio"], [role="tab"], label { touch-action: manipulation; }
 a { color: inherit; }
 :focus { outline: none; }
 :focus-visible { outline: var(--ring) solid var(--silver); outline-offset: var(--ring); border-radius: var(--r-xs); }

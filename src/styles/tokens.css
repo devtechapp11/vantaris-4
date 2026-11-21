@@ -207,6 +207,13 @@
   --z-toast: 90;
 }
 
+/* Phones: every control at least 48px tall, comfortable under a thumb */
+@media (max-width: 767px) {
+  :root {
+    --tap: 48px;
+    --control-h-sm: 48px;
+  }
+}
 @media (min-width: 768px) {
   :root {
     --gutter: max(32px, env(safe-area-inset-left, 0px));

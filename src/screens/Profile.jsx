@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'motion/react';
-import {
-  Accessibility, Award, Box, BookOpen, Check, CircleCheck, Clock, Cookie, CreditCard, FileText, Flame, LogOut, Mail, PartyPopper, Pencil, Shield, Trash2, Trophy, Vibrate, X, Zap,
-} from 'lucide-react';
+import { Accessibility, Award, Box, BookOpen, Check, CircleCheck, Clock, Cookie, CreditCard, FileText, Flame, LogOut, Mail, PartyPopper, Pencil, Shield, Trash2, Trophy, Vibrate, X, Zap, Volume2, ArrowRight } from 'lucide-react';
 import { api } from '../lib/api';
 import { useApp } from '../app/AppContext';
 import { resetConsent } from '../app/consent';
@@ -23,6 +21,7 @@ import { useMeta } from '../app/useMeta';
 const BADGE_ICON = { 'first-deal': CircleCheck, 'hat-trick': Zap, 'on-fire': Flame, 'fast-hands': Clock, 'module-clear': BookOpen, associate: Trophy };
 
 const SETTINGS = [
+  { key: 'sound', label: 'Sound', detail: 'A soft click on taps, a chime when you close a deal.', Icon: Volume2 },
   { key: 'haptics', label: 'Haptic feedback', detail: 'A light tap on answers and level-ups (phones that support it).', Icon: Vibrate },
   { key: 'celebrations', label: 'Celebrations', detail: 'A short burst when you close a deal or get promoted.', Icon: PartyPopper },
   { key: 'effects3d', label: '3D graphics', detail: 'The chrome mascot in 3D on capable devices.', Icon: Box },
@@ -97,7 +96,7 @@ export default function Profile() {
           </Item>
 
           <Item as="section" className="stack-12" aria-labelledby="rec">
-            <div className="section-head"><h2 id="rec">Recent deals</h2><Link to="/practice" className="link t-foot">All deals</Link></div>
+            <div className="section-head"><h2 id="rec">Recent deals</h2><Link to="/practice" className="link t-foot tap-target">All deals</Link></div>
             {me.recent.length ? (
               <div className="group">
                 {me.recent.map((r) => (
@@ -114,7 +113,7 @@ export default function Profile() {
                 ))}
               </div>
             ) : (
-              <p className="t-callout">Your closed deals land here.</p>
+              <FirstDeal me={me} onGo={(id) => navigate(`/practice/${id}`)} />
             )}
           </Item>
 
@@ -372,5 +371,21 @@ function PreviewControls({ onChange }) {
         </div>
       </div>
     </Item>
+  );
+}
+
+/** Empty history: the first deal, one tap away. */
+function FirstDeal({ me, onGo }) {
+  const deal = me.daily ?? me.continue?.[0];
+  if (!deal) return <p className="t-callout">Your closed deals land here.</p>;
+  return (
+    <div className="card stack-12">
+      <div className="stack-4">
+        <p className="t-eyebrow">Your first deal is ready</p>
+        <p className="t-headline">{deal.title}</p>
+        <p className="t-foot">{deal.kind} · <span className="fig">{deal.minutes}</span> min</p>
+      </div>
+      <button type="button" className="btn btn--primary" onClick={() => onGo(deal.id)}>Take it now <ArrowRight size={17} aria-hidden="true" /></button>
+    </div>
   );
 }

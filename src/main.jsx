@@ -13,6 +13,9 @@ import './styles/base.css';
 import './styles/components.css';
 import './styles/shell.css';
 import App from './App.jsx';
+import { installFeel } from './app/feel';
+
+installFeel();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

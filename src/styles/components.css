@@ -549,13 +549,21 @@ button.chip::after, a.chip::after, .copy-btn::after, .term-val::after { content:
    own stacking context: above its background, below its content. Use `.metal` on any card; add `.metal--live`
    when it is interactive.
    ========================================================= */
+@property --glint { syntax: '<number>'; inherits: false; initial-value: 0; }
 .metal {
   position: relative;
   isolation: isolate;
   border-radius: var(--r-md);
-  background: var(--metal-surface);
+  /* A pool of platinum light under the pointer (src/app/feel.js sets --mx/--my).
+     It only adds light on top of the same surface: no new colour. */
+  background:
+    radial-gradient(280px circle at var(--mx, 50%) var(--my, -60%), color-mix(in srgb, var(--white-metal) calc(var(--glint) * 7%), transparent), transparent 70%),
+    var(--metal-surface);
   box-shadow: var(--lift);
+  transition: --glint var(--dur-slow) var(--ease-out);
 }
+@media (hover: hover) and (pointer: fine) { .metal:hover { --glint: 1; } }
+.metal:active { --glint: 1.4; transition-duration: 60ms; }
 .metal::before {
   content: '';
   position: absolute; inset: 0; z-index: -1;
@@ -632,3 +640,92 @@ button.chip::after, a.chip::after, .copy-btn::after, .term-val::after { content:
 .streak-icon { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex: none; color: var(--fg-3); border: var(--hairline) solid var(--line-strong); }
 .streak.is-lit .streak-icon { color: var(--black); background: var(--metal-fill); border-color: var(--white-metal); box-shadow: var(--glow-soft); }
 .streak.is-due .streak-icon { color: var(--fg); border-color: var(--silver); animation: pip-pulse 2.4s var(--ease-in-out) infinite; }
+
+/* =========================================================
+   Momentum: session bar, combo, sound switch, promotion climb.
+   Same palette: platinum light, emerald only for a correct run.
+   ========================================================= */
+.session { display: flex; flex-direction: column; gap: var(--sp-2); }
+.session-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+.session-count { display: inline-flex; align-items: center; gap: 4px; font-size: var(--fs-sm); color: var(--fg); }
+.session.is-hit .session-count { color: var(--pos); }
+.session.is-hit .bar > i { box-shadow: 0 0 14px -1px color-mix(in srgb, var(--platinum) 75%, transparent); }
+
+.combo {
+  display: inline-flex; align-items: center; gap: var(--sp-2);
+  align-self: flex-start;
+  min-height: 32px; padding: 0 var(--sp-3) 0 var(--sp-1);
+  border-radius: var(--r-full);
+  font-size: var(--fs-sm); color: var(--fg-2);
+  background: color-mix(in srgb, var(--carbon) 80%, var(--aluminium-dark));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--platinum) 18%, transparent);
+  will-change: transform;
+}
+.combo b {
+  display: inline-grid; place-items: center; min-width: 30px; height: 24px; padding: 0 6px;
+  border-radius: var(--r-full);
+  background: var(--brush), var(--metal-fill);
+  color: var(--fg-inverse); font-size: var(--fs-sm); font-weight: var(--fw-bold);
+  box-shadow: inset 0 1px 0 white, var(--glow-soft);
+}
+.combo--x3, .combo--x5 { color: var(--fg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gain) 45%, transparent), var(--glow-gain); }
+.combo--x5 b { box-shadow: inset 0 1px 0 white, 0 0 18px -2px color-mix(in srgb, var(--platinum) 80%, transparent); }
+
+.sound-toggle {
+  width: var(--tap); height: var(--tap); flex: none;
+  display: grid; place-items: center;
+  border: 0; border-radius: 50%; background: none; color: var(--fg-3);
+  transition: color var(--dur-fast), transform var(--dur-fast) var(--ease-out);
+}
+.sound-toggle[aria-pressed='true'] { color: var(--fg-2); }
+@media (hover: hover) { .sound-toggle:hover { color: var(--fg); } }
+.sound-toggle:active { transform: scale(0.92); }
+
+.climb { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; max-width: 360px; }
+.climb-step { position: relative; display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
+.climb-node { position: relative; z-index: 1; width: 14px; height: 14px; border-radius: 50%; background: var(--aluminium-dark); box-shadow: inset 0 0 0 1px var(--line-strong); }
+.climb-step.is-done .climb-node { background: var(--metal-bar); }
+.climb-step.is-now .climb-node { width: 18px; height: 18px; margin-top: -2px; background: var(--brush), var(--metal-fill); box-shadow: 0 0 0 4px color-mix(in srgb, var(--platinum) 16%, transparent), 0 0 22px 2px color-mix(in srgb, var(--platinum) 55%, transparent); }
+.climb-link { position: absolute; top: 6px; left: calc(50% + 9px); right: calc(-50% + 9px); height: 2px; background: var(--aluminium-dark); border-radius: 2px; overflow: hidden; }
+.climb-link i { display: block; height: 100%; background: var(--metal-bar); transform-origin: left center; }
+.climb-label { font-size: var(--fs-xs); font-weight: var(--fw-medium); color: var(--fg-3); }
+.climb-step.is-done .climb-label { color: var(--fg-2); }
+.climb-step.is-now .climb-label { color: var(--fg); font-weight: var(--fw-semibold); }
+
+
+/* =========================================================
+   Answer options (deal screen, onboarding challenge, landing case)
+   ========================================================= */
+.options { display: flex; flex-direction: column; gap: var(--sp-2); }
+.option {
+  position: relative; width: 100%;
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4); min-height: 56px;
+  color: var(--fg);
+  border: 0; border-radius: var(--r-md);
+  text-align: left;
+  transition: box-shadow var(--dur-base) var(--ease-out), opacity var(--dur-base), transform var(--dur-fast) var(--ease-out);
+}
+.option:active:not(:disabled) { transform: scale(var(--press-scale)); }
+.option-key { width: 28px; height: 28px; border-radius: var(--r-xs); font-family: var(--font-mono); flex: none; display: grid; place-items: center; font-size: var(--fs-xs); font-weight: var(--fw-semibold); color: var(--fg-3); border: var(--hairline) solid var(--line-strong); transition: all var(--dur-fast); }
+.option-label { font-size: var(--fs-md); font-weight: var(--fw-medium); font-variant-numeric: tabular-nums; min-width: 0; overflow-wrap: anywhere; }
+.option-label.fig-mono { font-size: calc(var(--fs-md) + 1px); }
+.option-tag { margin-left: auto; }
+.option[data-state='selected'] { box-shadow: var(--lift), var(--glow); }
+.option[data-state='selected']::before { background: var(--metal-edge-strong); }
+.option[data-state='selected'] .option-key { background: var(--metal-fill); border-color: var(--white-metal); color: var(--black); }
+/* Emerald appears in exactly one place: the right answer */
+.option[data-state='answer'] { cursor: default; background: linear-gradient(180deg, color-mix(in srgb, var(--gain) 12%, var(--carbon)), var(--carbon)); box-shadow: var(--lift), var(--glow-gain); }
+.option[data-state='answer']::before { background: var(--metal-edge-gain); }
+.option[data-state='answer'] .option-key { border-color: var(--gain); color: var(--pos); }
+.option[data-state='wrong'] { cursor: default; }
+.option[data-state='wrong']::before { background: color-mix(in srgb, var(--loss) 70%, transparent); }
+.option[data-state='wrong'] .option-key { border-color: var(--loss); color: var(--neg); }
+.option[data-state='dim'] { opacity: 0.45; cursor: default; }
+
+/* Phones: small controls keep their look but get a 48px hit area */
+@media (max-width: 767px) {
+  button.chip, .term-val { position: relative; }
+  button.chip::after, .term-val::after { content: ''; position: absolute; left: -4px; right: -4px; top: 50%; height: 48px; transform: translateY(-50%); }
+  .onb-skip, .btn--ghost.btn--sm { min-width: 48px; }
+}

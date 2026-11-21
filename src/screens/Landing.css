@@ -108,7 +108,8 @@ html.lenis, html.lenis body { height: auto; }
     padding: var(--sp-12) var(--gutter-r) var(--sp-10) var(--gutter);
   }
   .mch + .mch { border-top: var(--hairline) solid var(--line); }
-  .mch--hero { gap: var(--sp-6); padding-top: calc(var(--safe-top) + 64px + var(--sp-4)); padding-bottom: var(--sp-16); }
+  .mch--hero { gap: var(--sp-5); padding-top: calc(var(--safe-top) + 64px); padding-bottom: var(--sp-16); }
+  .mch--hero .chapter-copy { gap: var(--sp-3); }
   .mch .chapter-copy { max-width: none; pointer-events: auto; }
   .mch-mascot { align-self: center; max-width: 100%; }
   .mch-visual { width: 100%; min-width: 0; }
@@ -145,3 +146,23 @@ html.lenis, html.lenis body { height: auto; }
 
 /* Data in the stage panels reads like a terminal */
 .mini-steps li, .panel-irr { font-family: var(--font-mono); letter-spacing: -0.02em; }
+
+/* ---------- Hero case: one deal, one tap ---------- */
+.hero-case { display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-4); margin-top: var(--sp-1); max-width: 520px; pointer-events: auto; }
+.hc-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); margin: calc(var(--sp-2) * -1) calc(var(--sp-2) * -1) calc(var(--sp-2) * -1) 0; }
+.hc-q { margin: 0; font-size: var(--fs-base); font-weight: var(--fw-medium); line-height: 1.45; color: var(--fg); }
+.hc-opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2); }
+.hc-opt { min-height: 48px; padding: var(--sp-2) var(--sp-3); }
+.hc-opt .option-key { width: 24px; height: 24px; }
+.hc-opt .option-label.fig-mono { font-size: var(--fs-base); }
+.hc-verdict { display: flex; flex-direction: column; gap: var(--sp-3); }
+.hc-score-row { display: flex; align-items: baseline; gap: var(--sp-2); flex-wrap: wrap; }
+.hc-score small { font-family: var(--font-ui); font-size: var(--fs-sm); font-weight: var(--fw-medium); color: var(--fg-3); letter-spacing: 0; margin-left: 4px; text-shadow: none; }
+.hc-score { font-size: 34px; font-weight: var(--fw-semibold); letter-spacing: -0.05em; line-height: 1; color: var(--pos); text-shadow: 0 0 24px color-mix(in srgb, var(--gain) 45%, transparent); }
+.hero-case .cta-wrap { margin-top: var(--sp-1); }
+.hero-case .btn--primary { width: 100%; }
+@media (min-width: 900px) {
+  .hero-case { padding: var(--sp-5); }
+  .hc-opts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .hero-case .btn--primary { width: auto; }
+}

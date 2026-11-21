@@ -5,8 +5,8 @@
   display: flex; align-items: center; gap: var(--sp-5);
   padding: calc(var(--safe-top) + var(--sp-4)) var(--gutter-r) var(--sp-4) var(--gutter);
 }
-.onb-progress { flex: 1; height: 1px; background: var(--aluminium-dark); overflow: hidden; }
-.onb-progress i { display: block; height: 100%; background: var(--platinum); transform-origin: 0 50%; }
+.onb-head { gap: var(--sp-3); }
+.onb-progress { flex: 1; min-width: 0; height: var(--bar-h); }
 .onb-skip { color: var(--fg-2); }
 
 .onb-body {
@@ -35,13 +35,9 @@
 .goal {
   position: relative; display: flex; align-items: center; gap: var(--sp-3);
   min-height: 72px; padding: var(--sp-3) var(--sp-4); text-align: left; color: var(--fg);
-  border-radius: var(--r-sm);
-  background: none;
-  border: var(--hairline) solid var(--line-strong);
-  transition: border-color var(--dur-fast), background-color var(--dur-fast);
+  border: 0;
+  transition: box-shadow var(--dur-base) var(--ease-out), transform var(--dur-fast) var(--ease-out);
 }
-@media (hover: hover) { .goal:hover { border-color: var(--aluminium); background: var(--hover); } }
-.goal--on { border-color: var(--platinum); }
 .goal-art { width: 40px; height: 40px; flex: none; display: grid; place-items: center; color: var(--fg-2); border-radius: 50%; border: var(--hairline) solid var(--line-strong); }
 .goal--on .goal-art { color: var(--fg); border-color: var(--aluminium); }
 .goal-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding-right: var(--sp-6); }
@@ -50,4 +46,19 @@
   width: 22px; height: 22px; border-radius: 50%;
   display: grid; place-items: center;
   background: var(--platinum); color: var(--black);
+}
+
+/* Challenge + verdict + seat */
+.onb-q { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-2); }
+@media (min-width: 520px) { .onb-q { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.onb-verdict { display: flex; flex-direction: column; gap: var(--sp-3); padding-top: var(--sp-2); }
+.onb-verdict.is-right .t-headline { color: var(--pos); }
+.onb-seat { display: flex; flex-direction: column; gap: var(--sp-4); }
+.onb-back { align-self: flex-start; }
+@media (max-width: 767px) {
+  .onb-body { align-content: start; align-items: start; gap: var(--sp-5); padding-top: var(--sp-4); }
+  .onb-vale { flex-direction: row; justify-content: flex-start; gap: var(--sp-3); }
+  .onb-vale .mascot { width: 64px !important; height: 64px !important; flex: none; }
+  .onb-bubble { text-align: left; }
+  .onb-skip { padding: 0 var(--sp-2); }
 }

@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
-import { Crown } from 'lucide-react';
+import { ArrowRight, Crown, Flag } from 'lucide-react';
 import { api } from '../lib/api';
 import { useApp } from '../app/AppContext';
 import { usePullToRefresh } from '../app/fluid';
 import { CountUp, Item, LargeTitle, Page, PullIndicator, Segmented } from '../components/chrome';
 import { Avatar, Skeleton, TierBadge } from '../components/bits';
-import Mascot from '../components/Mascot';
 import { group, item } from '../design/motion';
 import { duration, ease, spring, stagger } from '../design/tokens';
 import { number } from '../lib/format';
+import { CAREER } from '../lib/career';
 import './Ranking.css';
 import { useMeta } from '../app/useMeta';
 
@@ -47,43 +48,95 @@ export default function Ranking() {
       <LargeTitle title="Rank" eyebrow={data ? `${number(data.players)} players ranked` : 'Leaderboard'} />
       <Item className="rank-scope"><Segmented value={scope} onChange={setScope} options={SCOPES} label="Time range" /></Item>
 
+      {data && <Item><NextMove data={data} me={me} scope={scope} /></Item>}
+
       {!data ? (
         <div className="stack-12"><Skeleton height={260} /><Skeleton height={320} /></div>
-      ) : rows.length === 0 ? (
-        <Item className="card empty">
-          <Mascot mood="welcome" size={110} label="Vale beckoning you to start" />
-          <div className="stack-8">
-            <p className="t-headline">No one has scored {scope === 'all' ? 'yet' : scope === 'week' ? 'this week' : 'this month'}.</p>
-            <p className="t-callout">Solve a deal and you’ll open the board.</p>
-          </div>
-        </Item>
       ) : (
         <div className="rank-layout">
-          <Item><Podium key={scope} rows={podium} /></Item>
+          {podium.length > 0 && <Item><Podium key={scope} rows={podium} /></Item>}
           <Item className="stack-12">
             {rest.length > 0 && (
               <motion.ol key={scope} className="rank-list" variants={group(stagger.children)} initial="hidden" animate="show">
                 {rest.map((r) => <Row key={`${r.rank}-${r.name}`} r={r} />)}
               </motion.ol>
             )}
-            {!meInList && data.me && (
+            {!meInList && data.me?.rank && (
               <div className="stack-8">
                 <p className="group-label">You</p>
-                {data.me.rank ? (
-                  <ol className="rank-list"><Row r={data.me} /></ol>
-                ) : (
-                  <div className="card row">
-                    <Avatar name={data.me.name} variant="me" />
-                    <span className="grow t-callout">Solve a deal {scope === 'week' ? 'this week' : scope === 'month' ? 'this month' : ''} to get ranked.</span>
-                  </div>
-                )}
+                <ol className="rank-list"><Row r={data.me} /></ol>
               </div>
             )}
+            <Lines points={me?.profile?.points ?? 0} />
           </Item>
         </div>
       )}
       <Item as="p" className="t-foot center">Points come from first-time correct answers. Faster answers earn up to 50% more.</Item>
     </Page>
+  );
+}
+
+/** The one thing to do next on this board, with the deal ready in one tap. */
+function NextMove({ data, me, scope }) {
+  const navigate = useNavigate();
+  const rows = data.rows ?? [];
+  const i = rows.findIndex((r) => r.is_me);
+  const mine = i >= 0 ? rows[i] : data.me;
+  const above = i > 0 ? rows[i - 1] : null;
+  const when = scope === 'week' ? 'this week' : scope === 'month' ? 'this month' : 'all time';
+  const daily = me?.daily && me.daily.status !== 'correct' && me.daily.status !== 'wrong' ? me.daily : null;
+  const deal = daily ?? me?.continue?.[0] ?? null;
+  let title;
+  let line;
+  if (!mine?.rank) {
+    title = 'One closed deal puts you on this board.';
+    line = rows.length ? `${number(rows.length)} ${rows.length === 1 ? 'player has' : 'players have'} scored ${when}. Take your place.` : `No one has scored ${when} yet. The first close takes the top seat.`;
+  } else if (above) {
+    const gap = Math.max(1, above.points - mine.points + 1);
+    title = <><b className="fig-mono">{number(gap)}</b> pts to pass {above.name.split(' ')[0]}.</>;
+    line = gap <= 15 ? 'One fast, correct deal closes the gap.' : `You’re #${mine.rank} ${when}. Every first-time close counts.`;
+  } else {
+    title = `You lead ${when}.`;
+    line = 'Hold the seat: close a deal today and keep the streak alive.';
+  }
+  return (
+    <section className="next-move metal metal--pad" aria-label="Your next move">
+      <div className="stack-4 grow">
+        <p className="t-eyebrow">Your next move</p>
+        <p className="t-headline">{title}</p>
+        <p className="t-foot">{line}</p>
+      </div>
+      {deal && (
+        <button type="button" className="btn btn--primary btn--auto next-move-cta" onClick={() => navigate(`/practice/${deal.id}`)}>
+          {deal.opened || deal.status === 'opened' ? 'Back to the deal' : 'Take the next deal'} <ArrowRight size={17} aria-hidden="true" />
+        </button>
+      )}
+    </section>
+  );
+}
+
+/** The career thresholds still ahead of you: lines to cross, not players. */
+function Lines({ points }) {
+  const ahead = CAREER.slice(1).filter((c) => c.floor > points);
+  if (!ahead.length) return null;
+  return (
+    <div className="stack-8">
+      <p className="group-label">Lines to cross</p>
+      <motion.ol className="rank-list" variants={group(stagger.children)} initial="hidden" animate="show">
+        {ahead.map((c) => (
+          <motion.li key={c.level} variants={item} className="rank-row rank-row--mark" aria-label={`${c.name}: ${c.floor} points, ${c.floor - points} to go`}>
+            <span className="rank-pos" aria-hidden="true"><Flag size={14} /></span>
+            <span className="grow stack-4" style={{ minWidth: 0 }}>
+              <span className="row-8"><TierBadge level={c.level} />{c.name !== c.level && <span className="t-cap">{c.name}</span>}</span>
+            </span>
+            <span className="stack-4" style={{ alignItems: 'flex-end' }}>
+              <span className="fig rank-pts">{number(c.floor)}</span>
+              <span className="t-cap fig">{number(c.floor - points)} to go</span>
+            </span>
+          </motion.li>
+        ))}
+      </motion.ol>
+    </div>
   );
 }
 

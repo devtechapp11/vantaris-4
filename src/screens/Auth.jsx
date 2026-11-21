@@ -249,7 +249,7 @@ function SignUpForm({ onSent, onResult }) {
       {exists && (
         <div className="between">
           <Link to="/signin" replace className="link t-foot">Sign in</Link>
-          <Link to="/forgot" replace className="link t-foot">Forgot password?</Link>
+          <Link to="/forgot" replace className="link t-foot tap-target">Forgot password?</Link>
         </div>
       )}
       <button className="btn btn--primary" disabled={busy}>{busy ? <Spinner /> : 'Create my free account'}</button>
@@ -286,7 +286,7 @@ function SignInForm({ onResult }) {
       <PasswordField value={password} onChange={setPassword} autoComplete="current-password" />
       <div className="between">
         <span />
-        <Link to="/forgot" replace className="link t-foot">Forgot password?</Link>
+        <Link to="/forgot" replace className="link t-foot tap-target">Forgot password?</Link>
       </div>
       <FormError error={error} />
       <button className="btn btn--primary" disabled={busy}>{busy ? <Spinner /> : 'Sign in'}</button>

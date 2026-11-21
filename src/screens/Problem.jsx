@@ -14,6 +14,9 @@ import Calculator from '../components/Calculator';
 import { FormulaBlock, highlight } from '../components/Formula';
 import Mascot from '../components/Mascot';
 import { StreakLine } from '../components/RankGauge';
+import { ComboBadge, RankClimb, SessionBar } from '../components/Momentum';
+import { comboOf, comboTier } from '../lib/momentum';
+import { sound } from '../lib/sound';
 import { careerName } from '../lib/career';
 import Tutor, { TutorFab } from './Tutor';
 import { burst, originOf, shower } from '../lib/celebrate';
@@ -99,7 +102,12 @@ export default function Problem() {
       const res = await api.submitAnswer(id, choice);
       setMe(res.me);
       const fresh = !res.already_submitted;
-      setOutcome({ result: res.result, level_up: res.level_up, fresh, before, after: res.me.profile.points });
+      const combo = res.result.correct ? comboOf(res.me.recent) : 0;
+      setOutcome({ result: res.result, level_up: res.level_up, fresh, before, after: res.me.profile.points, combo });
+      if (fresh) {
+        if (res.result.correct) sound.correct(Math.max(0, comboTier(combo) === 5 ? 3 : comboTier(combo) - 1));
+        else sound.wrong();
+      }
       track('complete_deal', { correct: Boolean(res.result.correct) });
       haptic(res.result.correct ? [12, 40, 18] : [24, 50, 24]);
       requestAnimationFrame(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
@@ -430,6 +438,7 @@ function Result({ outcome, me, nextId, onNext, onShare, onTutor }) {
           ) : (
             <p className="t-h3">The right call was <span className="fig-mono c-pos">{r.answer_label}</span></p>
           )}
+          {r.correct && fresh && <ComboBadge n={outcome.combo ?? 0} pop />}
           {r.correct && r.points > 0 && r.time_ratio > 0 && <span className="chip chip--strong">Speed bonus +{Math.round(r.time_ratio * 50)}%</span>}
           {!r.correct && <p className="t-callout">Every MD has mispriced a deal once. Walk the solution below and this trap won’t catch you twice.</p>}
         </div>
@@ -445,6 +454,7 @@ function Result({ outcome, me, nextId, onNext, onShare, onTutor }) {
           <StreakLine streak={profile.streak} activeToday={profile.active_today} />
         </div>
       )}
+      {fresh && me && <div className="result-xp"><SessionBar me={me} delay={0.9} /></div>}
 
       <div className="result-actions">
         {nextId && (
@@ -536,6 +546,7 @@ function Promotion({ level, onClose, onShare }) {
         <motion.div className="promo" role="dialog" aria-modal="true" aria-labelledby="promo-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <motion.div className="promo-card glass" data-tier={level} initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0 }} transition={spring.gentle}>
             <div className="promo-mascot share-vale"><Mascot mood="levelup" size={200} decorative /></div>
+            <RankClimb level={level} />
             <p className="t-eyebrow">Promotion confirmed</p>
             <h2 id="promo-title" className="t-h1">You’re now {level === 'Associate' ? 'an' : 'a'} {careerName(level)}.</h2>
             <p className="t-body">Earned, not given. Harder desks are open to you on the right plan, and your new title now shows on the leaderboard.</p>

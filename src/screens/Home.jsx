@@ -2,9 +2,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Check, Lock } from 'lucide-react';
 import { useApp } from '../app/AppContext';
 import { useRank } from '../app/useRank';
-import { CountUp, Item, Page, PullIndicator } from '../components/chrome';
+import { Item, Page, PullIndicator } from '../components/chrome';
 import { Skeleton, TIER_LABEL } from '../components/bits';
 import { RankGauge, StreakLine } from '../components/RankGauge';
+import { ComboBadge, SessionBar, SoundToggle } from '../components/Momentum';
+import { comboOf } from '../lib/momentum';
 import Mascot from '../components/Mascot';
 import { Magnetic } from '../components/effects';
 import { LEVEL_TIER } from '../app/usePlans';
@@ -49,6 +51,7 @@ export default function Home() {
           <p className="t-eyebrow">{todayLine()}</p>
           <h1 className="t-h1">{greeting()}, {firstName}.</h1>
         </div>
+        <SoundToggle className="home-sound" />
         <Mascot mood={profile.streak >= 3 ? 'streak' : 'idle'} size={64} decorative className="home-mascot" />
       </Item>
 
@@ -86,6 +89,8 @@ export default function Home() {
               </>
             )}
             <StreakLine streak={profile.streak} activeToday={profile.active_today} />
+            <ComboBadge n={comboOf(me.recent)} />
+            <SessionBar me={me} />
             {tier.id === 'free' && quota.limit != null && (
               <p className="t-foot">
                 <span className="fig c-fg">{quota.remaining}</span> of <span className="fig">{quota.limit}</span> free deals left this week · back {weekday(quota.resets_at)} · <Link to="/plans" className="link">Go unlimited</Link>
@@ -95,22 +100,12 @@ export default function Home() {
 
           <Item as="section" className="home-level" aria-label="Your career">
             <RankGauge points={profile.points} level={profile.level} />
+            <Link to="/ranking" className="home-rank tap-target">
+              {rank ? <>Desk rank <b className="fig-mono">#{rank}</b></> : 'One closed deal puts you on the board'}
+              <ArrowRight size={15} aria-hidden="true" />
+            </Link>
           </Item>
 
-          <Item as="dl" className="home-stats" aria-label="Your numbers">
-            <div className="home-stat">
-              <dt>Streak</dt>
-              <dd className="fig-mono"><CountUp to={profile.streak} /><span className="unit">{profile.streak === 1 ? 'day' : 'days'}</span></dd>
-            </div>
-            <div className="home-stat">
-              <dt>Score</dt>
-              <dd className="fig-mono"><CountUp to={profile.points} /><span className="unit">pts</span></dd>
-            </div>
-            <div className="home-stat">
-              <dt>Desk rank</dt>
-              <dd className="fig-mono">{rank ? <>#<CountUp to={rank} /></> : <span className="c-3">—</span>}</dd>
-            </div>
-          </Item>
         </div>
 
         <Item as="section" className="home-path" aria-labelledby="path">

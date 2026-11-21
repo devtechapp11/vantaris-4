@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'motion/react';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, X } from 'lucide-react';
 import Logo from '../components/Logo';
 import Mascot from '../components/Mascot';
 import { Magnetic, Spotlight } from '../components/effects';
@@ -16,6 +16,11 @@ import { duration, ease, spring } from '../design/tokens';
 import { BRAND } from '../lib/config';
 import { track } from '../lib/analytics';
 import LegalLinks from '../components/LegalLinks';
+import { ProgressBar } from '../components/ui';
+import { SoundToggle } from '../components/Momentum';
+import { sound } from '../lib/sound';
+import { haptic } from '../app/prefs';
+import { burst, originOf } from '../lib/celebrate';
 import './Landing.css';
 import { useMeta } from '../app/useMeta';
 
@@ -128,7 +133,7 @@ function Film() {
                 <h2 id={`ch-${c.id}`} className="chapter-title">{c.title}</h2>
               )}
               <p className="t-lead">{c.body}</p>
-              {i === 0 && <StartCta source="hero" />}
+              {i === 0 && <HeroCase />}
             </div>
           </article>
         ))}
@@ -338,13 +343,13 @@ function MobileFilm() {
     <section id="film" className="mfilm" aria-label="How Vantaris works">
       <article className="mch mch--hero" aria-labelledby={`ch-${hero.id}`}>
         <div className="mch-mascot" aria-hidden="true">
-          <Mascot state={hero.vale} lookAt="pointer" size={176} decorative />
+          <Mascot state={hero.vale} lookAt="pointer" size={112} decorative />
         </div>
         <div className="chapter-copy">
           <p className="t-eyebrow">{hero.eyebrow}</p>
           <h1 id={`ch-${hero.id}`} className="t-display hero-title text-chrome text-chrome--live">{hero.title}</h1>
           <p className="t-lead">{hero.body}</p>
-          <StartCta source="hero" />
+          <HeroCase />
         </div>
       </article>
       {CHAPTERS.slice(1).map((c) => <MobileChapter key={c.id} c={c} />)}
@@ -402,12 +407,100 @@ function StillFilm() {
             <p className="t-eyebrow">{c.eyebrow}</p>
             {i === 0 ? <h1 id={`ch-${c.id}`} className="t-display hero-title text-chrome">{c.title}</h1> : <h2 id={`ch-${c.id}`} className="chapter-title">{c.title}</h2>}
             <p className="t-lead">{c.body}</p>
-            {i === 0 && <StartCta source="hero" />}
+            {i === 0 && <HeroCase />}
           </div>
           {i === 0 ? <Mascot state="idle" size={220} decorative /> : <div className="still-visual"><Visual kind={c.visual} p={still} /></div>}
         </article>
       ))}
     </section>
+  );
+}
+
+/* ---------- The hero case: one deal, playable before any sign-up ---------- */
+// Scored like a real deal (difficulty 1, up to +50% for speed against a one-minute clock).
+const HERO_CASE = {
+  q: 'EBITDA is $50M. Comparable companies trade at 8.0x. What is the business worth?',
+  options: ['$58M', '$400M', '$450M', '$6.3M'],
+  answer: 1,
+  why: 'Enterprise value = EBITDA × multiple = $50M × 8.0 = $400M.',
+};
+const ASSOCIATE_AT = 251;
+
+function HeroCase() {
+  const [pick, setPick] = useState(null);
+  const [pts, setPts] = useState(0);
+  const shown = useRef(0);
+  const card = useRef(null);
+  // The speed bonus clock starts when the case is on screen
+  useEffect(() => { shown.current = Date.now(); }, []);
+  const right = pick === HERO_CASE.answer;
+
+  const answer = (i) => {
+    if (pick != null) return;
+    const secs = (Date.now() - shown.current) / 1000;
+    const earned = i === HERO_CASE.answer ? Math.round(10 * (1 + 0.5 * Math.max(0, 1 - secs / 60))) : 0;
+    setPick(i);
+    setPts(earned);
+    track('hero_case', { correct: i === HERO_CASE.answer });
+    if (earned) {
+      sound.correct(1);
+      haptic([12, 40, 18]);
+      setTimeout(() => burst(originOf(card.current?.querySelector('.hc-score')) ?? undefined), 140);
+    } else {
+      sound.wrong();
+      haptic([24, 50, 24]);
+    }
+  };
+
+  return (
+    <div ref={card} className={`hero-case metal ${pick == null ? '' : right ? 'is-right metal--flash' : 'is-miss'}`}>
+      <div className="hc-head">
+        <span className="t-eyebrow">Try a live deal · no sign-up</span>
+        <SoundToggle />
+      </div>
+      <p className="hc-q">{HERO_CASE.q}</p>
+      <div className="hc-opts" role="radiogroup" aria-label="Your answer">
+        {HERO_CASE.options.map((o, i) => {
+          const state = pick == null ? 'idle' : i === HERO_CASE.answer ? 'answer' : i === pick ? 'wrong' : 'dim';
+          return (
+            <motion.button
+              key={o} type="button" role="radio" aria-checked={pick === i}
+              className="option hc-opt metal metal--live" data-state={state}
+              disabled={pick != null} onClick={() => answer(i)}
+              whileTap={{ scale: 0.96 }} transition={spring.snappy}
+            >
+              <span className="option-key">{state === 'answer' ? <Check size={14} strokeWidth={3} /> : state === 'wrong' ? <X size={14} strokeWidth={3} /> : 'ABCD'[i]}</span>
+              <span className="option-label fig-mono">{o}</span>
+            </motion.button>
+          );
+        })}
+      </div>
+      <AnimatePresence initial={false}>
+        {pick != null && (
+          <motion.div className="hc-verdict" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={spring.gentle} aria-live="polite">
+            {right ? (
+              <>
+                <div className="hc-score-row">
+                  <motion.span className="hc-score fig-mono" initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ ...spring.bouncy, delay: 0.1 }}>+{pts}<small>pts</small></motion.span>
+                  <span className="t-callout">That’s how an analyst values a business.</span>
+                </div>
+                <div className="stack-8">
+                  <div className="between t-cap"><span><b className="c-fg">Analyst</b> · <span className="fig">{pts}</span> / {ASSOCIATE_AT} pts</span><span>Associate</span></div>
+                  <ProgressBar value={pts / ASSOCIATE_AT} size="sm" delay={0.35} label="Progress to Associate" />
+                  <p className="t-cap">At this pace you make Associate in <b className="c-fg fig">{Math.ceil(ASSOCIATE_AT / pts)}</b> deals.</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="t-headline">The right call: <span className="fig-mono c-pos">{HERO_CASE.options[HERO_CASE.answer]}</span></p>
+                <p className="t-callout fig">{HERO_CASE.why}</p>
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <StartCta source="hero" label={pick == null ? 'Start free' : right ? 'Keep going, free' : 'Train on real deals, free'} />
+    </div>
   );
 }
 
