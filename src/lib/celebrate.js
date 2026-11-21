@@ -13,6 +13,24 @@ function allowed() {
 }
 
 const palette = () => [cssVar('--platinum', '#E7E8E5'), cssVar('--silver', '#B9BEC0'), cssVar('--aluminium', '#858D92')];
+// Polished metal: the house metals plus pure white highlights.
+const metals = () => ['#FFFFFF', ...palette()];
+
+// Metal shards and slivers instead of paper confetti.
+let shards = null;
+function shardShapes(confetti) {
+  if (shards) return shards;
+  try {
+    shards = [
+      confetti.shapeFromPath({ path: 'M0 0 L4 1 L1 9 z' }),
+      confetti.shapeFromPath({ path: 'M0 0 L10 2 L9 4 L0 3 z' }),
+      confetti.shapeFromPath({ path: 'M2 0 L6 3 L3 8 L0 4 z' }),
+    ];
+  } catch {
+    shards = ['square'];
+  }
+  return shards;
+}
 
 /** Subtle burst for a correct answer. `origin` is 0–1 of the viewport. */
 export async function burst(origin = { x: 0.5, y: 0.35 }) {
@@ -21,6 +39,26 @@ export async function burst(origin = { x: 0.5, y: 0.35 }) {
   const colors = palette();
   confetti({ particleCount: 60, spread: 70, startVelocity: 38, gravity: 1.1, ticks: 170, scalar: 0.85, origin, colors, disableForReducedMotion: true, zIndex: 95 });
   confetti({ particleCount: 24, spread: 110, startVelocity: 24, ticks: 140, scalar: 0.6, shapes: ['circle'], origin, colors, disableForReducedMotion: true, zIndex: 95 });
+}
+
+/**
+ * Bull run: a burst of polished metal shards out of `origin`, bigger at each
+ * multiplier (x2, x3, x5).
+ */
+export async function feverBurst(x = 2, origin = { x: 0.5, y: 0.4 }) {
+  if (!allowed()) return;
+  const confetti = await load();
+  const colors = metals();
+  const shapes = shardShapes(confetti);
+  const n = x >= 5 ? 160 : x >= 3 ? 110 : 70;
+  confetti({ particleCount: n, spread: 90 + x * 10, startVelocity: 40 + x * 3, gravity: 0.9, decay: 0.92, ticks: 220, scalar: 1.1, shapes, origin, colors, disableForReducedMotion: true, zIndex: 95 });
+  confetti({ particleCount: Math.round(n / 3), spread: 360, startVelocity: 18, gravity: 0.4, ticks: 160, scalar: 0.5, shapes: ['circle'], flat: true, origin, colors: ['#FFFFFF', '#E7E8E5'], disableForReducedMotion: true, zIndex: 95 });
+  if (x >= 5) {
+    setTimeout(() => {
+      confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0, y: 0.75 }, shapes, colors, zIndex: 95, disableForReducedMotion: true });
+      confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1, y: 0.75 }, shapes, colors, zIndex: 95, disableForReducedMotion: true });
+    }, 260);
+  }
 }
 
 /** Bigger two-sided shower for a promotion or a new plan. */

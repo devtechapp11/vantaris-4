@@ -1,6 +1,6 @@
 import { Link, NavLink } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { House, LayoutGrid, Trophy, CircleUserRound } from 'lucide-react';
+import { ChartCandlestick, Target, Trophy, CircleUserRound } from 'lucide-react';
 import { useApp } from '../app/AppContext';
 import { prefetchProps } from '../app/routes';
 import { spring } from '../design/tokens';
@@ -8,9 +8,9 @@ import Logo from './Logo';
 import { Avatar, TierBadge } from './bits';
 
 export const TABS = [
-  { to: '/', label: 'Home', Icon: House, end: true },
-  { to: '/practice', label: 'Deals', Icon: LayoutGrid },
-  { to: '/ranking', label: 'Rank', Icon: Trophy },
+  { to: '/', label: 'Terminal', Icon: ChartCandlestick, end: true },
+  { to: '/practice', label: 'Training', Icon: Target },
+  { to: '/ranking', label: 'Ranking', Icon: Trophy },
   { to: '/profile', label: 'Profile', Icon: CircleUserRound },
 ];
 
@@ -24,8 +24,9 @@ export function TabBar() {
             {({ isActive }) => (
               <>
                 {isActive && <motion.span layoutId="tab-mark" className="tab-mark" transition={spring.snappy} />}
+                {isActive && <motion.span layoutId="tab-pill" className="tab-pill" transition={spring.snappy} />}
                 <Icon size={22} aria-hidden="true" />
-                {label}
+                <span className="tab-label">{label}</span>
               </>
             )}
           </NavLink>

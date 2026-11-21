@@ -82,14 +82,30 @@ export const sound = {
     if (!ac) return;
     tick(ac, { freq: 4200, q: 3, gain: 0.025, decay: 0.012 });
   },
-  /** Glassy two-partial chime. `level` 0–3 lifts the pitch with the combo. */
-  correct(level = 0) {
+  /**
+   * Glassy chime. `run` is the deal streak: each answer in a row lifts the
+   * pitch a semitone (up to an octave), and a run of three adds the fifth.
+   */
+  correct(run = 0) {
     const ac = audio();
     if (!ac) return;
-    const k = 2 ** ((Math.min(level, 3) * 2) / 12);
+    const k = 2 ** (Math.min(Math.max(run - 1, 0), 12) / 12);
     tone(ac, { freq: 1318.5 * k, decay: 0.9, gain: 0.16 });
     tone(ac, { freq: 1975.5 * k, at: 0.07, decay: 1.1, gain: 0.12 });
     tone(ac, { freq: 3951 * k, at: 0.07, decay: 0.35, gain: 0.025 });
+    if (run >= 3) tone(ac, { freq: 2637 * k, at: 0.14, decay: 1.3, gain: 0.07 });
+    if (run >= 5) tone(ac, { freq: 3520 * k, at: 0.21, decay: 1.4, gain: 0.05 });
+  },
+  /** Bull run: a shimmering crystal cluster, brighter at each multiplier. */
+  fever(x = 2) {
+    const ac = audio();
+    if (!ac) return;
+    const notes = x >= 5 ? [2093, 2637, 3136, 3951, 4186] : x >= 3 ? [2093, 2637, 3136, 3951] : [2093, 2637, 3136];
+    notes.forEach((f, i) => {
+      tone(ac, { freq: f, at: 0.5 + i * 0.045, decay: 1.2, gain: 0.05 });
+      tone(ac, { freq: f * 1.003, at: 0.52 + i * 0.045, decay: 1.0, gain: 0.03 });
+    });
+    tick(ac, { freq: 6000, q: 4, gain: 0.04, decay: 0.03, at: 0.5 });
   },
   /** Muted, low thud. */
   wrong() {

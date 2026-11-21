@@ -4,6 +4,7 @@ import { group } from '../design/motion';
 import { duration, ease, spring, stagger } from '../design/tokens';
 import { Spinner } from './bits';
 import { Spotlight } from './effects';
+import { BorderBeam } from './Momentum';
 import './PlanCard.css';
 
 const check = {
@@ -43,6 +44,7 @@ export default function PlanCard({ tier, plan, monthly, featured = false, curren
       variants={group(stagger.list, 0.15)}
     >
       <Spotlight className={`plan-inner metal metal--live ${featured ? 'is-active' : ''}`}>
+      {featured && <BorderBeam duration={6} />}
       {featured && <span className="plan-flag">Most popular</span>}
       {current && <span className="plan-flag plan-flag--current">Current plan</span>}
       <header className="stack-4">

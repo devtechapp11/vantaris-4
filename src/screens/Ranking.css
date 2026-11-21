@@ -40,3 +40,4 @@
 /* Career thresholds among the players: a dashed line, no avatar */
 .rank-row--mark { border-top-style: dashed; color: var(--fg-3); }
 .rank-row--mark .rank-pts { color: var(--fg-3); }
+.rank-row.is-me { position: relative; border-radius: var(--r-sm); }

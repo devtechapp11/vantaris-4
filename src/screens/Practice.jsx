@@ -23,7 +23,7 @@ const FILTERS = [
 ];
 
 export default function Practice() {
-  useMeta({ title: 'Deals' });
+  useMeta({ title: 'Training' });
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const focus = params.get('m');

@@ -5,6 +5,8 @@ import { AppProvider, useApp } from './app/AppContext';
 import { usePrefs } from './app/prefs';
 import { Toast } from './components/chrome';
 import { Sidebar, TabBar, TABS } from './components/Shell';
+import { AmbientMetal, FeverFrame } from './components/Momentum';
+import { comboOf } from './lib/momentum';
 import Paywall from './components/Paywall';
 import { LogoLoader } from './components/Logo';
 import HeroShell from './components/HeroShell';
@@ -133,6 +135,7 @@ function Gate() {
   return (
     <div className={`app ${signedIn ? 'has-sidebar' : ''}`}>
       <a href="#main" className="skip" onClick={(e) => { e.preventDefault(); const m = document.getElementById('main') ?? document.querySelector('main'); m?.setAttribute('tabindex', '-1'); m?.focus(); }}>Skip to content</a>
+      {signedIn && <AmbientMetal />}
       {signedIn && <Sidebar />}
       <div className="app-main">
         <ErrorBoundary resetKey={location.pathname}>
@@ -143,6 +146,7 @@ function Gate() {
           </Suspense>
         </ErrorBoundary>
       </div>
+      {signedIn && <FeverFrame run={comboOf(me)} />}
       {onTab && <TabBar />}
       <CookieBanner aboveTabs={onTab} />
     </div>

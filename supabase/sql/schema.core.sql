@@ -490,6 +490,24 @@ begin
 end $$;
 
 -- Submit an answer. Scored once: 10 × difficulty, up to +50% for speed.
+-- Deal streak: correct answers in a row since the player's last miss.
+create or replace function public.combo_run(p_user uuid)
+returns integer language sql stable security definer set search_path = '' as $$
+  select count(*)::integer
+  from public.problem_attempts a
+  where a.user_id = p_user and a.submitted_at is not null and a.correct
+    and a.submitted_at > coalesce((
+      select max(w.submitted_at) from public.problem_attempts w
+      where w.user_id = p_user and w.submitted_at is not null and not w.correct
+    ), '-infinity'::timestamptz);
+$$;
+
+-- XP multiplier for a run: x2 from 3 in a row, x3 from 5, x5 from 10.
+create or replace function public.combo_multiplier(p_run integer)
+returns integer language sql immutable set search_path = '' as $$
+  select case when p_run >= 10 then 5 when p_run >= 5 then 3 when p_run >= 3 then 2 else 1 end;
+$$;
+
 create or replace function public.submit_answer(p_problem_id text, p_choice text)
 returns jsonb language plpgsql security definer set search_path = '' as $$
 declare
@@ -506,6 +524,8 @@ declare
   v_streak   integer;
   v_before   public.career_level;
   v_after    public.career_level;
+  v_run      integer;
+  v_mult     integer;
 begin
   if v_user is null then raise exception 'NOT_AUTHENTICATED' using errcode = '28000'; end if;
 
@@ -535,7 +555,10 @@ begin
 
   v_ratio   := greatest(0, least(1, 1 - extract(epoch from (now() - v_attempt.opened_at)) / (v_problem.minutes * 60.0)));
   v_correct := (p_choice = v_problem.answer);
-  v_points  := case when v_correct then round(10 * v_problem.difficulty * (1 + 0.5 * v_ratio))::integer else 0 end;
+  -- The run counts this answer; it is read before this attempt is saved.
+  v_run     := case when v_correct then public.combo_run(v_user) + 1 else 0 end;
+  v_mult    := public.combo_multiplier(v_run);
+  v_points  := case when v_correct then round(10 * v_problem.difficulty * (1 + 0.5 * v_ratio))::integer * v_mult else 0 end;
 
   update public.problem_attempts
   set submitted_at = now(), choice = p_choice, correct = v_correct,
@@ -573,6 +596,8 @@ begin
     'already_submitted', false,
     'result', public._result_payload(v_attempt, v_problem, v_tier.full_walkthroughs),
     'level_up', case when v_after > v_before then v_after else null end,
+    'combo', v_run,
+    'multiplier', v_mult,
     'me', public.get_me());
 end $$;
 
@@ -720,7 +745,7 @@ begin
     'recent', coalesce((
       select jsonb_agg(row_to_json(r)::jsonb)
       from (
-        select p.id, p.title, p.kind, m.name as module_name, a.correct, a.points, a.submitted_at
+        select p.id, p.title, p.kind, m.name as module_name, a.correct, a.points, a.submitted_at, a.time_ratio
         from public.problem_attempts a
         join public.problems p on p.id = a.problem_id
         join public.modules m on m.id = p.module_id
@@ -729,6 +754,7 @@ begin
         limit 5
       ) r
     ), '[]'::jsonb),
+    'combo', public.combo_run(v_user),
     'skills', (
       select jsonb_agg(jsonb_build_object(
                'module_id', m.id, 'name', m.name, 'short', m.short, 'level', m.level,

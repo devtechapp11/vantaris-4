@@ -1,24 +1,23 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { Accessibility, Award, Box, BookOpen, Check, CircleCheck, Clock, Cookie, CreditCard, FileText, Flame, LogOut, Mail, PartyPopper, Pencil, Shield, Trash2, Trophy, Vibrate, X, Zap, Volume2, ArrowRight } from 'lucide-react';
+import { Accessibility, Box, Check, Cookie, CreditCard, FileText, LogOut, Mail, PartyPopper, Pencil, Shield, Trash2, Vibrate, X, Volume2, ArrowRight } from 'lucide-react';
 import { api } from '../lib/api';
 import { useApp } from '../app/AppContext';
 import { resetConsent } from '../app/consent';
 import { setPref, usePrefs } from '../app/prefs';
-import { CountUp, Item, LargeTitle, Page, Segmented, Sheet } from '../components/chrome';
+import { Item, LargeTitle, Page, Segmented, Sheet } from '../components/chrome';
 import { Avatar, Chevron, PlanChip, Skeleton, Spinner, TIER_LABEL, TierBadge } from '../components/bits';
 import { ActivityChart, Radar } from '../components/charts';
 import { FloatingField, ProgressBar, Toggle } from '../components/ui';
 import MemberCard from '../components/MemberCard';
-import { group, item } from '../design/motion';
-import { stagger } from '../design/tokens';
+import RankCard from '../components/RankCard';
+import Badges from '../components/Badges';
+import { NumberTicker } from '../components/Momentum';
+import { useRank } from '../app/useRank';
 import { BRAND, IS_DEMO } from '../lib/config';
 import { longDate, money, number, relative } from '../lib/format';
 import './Profile.css';
 import { useMeta } from '../app/useMeta';
-
-const BADGE_ICON = { 'first-deal': CircleCheck, 'hat-trick': Zap, 'on-fire': Flame, 'fast-hands': Clock, 'module-clear': BookOpen, associate: Trophy };
 
 const SETTINGS = [
   { key: 'sound', label: 'Sound', detail: 'A soft click on taps, a chime when you close a deal.', Icon: Volume2 },
@@ -41,6 +40,7 @@ export default function Profile() {
   const [params, setParams] = useSearchParams();
   const tab = params.get('tab') === 'settings' ? 'settings' : 'progress';
   const [sheet, setSheet] = useState(null); // 'edit' | 'cancel' | 'delete'
+  const rank = useRank(me?.profile?.points);
 
   if (!me) return <Page wide><Skeleton height={160} /><Skeleton height={44} /><Skeleton height={300} /></Page>;
   const { profile, tier, subscription: sub } = me;
@@ -81,10 +81,15 @@ export default function Profile() {
 
       {tab === 'progress' ? (
         <>
+          <Item as="section" className="pf-card stack-12" aria-labelledby="rankcard">
+            <div className="section-head"><h2 id="rankcard">Rank card</h2><span className="t-foot">Tilt it</span></div>
+            <RankCard name={profile.display_name} level={profile.level} points={profile.points} rank={rank} since={profile.created_at} />
+          </Item>
+
           <Item as="dl" className="pf-stats" aria-label="Your record">
-            <div><dt>Solved</dt><dd className="fig"><CountUp to={profile.solved} /><span className="unit">of {profile.attempted}</span></dd></div>
-            <div><dt>Accuracy</dt><dd className="fig">{profile.accuracy != null ? <CountUp to={Math.round(profile.accuracy * 100)} format={(v) => `${Math.round(v)}%`} /> : '—'}</dd></div>
-            <div><dt>Best streak</dt><dd className="fig"><CountUp to={profile.streak_best} /><span className="unit">days</span></dd></div>
+            <div><dt>Solved</dt><dd className="fig"><NumberTicker value={profile.solved} /><span className="unit">of {profile.attempted}</span></dd></div>
+            <div><dt>Accuracy</dt><dd className="fig">{profile.accuracy != null ? <NumberTicker value={Math.round(profile.accuracy * 100)} suffix="%" /> : '—'}</dd></div>
+            <div><dt>Best streak</dt><dd className="fig"><NumberTicker value={profile.streak_best} /><span className="unit">days</span></dd></div>
           </Item>
 
           <Item as="section" className="stack-12" aria-labelledby="act">
@@ -124,7 +129,7 @@ export default function Profile() {
             </Item>
             <Item as="section" className="stack-12" aria-labelledby="ach">
               <div className="section-head"><h2 id="ach">Achievements</h2><span className="t-foot fig">{earned}/{me.achievements.length}</span></div>
-              <Achievements achievements={me.achievements} />
+              <Badges achievements={me.achievements} />
             </Item>
           </div>
 
@@ -219,25 +224,6 @@ export default function Profile() {
       <CancelSheet open={sheet === 'cancel'} onClose={() => setSheet(null)} sub={sub} />
       <DeleteSheet key={sheet === 'delete' ? 'del-open' : 'del'} open={sheet === 'delete'} onClose={() => setSheet(null)} hasSub={paid} />
     </Page>
-  );
-}
-
-function Achievements({ achievements }) {
-  return (
-    <motion.ol className="badges" variants={group(stagger.children)} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }}>
-      {achievements.map((a) => {
-        const Icon = BADGE_ICON[a.id] ?? Award;
-        return (
-          <motion.li key={a.id} variants={item} className={`badge ${a.earned ? 'is-earned' : ''}`}>
-            <span className="badge-mark"><Icon size={18} strokeWidth={1.5} aria-hidden="true" /></span>
-            <span className="grow stack-4">
-              <span className="t-label c-fg">{a.name}</span>
-              <span className="t-cap">{a.earned ? 'Earned' : a.detail}</span>
-            </span>
-          </motion.li>
-        );
-      })}
-    </motion.ol>
   );
 }
 

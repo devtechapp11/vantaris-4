@@ -5,7 +5,8 @@ import { ArrowRight, Crown, Flag } from 'lucide-react';
 import { api } from '../lib/api';
 import { useApp } from '../app/AppContext';
 import { usePullToRefresh } from '../app/fluid';
-import { CountUp, Item, LargeTitle, Page, PullIndicator, Segmented } from '../components/chrome';
+import { Item, LargeTitle, Page, PullIndicator, Segmented } from '../components/chrome';
+import { BorderBeam, NumberTicker } from '../components/Momentum';
 import { Avatar, Skeleton, TierBadge } from '../components/bits';
 import { group, item } from '../design/motion';
 import { duration, ease, spring, stagger } from '../design/tokens';
@@ -45,7 +46,7 @@ export default function Ranking() {
   return (
     <Page wide>
       <PullIndicator {...ptr} />
-      <LargeTitle title="Rank" eyebrow={data ? `${number(data.players)} players ranked` : 'Leaderboard'} />
+      <LargeTitle title="Ranking" eyebrow={data ? `${number(data.players)} players ranked` : 'Leaderboard'} />
       <Item className="rank-scope"><Segmented value={scope} onChange={setScope} options={SCOPES} label="Time range" /></Item>
 
       {data && <Item><NextMove data={data} me={me} scope={scope} /></Item>}
@@ -143,6 +144,7 @@ function Lines({ points }) {
 function Row({ r }) {
   return (
     <motion.li variants={item} className={`rank-row ${r.is_me ? 'is-me' : ''}`} aria-current={r.is_me ? 'true' : undefined}>
+      {r.is_me && <BorderBeam duration={7} />}
       <span className="fig rank-pos">{r.rank}</span>
       <Avatar name={r.name} variant={r.is_me ? 'me' : ''} />
       <span className="grow stack-4" style={{ minWidth: 0 }}>
@@ -197,7 +199,7 @@ function Podium({ rows }) {
                 transition={{ duration: duration.slower, delay: 0.1 + i * 0.1, ease: ease.out }}
               >
                 <span className="podium-rank">{r.rank}</span>
-                <span className="fig podium-pts"><CountUp to={r.points} delay={0.5} /></span>
+                <span className="fig podium-pts"><NumberTicker value={r.points} delay={0.5} /></span>
               </motion.div>
             </div>
           );

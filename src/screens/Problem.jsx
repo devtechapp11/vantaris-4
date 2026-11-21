@@ -7,19 +7,19 @@ import { useApp } from '../app/AppContext';
 import { haptic } from '../app/prefs';
 import { useMedia, BREAKPOINT } from '../app/useDevice';
 import { LEVEL_TIER } from '../app/usePlans';
-import { CountUp, NavBar, Page } from '../components/chrome';
+import { NavBar, Page } from '../components/chrome';
 import { DifficultyBadge, LoadBar, Skeleton, Spinner, TIER_LABEL, TierBadge } from '../components/bits';
 import { ProgressBar } from '../components/ui';
 import Calculator from '../components/Calculator';
 import { FormulaBlock, highlight } from '../components/Formula';
 import Mascot from '../components/Mascot';
 import { StreakLine } from '../components/RankGauge';
-import { ComboBadge, RankClimb, SessionBar } from '../components/Momentum';
-import { comboOf, comboTier } from '../lib/momentum';
+import { BorderBeam, ComboBadge, NumberTicker, RankClimb, SessionBar, SessionClose } from '../components/Momentum';
+import { closedToday, comboOf, dailyGoal, multiplierFor } from '../lib/momentum';
 import { sound } from '../lib/sound';
 import { careerName } from '../lib/career';
 import Tutor, { TutorFab } from './Tutor';
-import { burst, originOf, shower } from '../lib/celebrate';
+import { burst, feverBurst, originOf, shower } from '../lib/celebrate';
 import { shareCard } from '../lib/shareCard';
 import { termToToken } from '../lib/calc';
 import { clock, isFigure, weekday } from '../lib/format';
@@ -51,6 +51,8 @@ export default function Problem() {
   const [tutorPrompt, setTutorPrompt] = useState(null);
   const [thinking, setThinking] = useState(false);
   const [promotion, setPromotion] = useState(null);
+  const [closing, setClosing] = useState(false);
+  const closeAfterPromo = useRef(false);
   const calc = useRef(null);
   const titleRef = useRef(null);
   useMeta({ title: data?.problem?.title ?? 'Deal' });
@@ -102,16 +104,26 @@ export default function Problem() {
       const res = await api.submitAnswer(id, choice);
       setMe(res.me);
       const fresh = !res.already_submitted;
-      const combo = res.result.correct ? comboOf(res.me.recent) : 0;
-      setOutcome({ result: res.result, level_up: res.level_up, fresh, before, after: res.me.profile.points, combo });
+      const combo = res.result.correct ? res.combo ?? comboOf(res.me) : 0;
+      const multiplier = res.multiplier ?? multiplierFor(combo);
+      setOutcome({ result: res.result, level_up: res.level_up, fresh, before, after: res.me.profile.points, combo, multiplier });
       if (fresh) {
-        if (res.result.correct) sound.correct(Math.max(0, comboTier(combo) === 5 ? 3 : comboTier(combo) - 1));
+        if (res.result.correct) sound.correct(combo);
         else sound.wrong();
+      }
+      // Today's session just closed: the closing memo, after any promotion.
+      const sessionDone = fresh && closedToday(res.me.recent) === dailyGoal(res.me) && closedToday(me?.recent) < dailyGoal(res.me);
+      if (sessionDone) {
+        if (res.level_up) closeAfterPromo.current = true;
+        else setTimeout(() => setClosing(true), 2600);
       }
       track('complete_deal', { correct: Boolean(res.result.correct) });
       haptic(res.result.correct ? [12, 40, 18] : [24, 50, 24]);
       requestAnimationFrame(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-      if (fresh && res.result.correct) setTimeout(() => burst(originOf(resultRef.current?.querySelector('.score')) ?? undefined), 350);
+      if (fresh && res.result.correct) {
+        const at = () => originOf(resultRef.current?.querySelector('.score')) ?? undefined;
+        setTimeout(() => (multiplier > 1 ? feverBurst(multiplier, at()) : burst(at())), 350);
+      }
       if (fresh && res.level_up) setTimeout(() => setPromotion(res.level_up), 1600);
     } catch (err) {
       if (err.code === 'LEVEL_LOCKED') setLock(err);
@@ -178,7 +190,7 @@ export default function Problem() {
   if (error) {
     return (
       <>
-        <NavBar back="Deals" to="/practice" />
+        <NavBar back="Training" to="/practice" />
         <Page className="screen screen--bare">
           <div className="card stack-12 center-x center">
             <Mascot mood="wrong" size={110} />
@@ -198,7 +210,7 @@ export default function Problem() {
   return (
     <>
       <NavBar
-        back="Deals"
+        back="Training"
         to="/practice"
         title={<Stepper step={step} />}
         right={answered ? <span className="chip chip--pos"><Check size={12} aria-hidden="true" /> Submitted</span> : <Timer openedAt={data.opened_at} minutes={p.minutes} offset={data.offset} />}
@@ -302,7 +314,18 @@ export default function Problem() {
       {tutorAllowed && (
         <Tutor open={tutorOpen} onClose={() => setTutorOpen(false)} problem={p} submitted={answered} prompt={tutorPrompt} onPromptUsed={() => setTutorPrompt(null)} />
       )}
-      <Promotion level={promotion} onClose={() => setPromotion(null)} onShare={() => share('promotion')} />
+      <Promotion
+        level={promotion}
+        onClose={() => {
+          setPromotion(null);
+          if (closeAfterPromo.current) {
+            closeAfterPromo.current = false;
+            setTimeout(() => setClosing(true), 400);
+          }
+        }}
+        onShare={() => share('promotion')}
+      />
+      <SessionClose me={me} open={closing} onClose={() => setClosing(false)} onHome={() => navigate('/')} />
     </>
   );
 }
@@ -366,8 +389,9 @@ function Option({ o, index, choice, outcome, onPick }) {
       data-state={state}
       onClick={onPick}
       animate={outcome?.fresh && isWrongPick && !reduce ? shake : undefined}
-      whileTap={answered ? undefined : { scale: 0.985 }}
+      whileTap={answered ? undefined : { scale: 0.97 }}
     >
+      {selected && <BorderBeam duration={3.2} />}
       <span className="option-key">
         {isAnswer ? <Check size={15} strokeWidth={3} /> : isWrongPick ? <X size={15} strokeWidth={3} /> : KEYS[index]}
       </span>
@@ -421,6 +445,7 @@ function Result({ outcome, me, nextId, onNext, onShare, onTutor }) {
       transition={{ ...spring.gentle }}
       aria-live="polite"
     >
+      {r.correct && fresh && <BorderBeam duration={outcome.multiplier > 1 ? 3.5 : 6} />}
       <div className="result-top">
         <div className="result-vale share-vale"><Mascot mood={r.correct ? 'correct' : 'wrong'} size={roomy ? 124 : 76} label={r.correct ? 'Vale nods approvingly' : 'Vale, encouraging you to try again'} /></div>
         <div className="stack-8 grow">
@@ -429,7 +454,7 @@ function Result({ outcome, me, nextId, onNext, onShare, onTutor }) {
             r.points > 0 ? (
               <motion.div className="score" initial={reduce ? false : { scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ ...spring.bouncy, delay: 0.15 }}>
                 <span className="score-plus">+</span>
-                <CountUp to={r.points} duration={fresh ? 1.4 : 0} delay={0.25} className="fig-mono score-num" />
+                <NumberTicker value={r.points} delay={fresh ? 0.25 : 0} className="fig-mono score-num" />
                 <span className="score-unit">pts</span>
               </motion.div>
             ) : (
@@ -569,7 +594,7 @@ function Locked({ lock }) {
   const tier = TIER_LABEL[LEVEL_TIER[lock.detail]] ?? 'a paid plan';
   return (
     <>
-      <NavBar back="Deals" to="/practice" />
+      <NavBar back="Training" to="/practice" />
       <Page className="screen screen--bare">
         <div className="card stack-16 center center-x locked-card">
           <Mascot mood="think" size={150} />
@@ -594,7 +619,7 @@ function ProblemSkeleton() {
   return (
     <>
       <LoadBar />
-      <NavBar back="Deals" to="/practice" />
+      <NavBar back="Training" to="/practice" />
       <Page wide className="screen problem">
         <div className="prob-layout">
           <div className="stack-16">

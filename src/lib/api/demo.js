@@ -138,6 +138,15 @@ function shuffled(p) {
   return [...p.options].sort((a, b) => hash(USER_ID + p.id + a.id) - hash(USER_ID + p.id + b.id));
 }
 
+// Mirrors public.combo_run / combo_multiplier: correct answers since the last miss.
+function comboRun() {
+  const done = Object.values(state.attempts).filter((a) => a.submitted_at).sort((x, y) => y.submitted_at.localeCompare(x.submitted_at));
+  let n = 0;
+  for (const a of done) { if (!a.correct) break; n += 1; }
+  return n;
+}
+const comboMultiplier = (run) => (run >= 10 ? 5 : run >= 5 ? 3 : run >= 3 ? 2 : 1);
+
 function me() {
   requireUser();
   const pr = state.profile;
@@ -187,7 +196,8 @@ function me() {
       .filter(([, a]) => a.submitted_at)
       .sort((x, y) => y[1].submitted_at.localeCompare(x[1].submitted_at))
       .slice(0, 5)
-      .map(([id, a]) => ({ id, title: byId[id].title, kind: byId[id].kind, module_name: moduleOf(byId[id]).name, correct: a.correct, points: a.points, submitted_at: a.submitted_at })),
+      .map(([id, a]) => ({ id, title: byId[id].title, kind: byId[id].kind, module_name: moduleOf(byId[id]).name, correct: a.correct, points: a.points, submitted_at: a.submitted_at, time_ratio: a.time_ratio })),
+    combo: comboRun(),
     skills: MODULES.map((m) => {
       const list = PROBLEMS.filter((p) => p.module_id === m.id);
       return { module_id: m.id, name: m.name, short: m.short, level: m.level, total: list.length, solved: list.filter((p) => correctIds.has(p.id)).length };
@@ -351,7 +361,9 @@ export const api = {
     if (!p.options.some((o) => o.id === choice)) throw new ApiError('INVALID_CHOICE', 'Choose one of the answers.');
     const ratio = Math.max(0, Math.min(1, 1 - (Date.now() - new Date(a.opened_at).getTime()) / 1000 / (p.minutes * 60)));
     const correct = choice === p.answer;
-    const points = correct ? Math.round(10 * p.difficulty * (1 + 0.5 * ratio)) : 0;
+    const run = correct ? comboRun() + 1 : 0;
+    const multiplier = comboMultiplier(run);
+    const points = correct ? Math.round(10 * p.difficulty * (1 + 0.5 * ratio)) * multiplier : 0;
     Object.assign(a, { submitted_at: new Date().toISOString(), choice, correct, points, time_ratio: Math.round(ratio * 1000) / 1000 });
     const pr = state.profile;
     const today = localDate();
@@ -361,7 +373,7 @@ export const api = {
     if (points) state.ledger.push({ amount: points, local_date: today, at: a.submitted_at });
     save();
     const after = levelFor(pr.points);
-    return { already_submitted: false, result: resultPayload(a, p, t.full_walkthroughs), level_up: lvl(after) > lvl(before) ? after : null, me: me() };
+    return { already_submitted: false, result: resultPayload(a, p, t.full_walkthroughs), level_up: lvl(after) > lvl(before) ? after : null, combo: run, multiplier, me: me() };
   },
   async getLeaderboard(scope) {
     await wait(200);
