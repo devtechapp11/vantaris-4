@@ -104,6 +104,9 @@ export const api = {
   openProblem: (id) => rpc('open_problem', { p_problem_id: id }),
   submitAnswer: (id, choice) => rpc('submit_answer', { p_problem_id: id, p_choice: choice }),
   getLeaderboard: (scope) => rpc('get_leaderboard', { p_scope: scope, p_limit: 50 }),
+  saveLesson: ({ node, stars, firstTry, missed = [], cleared = [] }) =>
+    rpc('save_lesson', { p_node: node, p_stars: stars ?? null, p_first_try: firstTry ?? null, p_missed: missed, p_cleared: cleared }),
+  saveBlitz: (score) => rpc('save_blitz', { p_score: Math.max(0, Math.min(5000, Math.round(score))) }),
 
   // Public (no sign-in needed): landing page and sign-up screen.
   async getPublicStats() {

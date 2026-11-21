@@ -47,7 +47,7 @@ const lvl = (name) => LEVELS.indexOf(name);
 
 // ---------- persistence ----------
 function blank() {
-  return { account: null, signedIn: false, profile: null, attempts: {}, ledger: [], sub: null, tutor: { date: null, used: 0 } };
+  return { account: null, signedIn: false, profile: null, attempts: {}, ledger: [], sub: null, tutor: { date: null, used: 0 }, path: {}, review: {}, blitz: { best: 0, runs: 0 } };
 }
 let state = blank();
 try {
@@ -198,6 +198,17 @@ function me() {
       .slice(0, 5)
       .map(([id, a]) => ({ id, title: byId[id].title, kind: byId[id].kind, module_name: moduleOf(byId[id]).name, correct: a.correct, points: a.points, submitted_at: a.submitted_at, time_ratio: a.time_ratio })),
     combo: comboRun(),
+    path: { stars: { ...state.path }, total: Object.values(state.path).reduce((a, b) => a + b, 0) },
+    review: (() => {
+      const items = Object.entries(state.review);
+      const now = Date.now();
+      return {
+        due: items.filter(([, r]) => new Date(r.due_at).getTime() <= now).sort((a, b) => a[1].due_at.localeCompare(b[1].due_at)).map(([id]) => id),
+        fragile: items.length,
+        next_due_at: items.map(([, r]) => r.due_at).sort()[0] ?? null,
+      };
+    })(),
+    blitz_best: state.blitz.best,
     skills: MODULES.map((m) => {
       const list = PROBLEMS.filter((p) => p.module_id === m.id);
       return { module_id: m.id, name: m.name, short: m.short, level: m.level, total: list.length, solved: list.filter((p) => correctIds.has(p.id)).length };
@@ -374,6 +385,42 @@ export const api = {
     save();
     const after = levelFor(pr.points);
     return { already_submitted: false, result: resultPayload(a, p, t.full_walkthroughs), level_up: lvl(after) > lvl(before) ? after : null, combo: run, multiplier, me: me() };
+  },
+  // Mirrors public.save_lesson: stars only go up; misses reset to box 0 (due tomorrow).
+  async saveLesson({ node, stars, firstTry, missed = [], cleared = [] }) {
+    await wait(250);
+    requireUser();
+    const GAPS = [1, 3, 7, 14, 30];
+    if (node !== 'review') {
+      const m = MODULES.find((x) => x.id === node);
+      if (!m) throw new ApiError('INVALID_NODE', 'Unknown chapter.');
+      if (lvl(m.level) > lvl(tier().max_level)) throw new ApiError('LEVEL_LOCKED', 'This desk opens on a higher plan.');
+      state.path[node] = Math.max(state.path[node] ?? 0, Math.max(1, Math.min(3, stars ?? 1)));
+    }
+    void firstTry;
+    const day = (n) => new Date(Date.now() + n * 864e5).toISOString();
+    for (const c of new Set(missed)) state.review[c] = { box: 0, misses: (state.review[c]?.misses ?? 0) + 1, due_at: day(1) };
+    for (const c of cleared) {
+      const r = state.review[c];
+      if (!r || missed.includes(c) || new Date(r.due_at).getTime() > Date.now()) continue;
+      if (r.box >= 4) delete state.review[c];
+      else state.review[c] = { ...r, box: r.box + 1, due_at: day(GAPS[r.box + 1]) };
+    }
+    const pr = state.profile;
+    const today = localDate();
+    const streak = pr.last_active_on === today ? Math.max(pr.streak, 1) : pr.last_active_on === addDays(today, -1) ? pr.streak + 1 : 1;
+    Object.assign(pr, { streak, streak_best: Math.max(pr.streak_best, streak), last_active_on: today });
+    save();
+    return me();
+  },
+  async saveBlitz(score) {
+    await wait(150);
+    requireUser();
+    const s = Math.max(0, Math.min(5000, Math.round(score)));
+    const previous = state.blitz.best;
+    state.blitz = { best: Math.max(previous, s), runs: state.blitz.runs + 1 };
+    save();
+    return { best: state.blitz.best, previous, record: s > previous && s > 0, runs: state.blitz.runs };
   },
   async getLeaderboard(scope) {
     await wait(200);

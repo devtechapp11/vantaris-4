@@ -190,7 +190,7 @@ export default function Problem() {
   if (error) {
     return (
       <>
-        <NavBar back="Training" to="/practice" />
+        <NavBar back="Deals" to="/practice" />
         <Page className="screen screen--bare">
           <div className="card stack-12 center-x center">
             <Mascot mood="wrong" size={110} />
@@ -210,7 +210,7 @@ export default function Problem() {
   return (
     <>
       <NavBar
-        back="Training"
+        back="Deals"
         to="/practice"
         title={<Stepper step={step} />}
         right={answered ? <span className="chip chip--pos"><Check size={12} aria-hidden="true" /> Submitted</span> : <Timer openedAt={data.opened_at} minutes={p.minutes} offset={data.offset} />}
@@ -594,7 +594,7 @@ function Locked({ lock }) {
   const tier = TIER_LABEL[LEVEL_TIER[lock.detail]] ?? 'a paid plan';
   return (
     <>
-      <NavBar back="Training" to="/practice" />
+      <NavBar back="Deals" to="/practice" />
       <Page className="screen screen--bare">
         <div className="card stack-16 center center-x locked-card">
           <Mascot mood="think" size={150} />
@@ -619,7 +619,7 @@ function ProblemSkeleton() {
   return (
     <>
       <LoadBar />
-      <NavBar back="Training" to="/practice" />
+      <NavBar back="Deals" to="/practice" />
       <Page wide className="screen problem">
         <div className="prob-layout">
           <div className="stack-16">

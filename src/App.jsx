@@ -25,7 +25,9 @@ const Landing = lazy(loaders.landing);
 const AuthScreen = lazy(loaders.auth);
 const ResetPassword = lazy(() => loaders.auth().then((m) => ({ default: m.ResetPassword })));
 const Onboarding = lazy(loaders.onboarding);
-const Home = lazy(loaders.home);
+const Path = lazy(loaders.home);
+const Learn = lazy(loaders.learn);
+const Blitz = lazy(loaders.blitz);
 const Practice = lazy(loaders.practice);
 const Problem = lazy(loaders.problem);
 const Ranking = lazy(loaders.ranking);
@@ -53,13 +55,16 @@ export default function App() {
   );
 }
 
-const TAB_PATHS = new Set(TABS.map((t) => t.to));
+// Screens that show the tab bar on phones (the tabs plus the two desk screens).
+const TAB_PATHS = new Set([...TABS.map((t) => t.to), '/practice', '/ranking']);
+// Focus screens: no sidebar, no tabs, nothing between the player and the question.
+const isFocus = (path) => path.startsWith('/learn/');
 // Sign in, sign up and forgot password are one screen: switching between them
 // is a shared-layout animation, not a page transition.
 const AUTH_PATHS = new Set(['/signin', '/signup', '/forgot']);
 const routeKey = (path) => (AUTH_PATHS.has(path) ? 'auth' : path === '/welcome' ? '/' : path);
 // App screens that need an account: signed-out visitors go to sign in, not to a 404.
-const APP_PATHS = ['/practice', '/practice/:id', '/ranking', '/profile', '/plans', '/onboarding'];
+const APP_PATHS = ['/learn/:node', '/blitz', '/practice', '/practice/:id', '/ranking', '/profile', '/plans', '/onboarding'];
 const legalRoutes = LEGAL_ORDER.map((slug) => <Route key={slug} path={`/${slug}`} element={<Legal />} />);
 
 function Gate() {
@@ -79,7 +84,7 @@ function Gate() {
     if (!signedIn) return undefined;
     const idle = window.requestIdleCallback ?? ((cb) => setTimeout(cb, 1200));
     const cancel = window.cancelIdleCallback ?? clearTimeout;
-    const h = idle(() => ['home', 'practice', 'problem', 'ranking', 'profile', 'plans'].forEach((k) => loaders[k]().catch(() => {})));
+    const h = idle(() => ['home', 'learn', 'blitz', 'practice', 'problem', 'ranking', 'profile', 'plans'].forEach((k) => loaders[k]().catch(() => {})));
     return () => cancel(h);
   }, [signedIn]);
 
@@ -118,7 +123,9 @@ function Gate() {
   } else {
     routes = (
       <>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Path />} />
+        <Route path="/learn/:node" element={<Learn />} />
+        <Route path="/blitz" element={<Blitz />} />
         <Route path="/practice" element={<Practice />} />
         <Route path="/ranking" element={<Ranking />} />
         <Route path="/profile" element={<Profile />} />
@@ -132,11 +139,12 @@ function Gate() {
   }
 
   const onTab = signedIn && TAB_PATHS.has(location.pathname);
+  const focus = isFocus(location.pathname);
   return (
-    <div className={`app ${signedIn ? 'has-sidebar' : ''}`}>
+    <div className={`app ${signedIn && !focus ? 'has-sidebar' : ''}`}>
       <a href="#main" className="skip" onClick={(e) => { e.preventDefault(); const m = document.getElementById('main') ?? document.querySelector('main'); m?.setAttribute('tabindex', '-1'); m?.focus(); }}>Skip to content</a>
       {signedIn && <AmbientMetal />}
-      {signedIn && <Sidebar />}
+      {signedIn && !focus && <Sidebar />}
       <div className="app-main">
         <ErrorBoundary resetKey={location.pathname}>
           <Suspense fallback={loader}>
@@ -146,7 +154,7 @@ function Gate() {
           </Suspense>
         </ErrorBoundary>
       </div>
-      {signedIn && <FeverFrame run={comboOf(me)} />}
+      {signedIn && /^\/practice\/[^/]+$/.test(location.pathname) && <FeverFrame run={comboOf(me)} />}
       {onTab && <TabBar />}
       <CookieBanner aboveTabs={onTab} />
     </div>

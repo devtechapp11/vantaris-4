@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Accessibility, Box, Check, Cookie, CreditCard, FileText, LogOut, Mail, PartyPopper, Pencil, Shield, Trash2, Vibrate, X, Volume2, ArrowRight } from 'lucide-react';
 import { api } from '../lib/api';
@@ -12,6 +12,8 @@ import { FloatingField, ProgressBar, Toggle } from '../components/ui';
 import MemberCard from '../components/MemberCard';
 import RankCard from '../components/RankCard';
 import Badges from '../components/Badges';
+import Vault from '../components/Vault';
+import { feverBurst, originOf } from '../lib/celebrate';
 import { NumberTicker } from '../components/Momentum';
 import { useRank } from '../app/useRank';
 import { BRAND, IS_DEMO } from '../lib/config';
@@ -28,17 +30,20 @@ const SETTINGS = [
 ];
 
 const TABS = [
+  { value: 'vault', label: 'Vault' },
   { value: 'progress', label: 'Progress' },
   { value: 'settings', label: 'Settings' },
 ];
 
 export default function Profile() {
-  useMeta({ title: 'Profile' });
+  useMeta({ title: 'Vault & profile' });
   const { me, openPaywall, refreshMe, showToast } = useApp();
   const navigate = useNavigate();
   const prefs = usePrefs();
   const [params, setParams] = useSearchParams();
-  const tab = params.get('tab') === 'settings' ? 'settings' : 'progress';
+  const tab = ['progress', 'settings'].includes(params.get('tab')) ? params.get('tab') : 'vault';
+  const cardRef = useRef(null);
+  const lastBurst = useRef(0);
   const [sheet, setSheet] = useState(null); // 'edit' | 'cancel' | 'delete'
   const rank = useRank(me?.profile?.points);
 
@@ -52,7 +57,7 @@ export default function Profile() {
 
   return (
     <Page wide>
-      <LargeTitle title="Profile" eyebrow={profile.school || 'Your desk'} />
+      <LargeTitle title="Vault & profile" eyebrow={profile.school || 'Your desk'} />
 
       <Item className="pf-id">
         <div className="row-16">
@@ -76,15 +81,32 @@ export default function Profile() {
       </Item>
 
       <Item className="pf-tabs">
-        <Segmented value={tab} onChange={(v) => setParams(v === 'settings' ? { tab: v } : {}, { replace: true })} options={TABS} label="Profile sections" />
+        <Segmented value={tab} onChange={(v) => setParams(v === 'vault' ? {} : { tab: v }, { replace: true })} options={TABS} label="Profile sections" />
       </Item>
 
-      {tab === 'progress' ? (
+      {tab === 'vault' ? (
         <>
           <Item as="section" className="pf-card stack-12" aria-labelledby="rankcard">
-            <div className="section-head"><h2 id="rankcard">Rank card</h2><span className="t-foot">Tilt it</span></div>
-            <RankCard name={profile.display_name} level={profile.level} points={profile.points} rank={rank} since={profile.created_at} />
+            <div className="section-head"><h2 id="rankcard">Centurion card</h2><span className="t-foot">Tilt it, tap it</span></div>
+            <div
+              ref={cardRef}
+              onPointerUp={() => {
+                const now = Date.now();
+                if (now - lastBurst.current < 1200) return;
+                lastBurst.current = now;
+                feverBurst(3, originOf(cardRef.current) ?? undefined);
+              }}
+            >
+              <RankCard name={profile.display_name} level={profile.level} points={profile.points} rank={rank} since={profile.created_at} />
+            </div>
           </Item>
+          <Item as="section" className="stack-12" aria-labelledby="vault">
+            <div className="section-head"><h2 id="vault">Wall Street Vault</h2><span className="t-foot fig-mono">{me.path?.total ?? 0}★</span></div>
+            <Vault stars={me.path?.stars} review={me.review} />
+          </Item>
+        </>
+      ) : tab === 'progress' ? (
+        <>
 
           <Item as="dl" className="pf-stats" aria-label="Your record">
             <div><dt>Solved</dt><dd className="fig"><NumberTicker value={profile.solved} /><span className="unit">of {profile.attempted}</span></dd></div>

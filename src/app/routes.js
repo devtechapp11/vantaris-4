@@ -4,7 +4,9 @@ export const loaders = {
   landing: () => import('../screens/Landing'),
   auth: () => import('../screens/Auth'),
   onboarding: () => import('../screens/Onboarding'),
-  home: () => import('../screens/Home'),
+  home: () => import('../screens/Path'),
+  learn: () => import('../screens/Learn'),
+  blitz: () => import('../screens/Blitz'),
   practice: () => import('../screens/Practice'),
   problem: () => import('../screens/Problem'),
   ranking: () => import('../screens/Ranking'),
@@ -16,6 +18,8 @@ export const loaders = {
 
 const BY_PATH = [
   [/^\/$/, 'home'],
+  [/^\/learn\/[^/]+$/, 'learn'],
+  [/^\/blitz$/, 'blitz'],
   [/^\/practice\/[^/]+$/, 'problem'],
   [/^\/practice$/, 'practice'],
   [/^\/ranking$/, 'ranking'],

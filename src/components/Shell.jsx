@@ -1,17 +1,22 @@
 import { Link, NavLink } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { ChartCandlestick, Target, Trophy, CircleUserRound } from 'lucide-react';
+import { LibraryBig, Route, Trophy, Vault, Zap } from 'lucide-react';
 import { useApp } from '../app/AppContext';
 import { prefetchProps } from '../app/routes';
 import { spring } from '../design/tokens';
 import Logo from './Logo';
 import { Avatar, TierBadge } from './bits';
 
+// Three tabs on phones; the desktop rail adds the deal library and the ranking.
 export const TABS = [
-  { to: '/', label: 'Terminal', Icon: ChartCandlestick, end: true },
-  { to: '/practice', label: 'Training', Icon: Target },
+  { to: '/', label: 'Path', Icon: Route, end: true },
+  { to: '/blitz', label: 'Market Blitz', Icon: Zap },
+  { to: '/profile', label: 'Vault & Profile', Icon: Vault },
+];
+const RAIL = [
+  ...TABS,
+  { to: '/practice', label: 'Deal library', Icon: LibraryBig },
   { to: '/ranking', label: 'Ranking', Icon: Trophy },
-  { to: '/profile', label: 'Profile', Icon: CircleUserRound },
 ];
 
 /** Bottom tab bar on phones and tablets. */
@@ -45,7 +50,7 @@ export function Sidebar() {
     <aside className="sidebar" aria-label="Main">
       <Link to="/" className="sidebar-brand" aria-label="Vantaris home"><Logo size={30} /></Link>
       <nav className="sidebar-nav">
-        {TABS.map(({ to, label, Icon, end }) => (
+        {RAIL.map(({ to, label, Icon, end }) => (
           <NavLink key={to} to={to} end={end} className="side-link" {...prefetchProps(to)}>
             {({ isActive }) => (
               <>

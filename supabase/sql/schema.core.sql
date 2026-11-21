@@ -252,6 +252,38 @@ create table if not exists public.ai_usage (
 );
 create index if not exists ai_usage_user_day_idx on public.ai_usage (user_id, local_date);
 
+-- The Deal Path: mastery stars per chapter (one chapter per module).
+create table if not exists public.path_progress (
+  user_id         uuid not null references auth.users(id) on delete cascade,
+  node_id         text not null references public.modules(id) on delete cascade,
+  stars           smallint not null default 0 check (stars between 0 and 3),
+  runs            integer not null default 0 check (runs >= 0),
+  best_first_try  smallint not null default 0 check (best_first_try between 0 and 6),
+  updated_at      timestamptz not null default now(),
+  primary key (user_id, node_id)
+);
+
+-- Fragile notions for spaced repetition (Leitner boxes: 1, 3, 7, 14, 30 days, then mastered).
+create table if not exists public.review_items (
+  user_id     uuid not null references auth.users(id) on delete cascade,
+  concept_id  text not null check (concept_id ~ '^[a-z0-9.-]{1,60}$'),
+  box         smallint not null default 0 check (box between 0 and 4),
+  misses      integer not null default 1 check (misses >= 0),
+  due_at      timestamptz not null default now(),
+  updated_at  timestamptz not null default now(),
+  primary key (user_id, concept_id)
+);
+create index if not exists review_items_due_idx on public.review_items (user_id, due_at);
+
+-- Market Blitz: personal record.
+create table if not exists public.blitz_scores (
+  user_id     uuid primary key references auth.users(id) on delete cascade,
+  best        integer not null default 0 check (best between 0 and 5000),
+  last_score  integer not null default 0 check (last_score between 0 and 5000),
+  runs        integer not null default 0 check (runs >= 0),
+  updated_at  timestamptz not null default now()
+);
+
 -- ---------------------------------------------------------------------
 -- 3. Small helpers
 -- ---------------------------------------------------------------------
@@ -601,6 +633,94 @@ begin
     'me', public.get_me());
 end $$;
 
+-- A finished Deal Path session. Stars only ever go up; missed concepts go back
+-- to box 0 (due tomorrow); due concepts answered right move up a box.
+create or replace function public.save_lesson(p_node text, p_stars integer, p_first_try integer, p_missed text[], p_cleared text[])
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare
+  v_user    uuid := auth.uid();
+  v_module  public.modules;
+  v_tier    public.tiers;
+  v_profile public.profiles;
+  v_today   date;
+  v_streak  integer;
+  v_gaps    integer[] := array[1, 3, 7, 14, 30];
+begin
+  if v_user is null then raise exception 'NOT_AUTHENTICATED' using errcode = '28000'; end if;
+  if coalesce(array_length(p_missed, 1), 0) > 24 or coalesce(array_length(p_cleared, 1), 0) > 24 then
+    raise exception 'TOO_MANY_ITEMS' using errcode = '22023';
+  end if;
+
+  if p_node is distinct from 'review' then
+    select * into v_module from public.modules where id = p_node;
+    if not found then raise exception 'INVALID_NODE' using errcode = '22023'; end if;
+    select * into v_tier from public.tiers where id = public.user_tier(v_user);
+    if v_module.level > v_tier.max_level then
+      raise exception 'LEVEL_LOCKED' using errcode = 'P0001', detail = v_module.level::text;
+    end if;
+    insert into public.path_progress (user_id, node_id, stars, runs, best_first_try)
+    values (v_user, p_node, greatest(1, least(3, coalesce(p_stars, 1))), 1, greatest(0, least(6, coalesce(p_first_try, 0))))
+    on conflict (user_id, node_id) do update
+      set stars          = greatest(public.path_progress.stars, excluded.stars),
+          runs           = public.path_progress.runs + 1,
+          best_first_try = greatest(public.path_progress.best_first_try, excluded.best_first_try),
+          updated_at     = now();
+  end if;
+
+  insert into public.review_items (user_id, concept_id, box, misses, due_at)
+  select v_user, c, 0, 1, now() + interval '1 day'
+  from (select distinct unnest(coalesce(p_missed, '{}'::text[])) as c) m
+  where c ~ '^[a-z0-9.-]{1,60}$'
+  on conflict (user_id, concept_id) do update
+    set box = 0, misses = public.review_items.misses + 1, due_at = now() + interval '1 day', updated_at = now();
+
+  delete from public.review_items r
+  where r.user_id = v_user and r.box >= 4 and r.due_at <= now()
+    and r.concept_id = any(coalesce(p_cleared, '{}'::text[])) and not (r.concept_id = any(coalesce(p_missed, '{}'::text[])));
+  update public.review_items r
+     set box = r.box + 1, due_at = now() + make_interval(days => v_gaps[r.box + 2]), updated_at = now()
+   where r.user_id = v_user and r.due_at <= now()
+     and r.concept_id = any(coalesce(p_cleared, '{}'::text[])) and not (r.concept_id = any(coalesce(p_missed, '{}'::text[])));
+
+  -- A finished session keeps the daily streak alive, like a deal does.
+  select * into v_profile from public.profiles where id = v_user for update;
+  if found then
+    v_today  := (now() at time zone v_profile.timezone)::date;
+    v_streak := case
+                  when v_profile.last_active_on = v_today then greatest(v_profile.streak_current, 1)
+                  when v_profile.last_active_on = v_today - 1 then v_profile.streak_current + 1
+                  else 1
+                end;
+    update public.profiles
+       set streak_current = v_streak, streak_best = greatest(streak_best, v_streak), last_active_on = v_today
+     where id = v_user;
+  end if;
+
+  return public.get_me();
+end $$;
+
+-- A finished Market Blitz run: keeps the personal record.
+create or replace function public.save_blitz(p_score integer)
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare
+  v_user uuid := auth.uid();
+  v_prev integer;
+  v_row  public.blitz_scores;
+begin
+  if v_user is null then raise exception 'NOT_AUTHENTICATED' using errcode = '28000'; end if;
+  if p_score is null or p_score < 0 or p_score > 5000 then raise exception 'INVALID_SCORE' using errcode = '22023'; end if;
+  select best into v_prev from public.blitz_scores where user_id = v_user;
+  insert into public.blitz_scores (user_id, best, last_score, runs)
+  values (v_user, p_score, p_score, 1)
+  on conflict (user_id) do update
+    set best = greatest(public.blitz_scores.best, excluded.best),
+        last_score = excluded.last_score,
+        runs = public.blitz_scores.runs + 1,
+        updated_at = now()
+  returning * into v_row;
+  return jsonb_build_object('best', v_row.best, 'previous', coalesce(v_prev, 0), 'record', p_score > coalesce(v_prev, 0) and p_score > 0, 'runs', v_row.runs);
+end $$;
+
 -- Everything the app needs about the signed-in player, in one call.
 create or replace function public.get_me()
 returns jsonb language plpgsql stable security definer set search_path = '' as $$
@@ -755,6 +875,16 @@ begin
       ) r
     ), '[]'::jsonb),
     'combo', public.combo_run(v_user),
+    'path', jsonb_build_object(
+      'stars', coalesce((select jsonb_object_agg(pp.node_id, pp.stars) from public.path_progress pp where pp.user_id = v_user), '{}'::jsonb),
+      'total', coalesce((select sum(pp.stars)::integer from public.path_progress pp where pp.user_id = v_user), 0)
+    ),
+    'review', jsonb_build_object(
+      'due', coalesce((select jsonb_agg(ri.concept_id order by ri.due_at) from public.review_items ri where ri.user_id = v_user and ri.due_at <= now()), '[]'::jsonb),
+      'fragile', (select count(*) from public.review_items ri where ri.user_id = v_user),
+      'next_due_at', (select min(ri.due_at) from public.review_items ri where ri.user_id = v_user)
+    ),
+    'blitz_best', coalesce((select bs.best from public.blitz_scores bs where bs.user_id = v_user), 0),
     'skills', (
       select jsonb_agg(jsonb_build_object(
                'module_id', m.id, 'name', m.name, 'short', m.short, 'level', m.level,
@@ -1129,6 +1259,9 @@ alter table public.problems          enable row level security;
 alter table public.problem_attempts  enable row level security;
 alter table public.points_ledger     enable row level security;
 alter table public.ai_usage          enable row level security;
+alter table public.path_progress     enable row level security;
+alter table public.review_items      enable row level security;
+alter table public.blitz_scores      enable row level security;
 
 drop policy if exists "Catalog is public" on public.tiers;
 create policy "Catalog is public" on public.tiers for select to anon, authenticated using (true);
@@ -1170,6 +1303,18 @@ drop policy if exists "Read own AI usage" on public.ai_usage;
 create policy "Read own AI usage" on public.ai_usage for select to authenticated
   using (user_id = (select auth.uid()));
 
+drop policy if exists "Read own path" on public.path_progress;
+create policy "Read own path" on public.path_progress for select to authenticated
+  using (user_id = (select auth.uid()));
+
+drop policy if exists "Read own review items" on public.review_items;
+create policy "Read own review items" on public.review_items for select to authenticated
+  using (user_id = (select auth.uid()));
+
+drop policy if exists "Read own blitz score" on public.blitz_scores;
+create policy "Read own blitz score" on public.blitz_scores for select to authenticated
+  using (user_id = (select auth.uid()));
+
 -- webhook_events: no policies on purpose (nobody but the server can touch it)
 
 -- ---------------------------------------------------------------------
@@ -1181,7 +1326,8 @@ revoke all on all sequences in schema public from anon, authenticated;
 grant select on public.tiers, public.plans, public.modules to anon, authenticated;
 grant select (id, module_id, difficulty, minutes, title, kind, published, sort) on public.problems to anon, authenticated;
 grant select on public.profiles, public.billing_customers, public.subscriptions, public.payments,
-                public.problem_attempts, public.points_ledger, public.ai_usage to authenticated;
+                public.problem_attempts, public.points_ledger, public.ai_usage,
+                public.path_progress, public.review_items, public.blitz_scores to authenticated;
 
 revoke execute on all functions in schema public from public, anon, authenticated;
 
@@ -1191,6 +1337,8 @@ grant execute on function public.get_leaderboard(text, integer)                 
 grant execute on function public.open_problem(text)                               to authenticated;
 grant execute on function public.submit_answer(text, text)                        to authenticated;
 grant execute on function public.save_profile(text, text, text, text, boolean)   to authenticated;
+grant execute on function public.save_lesson(text, integer, integer, text[], text[]) to authenticated;
+grant execute on function public.save_blitz(integer)                              to authenticated;
 grant execute on function public.level_for_points(integer)                        to anon, authenticated;
 grant execute on function public.get_public_stats()                                to anon, authenticated;
 

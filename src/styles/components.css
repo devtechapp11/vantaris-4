@@ -859,3 +859,11 @@ button.chip::after, a.chip::after, .copy-btn::after, .term-val::after { content:
 .medal-lock { position: absolute; right: -2px; bottom: -2px; width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; background: var(--carbon); color: var(--fg-3); box-shadow: 0 0 0 1px var(--line-strong); }
 .medals--strip { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
 .medals--strip .medal { min-height: 0; }
+
+/* Session results grid and actions (Deal Path sessions, Market Blitz) */
+.finish-stats { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-3); width: 100%; max-width: 420px; }
+.finish-stats > div { padding: var(--sp-3) var(--sp-2); border-radius: var(--r-md); box-shadow: inset 0 0 0 1px var(--line-strong); }
+.finish-stats dt { font-size: var(--fs-xs); color: var(--fg-3); }
+.finish-stats dd { margin: 4px 0 0; font-size: var(--fs-xl); color: var(--fg); }
+.finish-actions { display: flex; flex-direction: column; gap: var(--sp-2); width: 100%; max-width: 420px; margin-top: var(--sp-2); }
+.finish-actions .btn { width: 100%; }
