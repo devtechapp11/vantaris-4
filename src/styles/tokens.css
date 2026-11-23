@@ -119,6 +119,9 @@
   /* ---------- Liquid Glass: floating layers only (max three at once) ---------- */
   --glass-bg: color-mix(in srgb, var(--obsidian-2) 70%, transparent);
   --glass-solid: var(--carbon);
+  /* Surfaces over the living background: obsidian-2 at 70%, frosted (blur-xl) */
+  --surface-glass: color-mix(in srgb, var(--obsidian-2) 70%, transparent);
+  --blur-xl: 24px;
   --glass-blur: 40px;
   --glass-saturate: 140%;
   --glass-edge: inset 0 1px 0 color-mix(in srgb, var(--chrome-hi) 14%, color-mix(in srgb, var(--platinum) 14%, transparent)), inset 0 0 0 1px color-mix(in srgb, var(--platinum) 7%, transparent);

@@ -1,4 +1,4 @@
-.legal-top { position: sticky; top: 0; z-index: var(--z-sticky); display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); max-width: var(--col); margin: 0 auto; padding: calc(var(--safe-top) + var(--sp-3)) var(--gutter-r) var(--sp-3) var(--gutter); background: var(--bg); border-bottom: var(--hairline) solid var(--line); }
+.legal-top { position: sticky; top: 0; z-index: var(--z-sticky); display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); max-width: var(--col); margin: 0 auto; padding: calc(var(--safe-top) + var(--sp-3)) var(--gutter-r) var(--sp-3) var(--gutter); background: var(--surface-glass); -webkit-backdrop-filter: blur(var(--blur-xl)) saturate(120%); backdrop-filter: blur(var(--blur-xl)) saturate(120%); border-bottom: var(--hairline) solid var(--line); }
 .legal-top a { min-height: var(--tap); display: inline-flex; align-items: center; color: var(--fg); text-decoration: none; }
 .legal-top a.link { text-decoration: underline; }
 .legal { max-width: 720px; padding-top: var(--sp-10); padding-bottom: calc(var(--safe-bottom) + var(--sp-16)); }

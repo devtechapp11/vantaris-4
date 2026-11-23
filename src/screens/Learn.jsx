@@ -6,6 +6,7 @@ import { useApp } from '../app/AppContext';
 import { haptic } from '../app/prefs';
 import { api } from '../lib/api';
 import { sound } from '../lib/sound';
+import { fieldBus } from '../fx/field/fieldBus';
 import { burst, feverBurst, originOf } from '../lib/celebrate';
 import { CHAPTERS, VAULT_STARS, chapterOf, chapterOfConcept, starsFor } from '../content/path';
 import { LESSONS, TEMPLATES, answerText, grade, makeQuestion } from '../content/lessons';
@@ -86,6 +87,12 @@ function Learn() {
     }
   }, [locked, level, navigate, openPaywall]);
 
+  // The background breathes with the run: brighter filaments at x2, x3, x5.
+  useEffect(() => {
+    fieldBus.setMultiplier(surgeOf(tally.run));
+  }, [tally.run]);
+  useEffect(() => () => fieldBus.setMultiplier(1), []);
+
   if ((!chapter && !free) || locked) return <Missing />;
   if (!queue.length) return <Missing review />;
 
@@ -106,6 +113,7 @@ function Learn() {
     });
     if (correct) {
       sound.correct(tally.run + 1);
+      fieldBus.pulse([...document.querySelectorAll('.learn-step')].pop());
       haptic([10, 30, 14]);
       const up = surgeOf(tally.run + 1);
       if (up > surgeOf(tally.run)) {

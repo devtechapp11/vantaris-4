@@ -788,27 +788,6 @@ button.chip::after, a.chip::after, .copy-btn::after, .term-val::after { content:
 @keyframes fever-breathe { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
 
 /* =========================================================
-   Liquid metal ambience behind the app: blurred platinum pools,
-   drifting on the compositor. Very low opacity; never above content.
-   ========================================================= */
-.ambient { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; contain: strict; }
-.ambient i {
-  position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%;
-  background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--platinum) 9%, transparent), transparent 62%);
-  will-change: transform; animation: ambient-drift 38s var(--ease-in-out) infinite alternate;
-}
-.ambient-a { left: -20vmax; top: -24vmax; }
-.ambient-b { right: -26vmax; top: 20vh; animation-duration: 46s !important; animation-delay: -12s !important; opacity: 0.8; }
-.ambient-c { left: 20vw; bottom: -34vmax; animation-duration: 54s !important; animation-delay: -24s !important; opacity: 0.6;
-  background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--silver) 8%, transparent), transparent 60%) !important; }
-@keyframes ambient-drift {
-  0% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(8vw, 6vh, 0) scale(1.12); }
-  100% { transform: translate3d(-6vw, 10vh, 0) scale(0.94); }
-}
-@media (max-width: 767px) { .ambient i { width: 90vmax; height: 90vmax; } }
-
-/* =========================================================
    Closing memo: the end-of-session summary.
    ========================================================= */
 .closing { position: fixed; inset: 0; z-index: var(--z-overlay); display: grid; place-items: center; padding: var(--sp-4); background: var(--scrim); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }

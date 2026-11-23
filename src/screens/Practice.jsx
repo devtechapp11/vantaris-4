@@ -6,7 +6,6 @@ import { api } from '../lib/api';
 import { useApp } from '../app/AppContext';
 import { Item, LargeTitle, Page, Segmented } from '../components/chrome';
 import PathSwitch from '../components/PathSwitch';
-import MetalWaves from '../components/gl/MetalWaves';
 import { DifficultyBadge, ProblemStatus, Skeleton, TIER_LABEL, TierBadge } from '../components/bits';
 import { Ring } from '../components/charts';
 import Mascot from '../components/Mascot';
@@ -59,7 +58,6 @@ export default function Practice() {
 
   return (
     <Page wide>
-      <MetalWaves />
       <Item><PathSwitch value="free" /></Item>
       <Item>
         <motion.button type="button" className="drill metal metal--live" onClick={() => navigate('/learn/drill')} whileTap={{ scale: 0.96 }} {...prefetchProps('/learn/drill')}>

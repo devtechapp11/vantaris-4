@@ -7,7 +7,6 @@ import { useRank } from '../app/useRank';
 import { useMedia } from '../app/useDevice';
 import { Page } from '../components/chrome';
 import PathSwitch from '../components/PathSwitch';
-import MetalWaves from '../components/gl/MetalWaves';
 import { Skeleton, TIER_LABEL } from '../components/bits';
 import { LEVEL_TIER } from '../app/usePlans';
 import { isLocked } from '../lib/modules';
@@ -94,7 +93,6 @@ export default function Path() {
 
   return (
     <Page wide className="screen path-screen">
-      <MetalWaves />
       <header className="pbar glass" aria-label="Your standing">
         <Link to="/ranking" className="pbar-stat pbar-rank" aria-label={`${careerName(me.profile.level)}${rank ? `, rank ${rank}` : ''}. Open the ranking`}>
           <span className="pbar-badge">{me.profile.level}</span>

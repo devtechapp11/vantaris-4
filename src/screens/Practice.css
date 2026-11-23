@@ -1,4 +1,4 @@
-.practice-bar { display: flex; flex-direction: column; gap: var(--sp-3); position: sticky; top: 0; z-index: var(--z-sticky); padding: calc(var(--safe-top) + var(--sp-3)) 0 var(--sp-3); margin: calc(var(--sp-3) * -1) 0; background: var(--bg); border-bottom: var(--hairline) solid var(--line); }
+.practice-bar { display: flex; flex-direction: column; gap: var(--sp-3); position: sticky; top: 0; z-index: var(--z-sticky); padding: calc(var(--safe-top) + var(--sp-3)) 0 var(--sp-3); margin: calc(var(--sp-3) * -1) 0; background: var(--surface-glass); -webkit-backdrop-filter: blur(var(--blur-xl)) saturate(120%); backdrop-filter: blur(var(--blur-xl)) saturate(120%); border-bottom: var(--hairline) solid var(--line); }
 @media (min-width: 900px) { .practice-bar { flex-direction: row; align-items: center; } .practice-filter { width: 320px; flex: none; } }
 .practice-jump { display: flex; gap: var(--sp-2); overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
 .practice-jump::-webkit-scrollbar { display: none; }

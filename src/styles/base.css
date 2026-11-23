@@ -10,7 +10,7 @@ html {
 }
 body {
   margin: 0;
-  background: var(--bg);
+  background: transparent;
   color: var(--fg);
   font-family: var(--font-ui);
   font-size: var(--fs-md);
@@ -177,3 +177,13 @@ hr.sep { border: 0; border-top: var(--hairline) solid var(--line); margin: 0; wi
 
 /* 404, error and account-error pages */
 .status-page { min-height: 100dvh; justify-content: center; align-items: center; text-align: center; gap: var(--sp-6); }
+
+/* ---------- Frosted surfaces over the living background ---------- */
+.frost {
+  background: var(--surface-glass);
+  -webkit-backdrop-filter: blur(var(--blur-xl)) saturate(120%);
+  backdrop-filter: blur(var(--blur-xl)) saturate(120%);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .frost { background: var(--obsidian-2); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}

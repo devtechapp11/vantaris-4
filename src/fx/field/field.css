@@ -1,0 +1,9 @@
+/* The living background. Until the first frame (and without WebGL2) the CSS
+   gradient stands in: obsidian, lifted to graphite in the upper left. */
+.field {
+  position: fixed; inset: 0; z-index: -1;
+  width: 100vw; height: 100lvh;
+  display: block; pointer-events: none;
+  background: radial-gradient(ellipse at 30% 20%, var(--graphite), var(--obsidian) 70%);
+}
+@media print { .field { display: none; } }

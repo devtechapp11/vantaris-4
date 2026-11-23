@@ -1,4 +1,4 @@
-.onb { position: relative; min-height: 100dvh; display: flex; flex-direction: column; background: var(--bg); }
+.onb { position: relative; min-height: 100dvh; display: flex; flex-direction: column; background: transparent; }
 .onb-head {
   position: relative; z-index: var(--z-raised);
   max-width: var(--col-wide); width: 100%; margin: 0 auto;

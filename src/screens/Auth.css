@@ -1,4 +1,4 @@
-.auth { min-height: 100dvh; display: grid; grid-template-columns: minmax(0, 1fr); background: var(--bg); }
+.auth { min-height: 100dvh; display: grid; grid-template-columns: minmax(0, 1fr); background: transparent; }
 @media (min-width: 1024px) { .auth { grid-template-columns: minmax(460px, 0.85fr) minmax(0, 1.15fr); } }
 
 .auth-left { display: flex; flex-direction: column; gap: var(--sp-6); padding: calc(var(--safe-top) + var(--sp-4)) var(--gutter-r) calc(var(--safe-bottom) + var(--sp-6)) var(--gutter); min-width: 0; }

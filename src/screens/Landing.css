@@ -4,7 +4,7 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 .lenis.lenis-stopped { overflow: hidden; }
 
-.landing { background: var(--bg); min-height: 100dvh; }
+.landing { background: transparent; min-height: 100dvh; }
 .landing main:focus { outline: none; }
 
 /* ---------- Top bar: transparent over the hero, glass once you scroll ---------- */
@@ -27,7 +27,7 @@ html.lenis, html.lenis body { height: auto; }
   z-index: 0;
 }
 .stage-canvas { position: absolute; inset: 0; }
-.stage-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(0deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 85%, transparent) 38%, transparent 62%); }
+.stage-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(0deg, color-mix(in srgb, var(--obsidian) 55%, transparent) 0%, transparent 45%); }
 .stage-svg { position: absolute; z-index: 0; }
 .stage-svg video, .stage-svg img { width: 100%; height: auto; display: block; }
 .stage-panel {
@@ -47,7 +47,7 @@ html.lenis, html.lenis body { height: auto; }
 .cta-wrap { margin-top: var(--sp-2); }
 
 @media (min-width: 900px) {
-  .stage-scrim { background: linear-gradient(90deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 82%, transparent) 30%, transparent 58%); }
+  .stage-scrim { background: linear-gradient(90deg, color-mix(in srgb, var(--obsidian) 45%, transparent) 0%, transparent 40%); }
   .stage-panel { left: auto; right: max(var(--gutter-r), calc((100vw - var(--col-wide)) / 2 + var(--gutter-r))); top: 50%; translate: 0 -46%; width: min(460px, 40vw); margin: 0; }
   .chapter { align-items: center; padding: 0 var(--gutter-r) 0 max(var(--gutter), calc((100vw - var(--col-wide)) / 2 + var(--gutter))); }
   .chapter--hero { align-items: center; padding-bottom: 0; }

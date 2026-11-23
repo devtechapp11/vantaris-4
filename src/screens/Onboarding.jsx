@@ -12,6 +12,7 @@ import { SoundToggle } from '../components/Momentum';
 import Logo from '../components/Logo';
 import Mascot from '../components/Mascot';
 import { sound } from '../lib/sound';
+import { fieldBus } from '../fx/field/fieldBus';
 import { burst, originOf } from '../lib/celebrate';
 import { step as stepVariants } from '../design/motion';
 import { duration, ease, spring } from '../design/tokens';
@@ -87,6 +88,7 @@ export default function Onboarding() {
     const right = i === q.answer;
     if (right) {
       sound.correct(1);
+      fieldBus.pulse(qRef.current);
       haptic([12, 40, 18]);
       setTimeout(() => burst(originOf(qRef.current) ?? undefined), 120);
     } else {

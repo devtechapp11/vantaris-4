@@ -17,6 +17,7 @@ import LegalLinks from '../components/LegalLinks';
 import { ProgressBar } from '../components/ui';
 import { SoundToggle } from '../components/Momentum';
 import { sound } from '../lib/sound';
+import { fieldBus } from '../fx/field/fieldBus';
 import { haptic } from '../app/prefs';
 import { feverBurst, originOf } from '../lib/celebrate';
 import { NumberTicker } from '../components/Momentum';
@@ -402,6 +403,7 @@ function HeroCase() {
     track('hero_case', { correct: i === HERO_CASE.answer });
     if (earned) {
       sound.correct(1);
+      fieldBus.pulse(card.current);
       haptic([12, 40, 18]);
       setTimeout(() => feverBurst(3, originOf(card.current?.querySelector('.hc-score')) ?? undefined), 60);
     } else {

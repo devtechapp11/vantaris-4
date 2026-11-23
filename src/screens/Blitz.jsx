@@ -6,6 +6,7 @@ import { useApp } from '../app/AppContext';
 import { haptic } from '../app/prefs';
 import { api } from '../lib/api';
 import { sound } from '../lib/sound';
+import { fieldBus } from '../fx/field/fieldBus';
 import { feverBurst } from '../lib/celebrate';
 import { multiplierFor } from '../lib/momentum';
 import { rng } from '../content/lessons';
@@ -54,6 +55,8 @@ export default function Blitz() {
   };
 
   // Countdown 3-2-1
+  // Leaving the screen calms the background again.
+  useEffect(() => () => fieldBus.setMultiplier(1), []);
   useEffect(() => {
     if (phase !== 'count') return undefined;
     if (count === 0) {
@@ -76,8 +79,10 @@ export default function Blitz() {
     const run = ok ? s.run + 1 : 0;
     const mult = multiplierFor(run);
     const gained = ok ? 10 * mult : 0;
+    fieldBus.setMultiplier(ok ? mult : 1);
     if (ok) {
       sound.correct(run);
+      fieldBus.pulse(document.querySelector('.blitz-q'));
       const threshold = [3, 5, 10].includes(run);
       haptic(threshold ? [10, 30, 16] : 8);
       if (threshold) sound.fever(mult);

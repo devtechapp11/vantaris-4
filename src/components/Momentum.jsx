@@ -130,16 +130,6 @@ export function FeverFrame({ run }) {
  * Liquid metal ambience: three soft platinum pools drifting very slowly behind
  * the app. Transform and opacity only, compositor-driven; still under reduced motion.
  */
-export function AmbientMetal() {
-  return (
-    <div className="ambient" aria-hidden="true">
-      <i className="ambient-a" />
-      <i className="ambient-b" />
-      <i className="ambient-c" />
-    </div>
-  );
-}
-
 /** Discreet sound switch. */
 export function SoundToggle({ className = '' }) {
   const { sound: on } = usePrefs();

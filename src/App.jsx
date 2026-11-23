@@ -5,7 +5,8 @@ import { AppProvider, useApp } from './app/AppContext';
 import { usePrefs } from './app/prefs';
 import { Toast } from './components/chrome';
 import { Sidebar, TabBar, TABS } from './components/Shell';
-import { AmbientMetal, FeverFrame } from './components/Momentum';
+import { FeverFrame } from './components/Momentum';
+import ObsidianField from './fx/field/ObsidianField';
 import { comboOf } from './lib/momentum';
 import Paywall from './components/Paywall';
 import { LogoLoader } from './components/Logo';
@@ -45,6 +46,7 @@ export default function App() {
     <Router>
       <MotionConfig reducedMotion={prefs.reduceMotion ? 'always' : 'user'}>
         <AppProvider>
+          <ObsidianField key={prefs.reduceMotion ? 'still' : 'live'} still={prefs.reduceMotion} />
           {IS_DEMO && <div className="preview-band" role="note">Preview: nothing you enter leaves this page</div>}
           <Gate />
           <Paywall />
@@ -143,7 +145,6 @@ function Gate() {
   return (
     <div className={`app ${signedIn && !focus ? 'has-sidebar' : ''}`}>
       <a href="#main" className="skip" onClick={(e) => { e.preventDefault(); const m = document.getElementById('main') ?? document.querySelector('main'); m?.setAttribute('tabindex', '-1'); m?.focus(); }}>Skip to content</a>
-      {signedIn && <AmbientMetal />}
       {signedIn && !focus && <Sidebar />}
       <div className="app-main">
         <ErrorBoundary resetKey={location.pathname}>

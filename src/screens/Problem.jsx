@@ -17,6 +17,7 @@ import { StreakLine } from '../components/RankGauge';
 import { BorderBeam, ComboBadge, NumberTicker, RankClimb, SessionBar, SessionClose } from '../components/Momentum';
 import { closedToday, comboOf, dailyGoal, multiplierFor } from '../lib/momentum';
 import { sound } from '../lib/sound';
+import { fieldBus } from '../fx/field/fieldBus';
 import { careerName } from '../lib/career';
 import Tutor, { TutorFab } from './Tutor';
 import { burst, feverBurst, originOf, shower } from '../lib/celebrate';
@@ -79,6 +80,8 @@ export default function Problem() {
     }
   }, [id, setMe]);
 
+  // Leaving the screen calms the background again.
+  useEffect(() => () => fieldBus.setMultiplier(1), []);
   useEffect(() => {
     load();
   }, [load]);
@@ -108,8 +111,11 @@ export default function Problem() {
       const multiplier = res.multiplier ?? multiplierFor(combo);
       setOutcome({ result: res.result, level_up: res.level_up, fresh, before, after: res.me.profile.points, combo, multiplier });
       if (fresh) {
-        if (res.result.correct) sound.correct(combo);
-        else sound.wrong();
+        if (res.result.correct) {
+          sound.correct(combo);
+          fieldBus.pulse(document.querySelector('.option[aria-checked="true"], .option.is-picked') ?? document.activeElement);
+        } else sound.wrong();
+        fieldBus.setMultiplier(res.result.correct ? multiplier : 1);
       }
       // Today's session just closed: the closing memo, after any promotion.
       const sessionDone = fresh && closedToday(res.me.recent) === dailyGoal(res.me) && closedToday(me?.recent) < dailyGoal(res.me);
