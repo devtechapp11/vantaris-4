@@ -45,9 +45,11 @@ export function usePrefs() {
   return useSyncExternalStore(subscribe, getPrefs, getPrefs);
 }
 
-/** Vibrate if the device supports it and the player hasn't turned haptics off. */
+/** Vibrate if the device supports it and the player hasn't turned haptics (or motion) off. */
 export function haptic(pattern) {
-  if (!prefs.haptics) return;
+  if (!prefs.haptics || prefs.reduceMotion) return;
+  if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (navigator.userActivation?.hasBeenActive === false) return;
   try {
     navigator.vibrate?.(pattern);
   } catch {

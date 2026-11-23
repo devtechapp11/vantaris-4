@@ -18,6 +18,9 @@ import { useScrollMemory, useSwipeBack } from './app/fluid';
 import ErrorBoundary from './components/ErrorBoundary';
 import CookieBanner from './components/CookieBanner';
 import AppHud from './components/AppHud';
+import MetalBurst from './fx/MetalBurst';
+import { useSfxUnlock } from './lib/sfx/useSfx';
+import PromotionCeremony from './exercise/PromotionCeremony';
 import { LEGAL_ORDER } from './content/legal';
 import { track } from './lib/analytics';
 
@@ -43,6 +46,7 @@ const Router = IS_DEMO ? MemoryRouter : BrowserRouter;
 
 export default function App() {
   const prefs = usePrefs();
+  useSfxUnlock();
   return (
     <Router>
       <MotionConfig reducedMotion={prefs.reduceMotion ? 'always' : 'user'}>
@@ -52,6 +56,8 @@ export default function App() {
           <Gate />
           <Paywall />
           <Toast />
+          <MetalBurst />
+          <PromotionCeremony />
         </AppProvider>
       </MotionConfig>
     </Router>
