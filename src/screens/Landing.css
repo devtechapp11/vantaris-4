@@ -55,7 +55,9 @@ html.lenis, html.lenis body { height: auto; }
 }
 
 /* ---------- Stage panels: flat sheets with a faint spotlight ---------- */
-.sheet-panel { padding: var(--sp-5); background: var(--metal-surface); display: flex; flex-direction: column; gap: var(--sp-4); }
+.sheet-panel { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); }
+/* The method's panels float over the exploded monoliths: frosted graphite */
+.fx-card.sheet-panel { background: radial-gradient(400px circle at var(--mx, 0px) var(--my, 0px), color-mix(in srgb, var(--platinum) 6%, transparent), transparent 70%), var(--surface-glass); -webkit-backdrop-filter: blur(var(--blur-xl)); backdrop-filter: blur(var(--blur-xl)); }
 .panel-title { font-family: var(--font-display); font-weight: var(--fw-heading); font-size: var(--fs-3xl); line-height: 1.05; letter-spacing: var(--tracking-tight); margin: 0; }
 .panel-q { font-size: var(--fs-lg); font-weight: var(--fw-medium); margin: 0; }
 .ledger { margin: 0; }
@@ -134,7 +136,8 @@ html.lenis, html.lenis body { height: auto; }
 /* ---------- Sections after the film ---------- */
 .lsec { max-width: var(--col-wide); margin: 0 auto; padding: var(--sp-24) var(--gutter-r) var(--sp-16) var(--gutter); display: flex; flex-direction: column; gap: var(--sp-8); scroll-margin-top: 64px; }
 .lsec-head { display: flex; flex-direction: column; gap: var(--sp-4); max-width: 640px; }
-.final { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-5); padding-top: var(--sp-12); border-top: var(--hairline) solid var(--line); }
+.final { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-5); margin-top: var(--sp-8); }
+.fx-card.final { background: var(--surface-glass); -webkit-backdrop-filter: blur(var(--blur-xl)); backdrop-filter: blur(var(--blur-xl)); }
 .final-line { font-family: var(--font-display); font-weight: var(--fw-heading); font-size: clamp(32px, 5vw, 56px); line-height: 1.06; letter-spacing: var(--tracking-tight); margin: 0; text-wrap: balance; }
 
 .lfoot { border-top: var(--hairline) solid var(--line); }
@@ -146,29 +149,10 @@ html.lenis, html.lenis body { height: auto; }
 /* Data in the stage panels reads like a terminal */
 .mini-steps li, .panel-irr { font-family: var(--font-mono); letter-spacing: -0.02em; }
 
-/* ---------- Hero case: one deal, one tap ---------- */
-.hero-case { display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-4); margin-top: var(--sp-1); max-width: 520px; pointer-events: auto; }
-.hc-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); margin: calc(var(--sp-2) * -1) calc(var(--sp-2) * -1) calc(var(--sp-2) * -1) 0; }
-.hc-q { margin: 0; font-size: var(--fs-base); font-weight: var(--fw-medium); line-height: 1.45; color: var(--fg); }
-.hc-opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2); }
-.hc-opt { min-height: 48px; padding: var(--sp-2) var(--sp-3); }
-.hc-opt .option-key { width: 24px; height: 24px; }
-.hc-opt .option-label.fig-mono { font-size: var(--fs-base); }
-.hc-verdict { display: flex; flex-direction: column; gap: var(--sp-3); }
-.hc-score-row { display: flex; align-items: baseline; gap: var(--sp-2); flex-wrap: wrap; }
-.hc-score small { font-family: var(--font-ui); font-size: var(--fs-sm); font-weight: var(--fw-medium); color: var(--fg-3); letter-spacing: 0; margin-left: 4px; text-shadow: none; }
-.hc-score { font-size: 34px; font-weight: var(--fw-semibold); letter-spacing: -0.05em; line-height: 1; color: var(--pos); text-shadow: 0 0 24px color-mix(in srgb, var(--gain) 45%, transparent); }
-.hero-case .cta-wrap { margin-top: var(--sp-1); }
-/* Wall Street potential: the first number a visitor earns */
-.hc-potential { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: var(--sp-2) var(--sp-3); padding: var(--sp-3) var(--sp-4); border-radius: var(--r-md); background: color-mix(in srgb, var(--steel-800) 40%, transparent); box-shadow: var(--spec-glow); }
-.hc-potential-score { font-size: 40px; line-height: 1; color: var(--white-metal); letter-spacing: -0.04em; text-shadow: 0 0 24px color-mix(in srgb, var(--platinum) 60%, transparent); }
-.hc-potential-score small { font-size: var(--fs-sm); color: var(--chrome-hi); margin-left: 2px; letter-spacing: 0; text-shadow: none; }
-.hc-potential-bar { grid-column: 1 / -1; display: block; height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--platinum) 14%, transparent); overflow: hidden; }
-.hc-potential-bar i { display: block; height: 100%; transform-origin: left center; background: linear-gradient(90deg, var(--steel-800), var(--platinum) 60%, var(--chrome-hi)); box-shadow: 0 0 12px var(--platinum); }
-.hero-case.is-right { box-shadow: var(--lift), var(--spec-glow); }
-.hero-case .btn--primary { width: 100%; }
-@media (min-width: 900px) {
-  .hero-case { padding: var(--sp-5); }
-  .hc-opts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .hero-case .btn--primary { width: auto; }
-}
+
+/* Content sits above the fixed Ledger Monolith layer */
+.landing > main, .landing > footer { position: relative; z-index: 1; }
+/* Membership on the tokens: frosted graphite plates, specular edge from .metal */
+.landing .plan-inner.metal { background: radial-gradient(320px circle at var(--mx, 50%) var(--my, -60%), color-mix(in srgb, var(--platinum) 7%, transparent), transparent 70%), var(--surface-glass); -webkit-backdrop-filter: blur(var(--blur-xl)); backdrop-filter: blur(var(--blur-xl)); border-radius: var(--radius-md); }
+.hero-demo { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-3); pointer-events: auto; }
+.hero-demo .dd-skip { margin-left: var(--sp-1); }

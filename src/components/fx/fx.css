@@ -55,7 +55,7 @@
   background: linear-gradient(180deg, var(--steel-700), var(--steel-800));
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--platinum) 14%, transparent), 0 1px 0 rgba(0, 0, 0, 0.6);
 }
-.fx-plate--steel .fx-plate-text { color: var(--steel-500); text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6), 0 1px 0 color-mix(in srgb, var(--platinum) 8%, transparent); }
+.fx-plate--steel .fx-plate-text { color: var(--steel-300); text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6), 0 1px 0 color-mix(in srgb, var(--platinum) 8%, transparent); }
 .fx-plate--glass {
   background: linear-gradient(160deg, color-mix(in srgb, var(--platinum) 10%, transparent), color-mix(in srgb, var(--obsidian) 70%, transparent));
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--platinum) 18%, transparent), inset 0 1px 0 color-mix(in srgb, var(--white) 14%, transparent);

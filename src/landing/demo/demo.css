@@ -1,0 +1,49 @@
+/* ---------- Try a live deal: three deals and the calibration ---------- */
+.dd { max-width: 540px; margin-top: var(--sp-1); pointer-events: auto; background: radial-gradient(400px circle at var(--mx, 0px) var(--my, 0px), color-mix(in srgb, var(--platinum) 6%, transparent), transparent 70%), var(--surface-glass); -webkit-backdrop-filter: blur(var(--blur-xl)); backdrop-filter: blur(var(--blur-xl)); }
+.dd.is-right { box-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.9), var(--spec-glow); }
+.dd-inner { display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-4); }
+@media (min-width: 768px) { .dd-inner { padding: var(--sp-5); } }
+.dd-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); min-height: 44px; margin: calc(var(--sp-2) * -1) calc(var(--sp-2) * -1) calc(var(--sp-1) * -1) 0; }
+.dd-head-r { display: inline-flex; align-items: center; gap: var(--sp-2); }
+.dd-step { font-size: 11px; letter-spacing: 0.12em; color: var(--steel-300); }
+.dd-pips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0; padding: 0; list-style: none; }
+.dd-pips li { height: 3px; border-radius: 2px; background: var(--steel-700); transition: background-color var(--dur-base) var(--ease-out); }
+.dd-pips li.is-now { background: var(--steel-500); }
+.dd-pips li.is-right { background: var(--platinum); }
+.dd-pips li.is-miss { background: var(--loss); opacity: 0.7; }
+
+.dd-deal { display: flex; flex-direction: column; gap: var(--sp-3); }
+.dd-kind { margin: 0; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--steel-500); }
+.dd-q { margin: 0; font-size: var(--fs-base); font-weight: var(--fw-medium); line-height: 1.45; color: var(--fg); text-wrap: pretty; }
+.dd-opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2); }
+@media (min-width: 1100px) { .dd-opts { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.dd-opt { min-height: 48px; padding: var(--sp-2) var(--sp-3); }
+.dd-opt .option-key { width: 24px; height: 24px; }
+.dd-opt .option-label.fig-mono { font-size: var(--fs-base); }
+
+.dd-verdict { display: flex; flex-direction: column; gap: var(--sp-3); }
+.dd-verdict-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); flex-wrap: wrap; }
+.dd-mark { display: inline-flex; align-items: center; gap: 6px; font-weight: var(--fw-semibold); font-size: var(--fs-sm); }
+.dd-mark.is-right { color: var(--gain); }
+.dd-mark.is-miss { color: var(--loss); }
+.dd-xp { display: inline-flex; align-items: baseline; gap: var(--sp-2); }
+.dd-xp b { font-size: 26px; font-weight: 600; letter-spacing: -0.04em; color: var(--white); text-shadow: 0 0 22px color-mix(in srgb, var(--platinum) 45%, transparent); }
+.dd-xp-total { font-size: var(--fs-sm); color: var(--steel-300); }
+.dd-why { margin: 0; font-size: var(--fs-sm); line-height: 1.55; color: var(--fg-2); }
+.dd-why b { color: var(--fg); font-weight: 500; }
+.dd-next { align-self: stretch; }
+@media (min-width: 768px) { .dd-next { align-self: flex-start; } }
+
+.dd-cal { display: flex; flex-direction: column; gap: var(--sp-4); }
+.dd-cal-top { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); flex-wrap: wrap; }
+.dd-cal-score { margin: 0; font-size: 64px; line-height: 0.9; letter-spacing: -0.05em; color: var(--white); }
+.dd-cal-score small { font-size: 22px; color: var(--steel-500); letter-spacing: 0; margin-left: 2px; }
+.dd-cal-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-2); margin: 0; padding: var(--sp-3) 0; border-block: var(--hairline) solid var(--line); }
+.dd-cal-stats div { display: flex; flex-direction: column; gap: 4px; }
+.dd-cal-stats dt { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--steel-300); }
+.dd-cal-stats dd { margin: 0; font-size: var(--fs-lg); color: var(--white); }
+.dd-cta { width: 100%; }
+.dd-replay { align-self: center; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 var(--sp-3); border: 0; background: none; color: var(--steel-300); font: inherit; font-size: var(--fs-sm); cursor: pointer; }
+@media (hover: hover) { .dd-replay:hover { color: var(--fg); } }
+.dd-skip { font-size: var(--fs-sm); color: var(--steel-300); }
+@media (max-width: 420px) { .dd-nosign { display: none; } }

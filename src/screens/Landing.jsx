@@ -1,26 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'motion/react';
-import { ArrowRight, Check, X } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import Logo from '../components/Logo';
-import { Magnetic, Spotlight } from '../components/effects';
+import { Magnetic } from '../components/effects';
+import SpecularCard from '../components/fx/SpecularCard';
 import { TierBadge } from '../components/bits';
 import PlanCard, { BillingToggle } from '../components/PlanCard';
 import { useMedia } from '../app/useDevice';
 import { usePlans } from '../app/usePlans';
 import { usePrefs } from '../app/prefs';
 import { CHAPTERS, LADDER, SAMPLE_DEAL } from '../content/landing';
-import { duration, ease, spring } from '../design/tokens';
+import { duration, ease } from '../design/tokens';
 import { BRAND } from '../lib/config';
 import { track } from '../lib/analytics';
 import LegalLinks from '../components/LegalLinks';
-import { ProgressBar } from '../components/ui';
-import { SoundToggle } from '../components/Momentum';
-import { sound } from '../lib/sound';
-import { fieldBus } from '../fx/field/fieldBus';
-import { haptic } from '../app/prefs';
-import { feverBurst, originOf } from '../lib/celebrate';
-import { NumberTicker } from '../components/Momentum';
+import DemoDeals from '../landing/demo/DemoDeals';
+import MonolithStage from '../landing/hero/MonolithStage';
+import Shutter from '../landing/hud/Shutter';
+import HudOverlay from '../landing/hud/HudOverlay';
 import './Landing.css';
 import { useMeta } from '../app/useMeta';
 
@@ -61,6 +59,9 @@ export default function Landing() {
   useMeta({ path: '/' });
   return (
     <motion.div className="landing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: duration.slow }}>
+      <Shutter />
+      <HudOverlay />
+      {wide && !reduce && <MonolithStage variant="fixed" />}
       <LandingNav />
       <main id="main" tabIndex={-1}>
         {reduce ? <StillFilm /> : wide ? <Film /> : <MobileFilm />}
@@ -124,7 +125,7 @@ function Film() {
       <Stage index={index} t={t} />
       <div className="film-chapters">
         {CHAPTERS.map((c, i) => (
-          <article key={c.id} ref={(el) => { chapters.current[i] = el; }} className={`chapter chapter--${c.id} ${i === index ? 'is-active' : ''}`} aria-labelledby={`ch-${c.id}`}>
+          <article key={c.id} ref={(el) => { chapters.current[i] = el; }} data-ledger={i === 1 ? 'method' : undefined} className={`chapter chapter--${c.id} ${i === index ? 'is-active' : ''}`} aria-labelledby={`ch-${c.id}`}>
             <div className="chapter-copy">
               <p className="t-eyebrow">{c.eyebrow}</p>
               {i === 0 ? (
@@ -133,7 +134,7 @@ function Film() {
                 <h2 id={`ch-${c.id}`} className="chapter-title">{c.title}</h2>
               )}
               <p className="t-lead">{c.body}</p>
-              {i === 0 && <HeroCase />}
+              {i === 0 && <HeroDemo />}
             </div>
           </article>
         ))}
@@ -175,7 +176,7 @@ function Visual({ kind, p, metal = false }) {
   if (kind === 'tutor') return <TutorBubble p={p} metal={metal} />;
   return null;
 }
-const sheet = (metal) => `sheet-panel${metal ? ' metal' : ''}`;
+const sheet = (metal) => `sheet-panel${metal ? ' sheet-panel--inline' : ''}`;
 
 /** A motion value as React state, rounded to a few steps (keeps re-renders rare). */
 function useStep(mv, steps) {
@@ -190,7 +191,7 @@ function useStep(mv, steps) {
 function DealSheet({ p }) {
   const shown = useStep(p, SAMPLE_DEAL.terms.length + 1);
   return (
-    <Spotlight className="sheet-panel metal">
+    <SpecularCard className="sheet-panel" pad={false}>
       <p className="t-eyebrow">{SAMPLE_DEAL.kind}</p>
       <p className="panel-title">{SAMPLE_DEAL.title}</p>
       <dl className="ledger">
@@ -200,7 +201,7 @@ function DealSheet({ p }) {
           </div>
         ))}
       </dl>
-    </Spotlight>
+    </SpecularCard>
   );
 }
 
@@ -210,7 +211,7 @@ function AnswerSheet({ p, metal }) {
   const scored = step >= 7;
   const ring = useTransform(p, [0, 1], [0, 1]);
   return (
-    <Spotlight className={sheet(metal)}>
+    <SpecularCard className={sheet(metal)} pad={false}>
       <div className="between">
         <p className="t-eyebrow">Question</p>
         <svg width="28" height="28" viewBox="0 0 28 28" className="mini-timer" aria-hidden="true">
@@ -228,7 +229,7 @@ function AnswerSheet({ p, metal }) {
         ))}
       </ul>
       <p className={`panel-score ${scored ? 'is-in' : ''}`}><span className="c-pos fig-mono">+18</span> <span className="c-3">pts · ahead of the clock</span></p>
-    </Spotlight>
+    </SpecularCard>
   );
 }
 
@@ -245,7 +246,7 @@ function ReturnsChart({ p, metal }) {
   const steps = ['Exit EV  8.0x × $70M = $560M', 'Exit equity  $560M − $110M = $450M', 'MOIC  $450M ÷ $160M = 2.81x', 'IRR  2.81^(1/5) − 1 = 23.0%'];
   const shown = useStep(p, steps.length + 1);
   return (
-    <Spotlight className={sheet(metal)}>
+    <SpecularCard className={sheet(metal)} pad={false}>
       <div className="between">
         <p className="t-eyebrow">Sponsor equity, $M</p>
         <p className={`fig panel-irr ${done ? 'is-in' : ''}`}><span className="c-pos">+23.0%</span> <span className="c-3">IRR</span></p>
@@ -263,14 +264,14 @@ function ReturnsChart({ p, metal }) {
       <ol className="mini-steps">
         {steps.map((s, i) => <li key={s} className={`fig ${i < shown ? 'is-in' : ''}`}>{s}</li>)}
       </ol>
-    </Spotlight>
+    </SpecularCard>
   );
 }
 
 function RankLadder({ p, metal }) {
   const lit = Math.min(LADDER.length, 1 + useStep(p, LADDER.length));
   return (
-    <Spotlight className={sheet(metal)}>
+    <SpecularCard className={sheet(metal)} pad={false}>
       <p className="t-eyebrow">Your career track</p>
       <ol className="rungs">
         {[...LADDER].reverse().map((l) => {
@@ -284,14 +285,14 @@ function RankLadder({ p, metal }) {
           );
         })}
       </ol>
-    </Spotlight>
+    </SpecularCard>
   );
 }
 
 function TutorBubble({ p, metal }) {
   const step = useStep(p, 6);
   return (
-    <Spotlight className={sheet(metal)}>
+    <SpecularCard className={sheet(metal)} pad={false}>
       <p className="t-eyebrow">Vale · your coach</p>
       <div className="bubbles">
         <p className={`bub bub--me ${step >= 1 ? 'is-in' : ''}`}>Where do I start with the IRR?</p>
@@ -300,7 +301,7 @@ function TutorBubble({ p, metal }) {
           <p className="c-3">Want the formula for exit equity?</p>
         </div>
       </div>
-    </Spotlight>
+    </SpecularCard>
   );
 }
 
@@ -314,24 +315,25 @@ function MobileFilm() {
   return (
     <section id="film" className="mfilm" aria-label="How Vantaris works">
       <article className="mch mch--hero" aria-labelledby={`ch-${hero.id}`}>
+        <MonolithStage variant="inline" />
         <div className="chapter-copy">
           <p className="t-eyebrow">{hero.eyebrow}</p>
           <h1 id={`ch-${hero.id}`} className="t-display hero-title text-chrome text-chrome--live">{hero.title}</h1>
           <p className="t-lead">{hero.body}</p>
-          <HeroCase />
+          <HeroDemo />
         </div>
       </article>
-      {CHAPTERS.slice(1).map((c) => <MobileChapter key={c.id} c={c} />)}
+      {CHAPTERS.slice(1).map((c, i) => <MobileChapter key={c.id} c={c} method={i === 0} />)}
     </section>
   );
 }
 
-function MobileChapter({ c }) {
+function MobileChapter({ c, method }) {
   const ref = useRef(null);
   // 0 when the panel's top enters the screen, 1 once its middle reaches the upper half
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'center 0.5'] });
   return (
-    <article className="mch" aria-labelledby={`ch-${c.id}`}>
+    <article className="mch" data-ledger={method ? 'method' : undefined} aria-labelledby={`ch-${c.id}`}>
       <div className="chapter-copy">
         <p className="t-eyebrow">{c.eyebrow}</p>
         <h2 id={`ch-${c.id}`} className="chapter-title">{c.title}</h2>
@@ -363,7 +365,7 @@ function StillFilm() {
             <p className="t-eyebrow">{c.eyebrow}</p>
             {i === 0 ? <h1 id={`ch-${c.id}`} className="t-display hero-title text-chrome">{c.title}</h1> : <h2 id={`ch-${c.id}`} className="chapter-title">{c.title}</h2>}
             <p className="t-lead">{c.body}</p>
-            {i === 0 && <HeroCase />}
+            {i === 0 && <HeroDemo />}
           </div>
           {i === 0 ? null : <div className="still-visual"><Visual kind={c.visual} p={still} /></div>}
         </article>
@@ -372,99 +374,12 @@ function StillFilm() {
   );
 }
 
-/* ---------- The hero case: one deal, playable before any sign-up ---------- */
-// Scored like a real deal (difficulty 1, up to +50% for speed against a one-minute clock).
-const HERO_CASE = {
-  q: 'EBITDA is $50M. Comparable companies trade at 8.0x. What is the business worth?',
-  options: ['$58M', '$400M', '$450M', '$6.3M'],
-  answer: 1,
-  why: 'Enterprise value = EBITDA × multiple = $50M × 8.0 = $400M.',
-};
-const ASSOCIATE_AT = 251;
-
-function HeroCase() {
-  const [pick, setPick] = useState(null);
-  const [pts, setPts] = useState(0);
-  const [potential, setPotential] = useState(0);
-  const shown = useRef(0);
-  const card = useRef(null);
-  // The speed bonus clock starts when the case is on screen
-  useEffect(() => { shown.current = Date.now(); }, []);
-  const right = pick === HERO_CASE.answer;
-
-  const answer = (i) => {
-    if (pick != null) return;
-    const secs = (Date.now() - shown.current) / 1000;
-    const earned = i === HERO_CASE.answer ? Math.round(10 * (1 + 0.5 * Math.max(0, 1 - secs / 60))) : 0;
-    setPick(i);
-    setPts(earned);
-    // Wall Street potential: accuracy first, then speed against a 30-second read.
-    setPotential(earned ? Math.round(Math.max(74, Math.min(99, 99 - Math.max(0, secs - 4) * 0.9))) : Math.round(Math.max(41, 63 - secs * 0.4)));
-    track('hero_case', { correct: i === HERO_CASE.answer });
-    if (earned) {
-      sound.correct(1);
-      fieldBus.pulse(card.current);
-      haptic([12, 40, 18]);
-      setTimeout(() => feverBurst(3, originOf(card.current?.querySelector('.hc-score')) ?? undefined), 60);
-    } else {
-      sound.wrong();
-      haptic([24, 50, 24]);
-    }
-  };
-
+/* ---------- Three demo deals, playable before any sign-up ---------- */
+function HeroDemo() {
   return (
-    <div ref={card} className={`hero-case metal ${pick == null ? '' : right ? 'is-right metal--flash' : 'is-miss'}`}>
-      <div className="hc-head">
-        <span className="t-eyebrow">Try a live deal · no sign-up</span>
-        <SoundToggle />
-      </div>
-      <p className="hc-q">{HERO_CASE.q}</p>
-      <div className="hc-opts" role="radiogroup" aria-label="Your answer">
-        {HERO_CASE.options.map((o, i) => {
-          const state = pick == null ? 'idle' : i === HERO_CASE.answer ? 'answer' : i === pick ? 'wrong' : 'dim';
-          return (
-            <motion.button
-              key={o} type="button" role="radio" aria-checked={pick === i}
-              className="option hc-opt metal metal--live" data-state={state}
-              disabled={pick != null} onClick={() => answer(i)}
-              whileTap={{ scale: 0.96 }} transition={spring.snappy}
-            >
-              <span className="option-key">{state === 'answer' ? <Check size={14} strokeWidth={3} /> : state === 'wrong' ? <X size={14} strokeWidth={3} /> : 'ABCD'[i]}</span>
-              <span className="option-label fig-mono">{o}</span>
-            </motion.button>
-          );
-        })}
-      </div>
-      <AnimatePresence initial={false}>
-        {pick != null && (
-          <motion.div className="hc-verdict" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={spring.gentle} aria-live="polite">
-            <div className="hc-potential">
-              <span className="t-eyebrow">Wall Street potential</span>
-              <span className="hc-potential-score fig-mono"><NumberTicker value={potential} delay={0.05} /><small>/100</small></span>
-              <span className="hc-potential-bar" aria-hidden="true"><motion.i initial={{ scaleX: 0 }} animate={{ scaleX: potential / 100 }} transition={{ type: 'spring', stiffness: 90, damping: 16, delay: 0.1 }} /></span>
-            </div>
-            {right ? (
-              <>
-                <div className="hc-score-row">
-                  <motion.span className="hc-score fig-mono" initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ ...spring.bouncy, delay: 0.1 }}>+{pts}<small>pts</small></motion.span>
-                  <span className="t-callout">That’s how an analyst values a business.</span>
-                </div>
-                <div className="stack-8">
-                  <div className="between t-cap"><span><b className="c-fg">Analyst</b> · <span className="fig">{pts}</span> / {ASSOCIATE_AT} pts</span><span>Associate</span></div>
-                  <ProgressBar value={pts / ASSOCIATE_AT} size="sm" delay={0.35} label="Progress to Associate" />
-                  <p className="t-cap">At this pace you make Associate in <b className="c-fg fig">{Math.ceil(ASSOCIATE_AT / pts)}</b> deals.</p>
-                </div>
-              </>
-            ) : (
-              <>
-                <p className="t-headline">The right call: <span className="fig-mono c-pos">{HERO_CASE.options[HERO_CASE.answer]}</span></p>
-                <p className="t-callout fig">{HERO_CASE.why}</p>
-              </>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <StartCta source="hero" label={pick == null ? 'Start free' : right ? 'Keep going, free' : 'Train on real deals, free'} />
+    <div className="hero-demo">
+      <DemoDeals />
+      <Link to="/signup" className="dd-skip link" onClick={() => track('upgrade_click', { source: 'landing-skip' })}>Skip the demo, start free</Link>
     </div>
   );
 }
@@ -487,7 +402,7 @@ function Pricing() {
   const tiers = data?.tiers.filter((t) => t.id !== 'free') ?? [];
   return (
     <section id="pricing" className="lsec" aria-labelledby="pricing-title">
-      <header className="lsec-head">
+      <header className="lsec-head" data-ledger="membership">
         <p className="t-eyebrow">Membership</p>
         <h2 id="pricing-title" className="chapter-title">Start free. Scale when you’re ready.</h2>
         <p className="t-lead">Three deals a week, free for as long as you like. Paid plans open every desk, the full debriefs and Vale. Cancel anytime.</p>
@@ -512,10 +427,10 @@ function Pricing() {
         <div className="plans-grid">{[0, 1, 2].map((i) => <div key={i} className="skeleton" style={{ height: 460 }} />)}</div>
       )}
       <p className="t-foot">Prices in Indian rupees, taxes as applicable. Payments by Razorpay. See the <Link className="link" to="/subscription-terms">subscription terms</Link> and <Link className="link" to="/refund">refund policy</Link>.</p>
-      <div className="final">
+      <SpecularCard className="final">
         <p className="final-line">Five minutes. One deal. Your first rung.</p>
         <StartCta source="final" label="Take your first deal" />
-      </div>
+      </SpecularCard>
     </section>
   );
 }

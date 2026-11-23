@@ -67,7 +67,7 @@ void main(){
 
   vec3 col = obsidian;
   col = mix(col, steel * 0.55, m * 0.35);
-  col += platinum * ridge * (0.045 + 0.10 * uIntensity);
+  col += platinum * ridge * (0.075 + 0.14 * uIntensity);
   col += mix(platinum, glacier, 0.5) * grid * (0.6 + 0.5 * uIntensity);
   col += glacier * beam;
   col += platinum * pl;

@@ -23,7 +23,7 @@ export function useMedia(query) {
 }
 
 let webgl = null;
-function hasWebGL() {
+export function hasWebGL() {
   if (webgl !== null) return webgl;
   try {
     const c = document.createElement('canvas');
@@ -34,7 +34,7 @@ function hasWebGL() {
   return webgl;
 }
 
-function lowPower() {
+export function lowPower() {
   const n = typeof navigator !== 'undefined' ? navigator : {};
   if (n.connection?.saveData) return true;
   if (n.hardwareConcurrency && n.hardwareConcurrency < 4) return true;

@@ -1,0 +1,29 @@
+/* ---------- Ledger Monolith stage ---------- */
+.mono { pointer-events: none; }
+.mono--fixed { position: fixed; top: 0; right: 0; z-index: 0; width: 50vw; height: 100lvh; }
+.mono--inline { position: relative; height: 200px; margin: 0 calc(var(--gutter) * -1) calc(var(--sp-2) * -1); }
+.mono-canvas { position: absolute !important; inset: 0; opacity: 0; transition: opacity 700ms var(--ease-out); }
+.mono.is-ready .mono-canvas { opacity: 1; }
+
+/* The poster: three slabs in CSS, fading out once the 3D frame is drawn */
+.mono-poster {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 4%;
+  perspective: 900px; transition: opacity 500ms var(--ease-out);
+}
+.mono.is-ready .mono-poster { opacity: 0; }
+.mono-slab {
+  display: block; width: 9%; height: 46%; border-radius: 3px;
+  transform: rotateY(-18deg) rotateX(4deg);
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.mono--inline .mono-slab { width: 11%; height: 78%; }
+.mono-slab--platinum { background: var(--metal-brushed); transform: rotateY(-18deg) rotateX(4deg) translateY(4%); }
+.mono-slab--chrome { background: var(--metal-chrome); transform: rotateY(-18deg) rotateX(4deg) translateY(-3%); }
+.mono-slab--glass {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--platinum) 22%, transparent), color-mix(in srgb, var(--steel-800) 80%, transparent) 60%, color-mix(in srgb, var(--obsidian) 85%, transparent));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--platinum) 28%, transparent), 0 30px 60px -30px rgba(0, 0, 0, 0.9);
+  transform: rotateY(-18deg) rotateX(4deg) translateY(6%);
+}
+/* Locked without WebGL: the poster closes the gaps */
+.mono.is-locked .mono-poster { gap: 0; }
+.mono-poster { transition: opacity 500ms var(--ease-out), gap 420ms var(--ease-out); }
