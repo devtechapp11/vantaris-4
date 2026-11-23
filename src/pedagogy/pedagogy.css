@@ -1,0 +1,17 @@
+/* ---------- Deal Brief ---------- */
+.brief { display: flex; flex-direction: column; gap: 10px; }
+.brief-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; }
+.brief-toggle { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
+.brief-toggle svg { color: var(--steel-300); transition: transform var(--dur-fast) var(--ease-out); }
+.brief-toggle svg.is-open { transform: rotate(180deg); }
+.brief-save {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; border: 0; border-radius: var(--r-full);
+  background: none; color: var(--steel-300); font-size: var(--fs-xs); white-space: nowrap; box-shadow: inset 0 0 0 1px var(--line); cursor: pointer;
+}
+.brief-save:hover { color: var(--fg); box-shadow: inset 0 0 0 1px var(--line-strong); }
+.brief-save.is-saved { color: var(--fg); background: color-mix(in srgb, var(--platinum) 10%, transparent); }
+.brief-rows { margin: 0; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+.brief-rows > div { display: grid; gap: 3px; }
+.brief-rows dt { font-size: 10px; letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--steel-300); }
+.brief-rows dd { margin: 0; font-size: var(--fs-sm); line-height: 1.5; color: var(--fg-2); }
+.brief-formula { display: block; width: fit-content; margin-bottom: 4px; padding: 3px 8px; border-radius: 6px; font-size: var(--fs-xs); color: var(--fg); background: color-mix(in srgb, var(--platinum) 8%, transparent); box-shadow: inset 0 0 0 1px var(--line); }

@@ -3,8 +3,11 @@ import { motion } from 'motion/react';
 import { Route, Trophy, Vault, Zap } from 'lucide-react';
 import { useApp } from '../app/AppContext';
 import { prefetchProps } from '../app/routes';
-import { spring } from '../design/tokens';
-import Logo from './Logo';
+import { springs } from '../motion/springs';
+import { sound } from '../lib/sound';
+import { haptic } from '../app/prefs';
+import { VMark } from './Logo';
+import VantarisWordmark from './VantarisWordmark';
 import { Avatar, TierBadge } from './bits';
 
 // Four pillars, the same on the phone tab bar and the desktop rail. Path holds
@@ -15,9 +18,14 @@ export const TABS = [
   { to: '/profile', label: 'Vault', Icon: Vault },
   { to: '/ranking', label: 'Rank', Icon: Trophy },
 ];
+/** A felt click and a light tick when the tab changes. */
+const tabFeedback = () => {
+  sound.tap();
+  haptic(6);
+};
 const isOn = (tab, path) => (tab.match ? tab.match(path) : path === tab.to || path.startsWith(`${tab.to}/`));
 
-/** Bottom tab bar on phones and tablets. */
+/** Bottom tab bar on phones (below 768 px). */
 export function TabBar() {
   const { pathname } = useLocation();
   return (
@@ -28,9 +36,9 @@ export function TabBar() {
           const on = isOn(tab, pathname);
           return (
             <motion.span key={to} className="tab-cell" whileTap={{ scale: 0.96 }}>
-              <Link to={to} className={`tab ${on ? 'active' : ''}`} aria-current={on ? 'page' : undefined} {...prefetchProps(to)}>
-                {on && <motion.span layoutId="tab-mark" className="tab-mark" transition={spring.snappy} />}
-                {on && <motion.span layoutId="tab-pill" className="tab-pill" transition={spring.snappy} />}
+              <Link to={to} className={`tab ${on ? 'active' : ''}`} aria-current={on ? 'page' : undefined} onClick={() => !on && tabFeedback()} {...prefetchProps(to)}>
+                {on && <motion.span layoutId="tab-mark" className="tab-mark" transition={springs.snappy} />}
+                {on && <motion.span layoutId="tab-pill" className="tab-pill" transition={springs.snappy} />}
                 <Icon size={22} aria-hidden="true" />
                 <span className="tab-label">{label}</span>
               </Link>
@@ -42,7 +50,7 @@ export function TabBar() {
   );
 }
 
-/** Left rail on desktop: brand, navigation, the player's card and an upgrade nudge. */
+/** Left rail from 768 px (icons only until 1280 px): brand, navigation, the player's card and an upgrade nudge. */
 export function Sidebar() {
   const { me } = useApp();
   const { pathname } = useLocation();
@@ -50,16 +58,19 @@ export function Sidebar() {
   const free = me?.tier?.id === 'free';
   return (
     <aside className="sidebar" aria-label="Main">
-      <Link to="/" className="sidebar-brand" aria-label="Vantaris home"><Logo size={30} /></Link>
+      <Link to="/" className="sidebar-brand" aria-label="Vantaris home">
+        <VMark size={30} />
+        <VantarisWordmark height={13} className="side-word" />
+      </Link>
       <nav className="sidebar-nav">
         {TABS.map((tab) => {
           const { to, label, Icon } = tab;
           const on = isOn(tab, pathname);
           return (
-            <Link key={to} to={to} className={`side-link ${on ? 'active' : ''}`} aria-current={on ? 'page' : undefined} {...prefetchProps(to)}>
-              {on && <motion.span layoutId="side-pill" className="side-pill" transition={spring.snappy} />}
+            <Link key={to} to={to} className={`side-link ${on ? 'active' : ''}`} aria-current={on ? 'page' : undefined} aria-label={label} onClick={() => !on && tabFeedback()} {...prefetchProps(to)}>
+              {on && <motion.span layoutId="side-pill" className="side-pill" transition={springs.snappy} />}
               <Icon size={20} aria-hidden="true" />
-              {label}
+              <span className="side-label">{label}</span>
             </Link>
           );
         })}

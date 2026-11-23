@@ -15,6 +15,7 @@ import { isLocked } from '../lib/modules';
 import { Spinner } from '../components/bits';
 import { spring } from '../design/tokens';
 import { useMeta } from '../app/useMeta';
+import { clearSession, markSession } from '../path/store';
 import { IS_DEMO } from '../lib/config';
 import './Learn.css';
 
@@ -131,6 +132,7 @@ function Learn() {
 
   const finish = async (final) => {
     const stars = free ? null : starsFor(final.firstTry);
+    if (!free) clearSession();
     setFinished({ stars, saving: true, error: null, ...final, seconds: Math.round((Date.now() - started.current) / 1000) });
     try {
       const updated = await api.saveLesson({ node: free ? 'review' : node, stars, firstTry: final.firstTry, missed: final.missed, cleared: final.cleared });
@@ -143,6 +145,7 @@ function Learn() {
   };
 
   const next = () => {
+    if (!free) markSession(node, Math.min(at + 1, originals), originals);
     if (at + 1 < queue.length) setAt(at + 1);
     else finish(tally);
   };

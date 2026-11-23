@@ -57,3 +57,16 @@
 @keyframes sbar { 0% { transform: scaleY(0.25); } 100% { transform: scaleY(1); } }
 @media (prefers-reduced-motion: reduce) { .sbars.is-on i { animation: none; transform: scaleY(0.6); } }
 [data-motion='reduce'] .sbars.is-on i { animation: none; transform: scaleY(0.6); }
+
+/* ---------- In the app: the marks clear the sidebar and the sticky bar ---------- */
+.hud--app .hud-mark { opacity: 0.4; }
+.hud--app .hud-mark::before, .hud--app .hud-mark::after { background: var(--steel-700); }
+.hud--app .hud-mark--tl { top: calc(var(--safe-top) + 6px); left: calc(var(--sidebar-w) + 6px); }
+.hud--app .hud-mark--tr { top: calc(var(--safe-top) + 6px); right: 6px; }
+.hud--app .hud-mark--bl { left: calc(var(--sidebar-w) + 6px); bottom: calc(var(--safe-bottom) + 6px); }
+.hud--app .hud-mark--br { right: 6px; bottom: calc(var(--safe-bottom) + 6px); }
+.hud--app .hud-tele { color: var(--steel-700); }
+.hud--app .hud-tele--l { left: calc(var(--sidebar-w) + 10px); bottom: 40px; }
+.hud--app .hud-tele--r { right: 10px; top: 96px; }
+@media (max-width: 767px) { .hud--app .hud-mark--bl, .hud--app .hud-mark--br { display: none; } }
+@media (max-width: 1279px) { .hud--app .hud-tele { display: none; } }

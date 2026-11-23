@@ -2,7 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Dumbbell, Route } from 'lucide-react';
 import { prefetchProps } from '../app/routes';
-import { spring } from '../design/tokens';
+import { springs } from '../motion/springs';
+import { sound } from '../lib/sound';
+import { haptic } from '../app/prefs';
 
 const MODES = [
   { value: 'guided', to: '/', label: 'Guided path', Icon: Route },
@@ -23,11 +25,11 @@ export default function PathSwitch({ value }) {
             role="tab"
             aria-selected={on}
             className={`pswitch-opt ${on ? 'is-on' : ''}`}
-            onClick={() => !on && navigate(to)}
+            onClick={() => { if (on) return; sound.tap(); haptic(6); navigate(to); }}
             whileTap={{ scale: 0.96 }}
             {...prefetchProps(to)}
           >
-            {on && <motion.span layoutId="pswitch-thumb" className="pswitch-thumb" transition={spring.snappy} />}
+            {on && <motion.span layoutId="pswitch-thumb" className="pswitch-thumb" transition={springs.snappy} />}
             <Icon size={17} aria-hidden="true" />
             <span>{label}</span>
           </motion.button>

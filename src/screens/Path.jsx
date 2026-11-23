@@ -1,235 +1,326 @@
-import { useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion, useReducedMotion } from 'motion/react';
-import { Building2, Calculator, FileSpreadsheet, Flame, History, LifeBuoy, Lock, Merge, Puzzle, Repeat2, Scale, Star, Zap } from 'lucide-react';
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useReducedMotion } from 'motion/react';
+import { Play } from 'lucide-react';
 import { useApp } from '../app/AppContext';
-import { useRank } from '../app/useRank';
-import { useMedia } from '../app/useDevice';
+import { useBoard } from '../app/useRank';
+import { hasWebGL, lowPower, useMedia } from '../app/useDevice';
+import { usePrefs } from '../app/prefs';
 import { Page } from '../components/chrome';
 import PathSwitch from '../components/PathSwitch';
 import { Skeleton, TIER_LABEL } from '../components/bits';
+import MagneticButton from '../components/fx/MagneticButton';
+import Vale from '../components/vale/Vale';
+import { valeBus } from '../components/vale/valeBus';
 import { LEVEL_TIER } from '../app/usePlans';
 import { isLocked } from '../lib/modules';
-import { CHAPTERS } from '../content/path';
 import { prefetchProps } from '../app/routes';
-import { careerName } from '../lib/career';
-import { spring } from '../design/tokens';
 import { useMeta } from '../app/useMeta';
-import './Path.css';
+import { sound } from '../lib/sound';
+import { haptic } from '../app/prefs';
+import { feverBurst, originOf } from '../lib/celebrate';
+import { fieldBus } from '../fx/field/fieldBus';
+import { api } from '../lib/api';
+import StatsBar from '../path/StatsBar';
+import TodaysDesk from '../path/TodaysDesk';
+import PathNode, { NODE } from '../path/PathNode';
+import VaultCache from '../path/VaultCache';
+import DeskPlaque from '../path/DeskPlaque';
+import { buildPath, DESKS } from '../path/model';
+import { recordCache } from '../path/store';
+import { RELIC_OF, posterUrl } from '../path/relics/kinds';
+import '../path/path.css';
 
-const ICONS = { FileSpreadsheet, Calculator, Scale, History, Building2, Merge, LifeBuoy, Puzzle };
-const DESK = { Analyst: 'Analyst desk', Associate: 'Associate desk', VP: 'VP desk', MD: 'MD desk' };
+// three, fiber and drei only load once the path is on screen and the page is idle.
+const RelicLayer = lazy(() => import('../path/relics/RelicLayer'));
 
-const NODE = 76; // disc diameter
-const ROW = 168; // vertical rhythm per chapter
-const UNIT = 76; // desk header
+const MAX_W = 560;
+const GAUGE = 30; // left margin for the elevation gauge
+const UNIT = 92; // desk plaque row
+const CACHE_ROW = 116;
+
+/** Width of an element, kept up to date. */
+function useWidth(ref) {
+  const [w, setW] = useState(0);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width)));
+    ro.observe(el);
+    setW(Math.round(el.getBoundingClientRect().width));
+    return () => ro.disconnect();
+  }, [ref]);
+  return w;
+}
+
+/** Smooth vertical S-curves through a list of points. */
+const curve = (list) => list.reduce((d, [x, y], k) => {
+  if (k === 0) return `M ${x} ${y}`;
+  const [px, py] = list[k - 1];
+  const h = (y - py) / 2;
+  return `${d} C ${px} ${py + h}, ${x} ${y - h}, ${x} ${y}`;
+}, '');
 
 /**
- * The Deal Path: one winding route through the eight desks. Each chapter is a
- * metal node with 0–3 platinum stars; the next one glows and carries the only
- * button on the screen.
+ * The Deal Path. Desktop (≥ 1280 px): sidebar, the path (560 px) and the
+ * « Today's Desk » rail. Tablet: the rail's cards sit above the path. Phone:
+ * compact cards, the path and the tab bar.
  */
 export default function Path() {
   useMeta({ title: 'Deal Path' });
-  const { me, openPaywall, showToast } = useApp();
+  const { me, setMe, openPaywall, showToast } = useApp();
   const navigate = useNavigate();
-  const rank = useRank(me?.profile?.points);
-  const wide = useMedia('(min-width: 768px)');
-  const reduce = useReducedMotion();
+  const board = useBoard(me?.profile?.points);
+  const rail = useMedia('(min-width: 1280px)');
+  const prefs = usePrefs();
+  const reduce = useReducedMotion() || prefs.reduceMotion;
+  const fine = useMedia('(hover: hover) and (pointer: fine)');
+  const wrap = useRef(null);
   const activeRef = useRef(null);
-  const loaded = me != null;
+  const width = useWidth(wrap);
+  const [hover, setHover] = useState(null);
+  const [slots, setSlots] = useState([]);
+  const [relicsReady, setRelicsReady] = useState(false);
+  const [armed, setArmed] = useState(false);
+  const can3d = fine && !reduce && prefs.effects3d && hasWebGL() && !lowPower();
 
-  // Bring the next chapter into view on arrival
+  const model = useMemo(() => (me ? buildPath(me) : null), [me]);
+
+  // Bring the next chapter into view on arrival.
   useEffect(() => {
     const el = activeRef.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
     if (r.top > window.innerHeight * 0.75) el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
-  }, [reduce, loaded]);
+  }, [reduce, Boolean(model)]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!me) return <PathSkeleton />;
+  // The relics' 3D chunk waits for an idle moment after the first paint.
+  useEffect(() => {
+    if (!can3d) return undefined;
+    const idle = window.requestIdleCallback ?? ((cb) => window.setTimeout(cb, 1));
+    const cancel = window.cancelIdleCallback ?? window.clearTimeout;
+    let id = 0;
+    const t = window.setTimeout(() => { id = idle(() => setArmed(true), { timeout: 1500 }); }, 600);
+    return () => { clearTimeout(t); cancel(id); };
+  }, [can3d]);
 
-  const stars = me.path?.stars ?? {};
-  const total = me.path?.total ?? 0;
-  const levelOf = Object.fromEntries(me.skills.map((m) => [m.module_id, m.level]));
-  const nodes = CHAPTERS.map((c, i) => {
-    const level = levelOf[c.id] ?? c.level;
-    return {
-      ...c,
-      level,
-      stars: stars[c.id] ?? 0,
-      tierLocked: isLocked(level, me.tier.max_level),
-      reachable: i === 0 || (stars[CHAPTERS[i - 1].id] ?? 0) >= 1,
-    };
-  });
-  const active = nodes.findIndex((n) => n.stars === 0);
-  const due = me.review?.due?.length ?? 0;
+  const W = Math.min(MAX_W, width || 343);
+  const phone = W < 440;
+  const ROW = phone ? 188 : 204;
+  const RELIC = phone ? 72 : 120;
 
-  // Layout: a sine-wave column, desk headers between levels.
-  const W = wide ? 440 : 320;
-  const amp = W / 2 - 56;
-  let y = 0;
-  const items = [];
-  nodes.forEach((n, i) => {
-    if (i === 0 || nodes[i - 1].level !== n.level) {
-      items.push({ kind: 'unit', level: n.level, y });
-      y += UNIT;
+  const layout = useMemo(() => {
+    if (!model) return null;
+    const amp = W / 2 - NODE / 2 - GAUGE + (phone ? 10 : 0);
+    const mid = W / 2 + (phone ? 6 : GAUGE / 2);
+    const items = [];
+    const pts = [];
+    let y = 8;
+    model.nodes.forEach((n, i) => {
+      if (i === 0 || model.nodes[i - 1].level !== n.level) {
+        items.push({ kind: 'desk', desk: n.level, y });
+        y += UNIT;
+      }
+      const cx = Math.round(mid + amp * Math.sin((i * Math.PI) / 3 + Math.PI / 6));
+      items.push({ kind: 'node', n, cx, y });
+      pts.push({ x: cx, y: y + 14 + NODE / 2, reached: n.state !== 'locked', node: true });
+      y += ROW;
+      const cache = model.caches.find((c) => c.after === n.id);
+      if (cache) {
+        const next = Math.round(mid + amp * Math.sin(((i + 1) * Math.PI) / 3 + Math.PI / 6));
+        const x = Math.round((cx + next) / 2);
+        items.push({ kind: 'cache', cache, cx: x, y: y - 34 });
+        pts.push({ x, y: y - 34 + 30, reached: cache.ready, node: false });
+        y += CACHE_ROW - 34;
+      }
+    });
+    items.push({ kind: 'elite', y });
+    y += UNIT;
+    return { items, pts, H: y };
+  }, [model, W, phone, ROW]);
+
+  // Relic slots on screen, for the shared 3D canvas.
+  useEffect(() => {
+    if (!can3d || !wrap.current) return;
+    const els = [...wrap.current.querySelectorAll('[data-relic]')];
+    setSlots(els.map((el) => ({ id: el.dataset.relic, kind: el.dataset.kind, el })));
+  }, [can3d, layout]);
+
+  const claim = useCallback(async (cache, el) => {
+    sound.impact(2);
+    haptic([20, 40, 30]);
+    valeBus.react('celebrate');
+    fieldBus.pulse(el);
+    feverBurst(3, originOf(el) ?? undefined);
+    let credited = false;
+    try {
+      const res = await api.claimCache?.(cache.id, cache.reward);
+      if (res?.me) setMe(res.me);
+      credited = Boolean(res?.credited);
+    } catch {
+      credited = false;
     }
-    const cx = W / 2 + amp * Math.sin((i * Math.PI) / 3 + Math.PI / 6);
-    items.push({ kind: 'node', n, i, cx, y });
-    y += ROW;
-  });
-  const H = y;
-  const pts = items.filter((it) => it.kind === 'node').map((it) => [it.cx, it.y + 14 + NODE / 2]);
-  const curve = (list) => list.reduce((d, [x, yy], k) => (k === 0 ? `M ${x} ${yy}` : `${d} C ${list[k - 1][0]} ${list[k - 1][1] + ROW / 2}, ${x} ${yy - ROW / 2}, ${x} ${yy}`), '');
-  const reached = active < 0 ? pts : pts.slice(0, active + 1);
+    recordCache(cache.id, cache.reward, credited);
+    return { credited };
+  }, [setMe]);
+
+  if (!me || !model || !layout) return <PathSkeleton />;
+
+  const { nodes, active, nextLocked } = model;
+  const due = me.review?.due?.length ?? 0;
+  const deskIdx = DESKS.indexOf(me.profile.level);
+  const allMastered = nodes.every((n) => n.stars >= 3);
+  const reachedTo = layout.pts.reduce((last, p, k) => (p.reached ? k : last), 0);
 
   const open = (n) => {
     if (n.tierLocked) return openPaywall('level', { level: n.level });
     if (!n.reachable) return showToast(`Earn a star on “${nodes[n.index - 1]?.title}” to open this chapter.`);
+    sound.tap();
     navigate(`/learn/${n.id}`);
     return undefined;
   };
 
+  const caption = (n, i) => {
+    if (n.state === 'locked') {
+      if (i !== nextLocked) return null;
+      return n.tierLocked ? `Opens with ${TIER_LABEL[LEVEL_TIER[n.level]]}` : `Opens at 1★ on ${nodes[i - 1]?.title}`;
+    }
+    if (n.state === 'mastered') return 'Mastered · 3★';
+    if (n.state === 'completed') return 'Replay for 3★';
+    if (n.state === 'progress') return `In progress · ${Math.round(n.progress * 6)}/6`;
+    return '6 questions · 2 min';
+  };
+
   return (
     <Page wide className="screen path-screen">
-      <header className="pbar glass" aria-label="Your standing">
-        <Link to="/ranking" className="pbar-stat pbar-rank" aria-label={`${careerName(me.profile.level)}${rank ? `, rank ${rank}` : ''}. Open the ranking`}>
-          <span className="pbar-badge">{me.profile.level}</span>
-          {rank ? <b className="fig-mono">#{rank}</b> : <span className="t-cap">Unranked</span>}
-        </Link>
-        <span className={`pbar-stat ${me.profile.active_today ? 'is-lit' : ''}`} aria-label={`${me.profile.streak}-day streak`}>
-          <Flame size={18} aria-hidden="true" /> <b className="fig-mono">{me.profile.streak}</b>
-        </span>
-        <span className="pbar-stat" aria-label={`${total} stars`}>
-          <Star size={18} aria-hidden="true" className="pbar-star" /> <b className="fig-mono">{total}</b>
-        </span>
-      </header>
+      <div className="desk">
+        <div className="desk-main">
+          <StatsBar level={me.profile.level} streak={me.profile.streak} lit={me.profile.active_today} stars={me.path?.total ?? 0} board={board} />
+          {!rail && <TodaysDesk me={me} board={board} due={due} compact />}
+          <PathSwitch value="guided" />
 
-      <PathSwitch value="guided" />
+          <div ref={wrap} className={`path-wrap ${relicsReady ? 'relics-live' : ''}`}>
+            <div className="path2" style={{ width: W, height: layout.H }}>
+              <svg className="path2-svg" width={W} height={layout.H} viewBox={`0 0 ${W} ${layout.H}`} aria-hidden="true">
+                <defs>
+                  <linearGradient id="seg-chrome" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stopColor="var(--chrome-hi)" />
+                    <stop offset="0.5" stopColor="var(--platinum)" />
+                    <stop offset="1" stopColor="var(--chrome-hi)" />
+                  </linearGradient>
+                </defs>
+                {/* Elevation gauge: graduated, chrome up to where you stand */}
+                <line x1={6} y1={0} x2={6} y2={layout.H} className="gauge-base" />
+                <line x1={6} y1={0} x2={6} y2={layout.pts[reachedTo].y} className="gauge-lit" />
+                {layout.pts.filter((p) => p.node).map((p, k) => (
+                  <g key={`t${k}`}>
+                    <line x1={2} x2={12} y1={p.y} y2={p.y} className={p.reached ? 'gauge-tick is-on' : 'gauge-tick'} />
+                    {!phone && <text x={16} y={p.y + 3} className="gauge-num">{String(k + 1).padStart(2, '0')}</text>}
+                  </g>
+                ))}
+                {layout.pts.slice(1).map((p, k) => {
+                  const seg = curve([[layout.pts[k].x, layout.pts[k].y], [p.x, p.y]]);
+                  return p.reached ? (
+                    <g key={`s${k}`}>
+                      <path d={seg} className="seg-lit" />
+                      {!reduce && <path d={seg} className="seg-glint" pathLength="100" style={{ animationDelay: `${-k * 0.7}s` }} />}
+                    </g>
+                  ) : (
+                    <path key={`s${k}`} d={seg} className="seg-locked" />
+                  );
+                })}
+              </svg>
 
-      <div className="path-chips">
-        {due > 0 && (
-          <motion.button type="button" className="pchip pchip--review" whileTap={{ scale: 0.96 }} onClick={() => navigate('/learn/review')} {...prefetchProps('/learn/review')}>
-            <Repeat2 size={17} aria-hidden="true" /> Review <b className="fig-mono">{due}</b> fragile {due === 1 ? 'notion' : 'notions'}
-          </motion.button>
-        )}
-        <motion.button type="button" className="pchip" whileTap={{ scale: 0.96 }} onClick={() => navigate('/blitz')} {...prefetchProps('/blitz')}>
-          <Zap size={17} aria-hidden="true" /> Blitz · 60s{me.blitz_best ? <> · best <b className="fig-mono">{me.blitz_best}</b></> : null}
-        </motion.button>
-      </div>
-
-      <div className="path" style={{ width: W, height: H }}>
-        <svg className="path-trail" width={W} height={H} viewBox={`0 0 ${W} ${H}`} aria-hidden="true">
-          <defs>
-            <linearGradient id="trail-metal" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="var(--white-metal)" />
-              <stop offset="0.5" stopColor="var(--chrome-hi)" />
-              <stop offset="1" stopColor="var(--platinum)" />
-            </linearGradient>
-          </defs>
-          <path d={curve(pts)} className="trail-base" />
-          {reached.length > 1 && (
-            <motion.path d={curve(reached)} className="trail-lit" initial={reduce ? false : { pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} />
-          )}
-        </svg>
-
-        {items.map((it) => (it.kind === 'unit' ? (
-          <div key={`u-${it.level}`} className="punit" style={{ top: it.y + 18 }}>
-            <span>{DESK[it.level] ?? it.level}</span>
-            {isLocked(it.level, me.tier.max_level) && <em><Lock size={11} aria-hidden="true" /> {TIER_LABEL[LEVEL_TIER[it.level]]}</em>}
+              {layout.items.map((it) => {
+                if (it.kind === 'desk') {
+                  const di = DESKS.indexOf(it.desk);
+                  return (
+                    <div key={`d-${it.desk}`} className="path2-row" style={{ top: it.y + 18 }}>
+                      <DeskPlaque desk={it.desk} reached={di <= deskIdx} tierLabel={isLocked(it.desk, me.tier.max_level) ? TIER_LABEL[LEVEL_TIER[it.desk]] : null} />
+                    </div>
+                  );
+                }
+                if (it.kind === 'elite') {
+                  return (
+                    <div key="elite" className="path2-row" style={{ top: it.y + 14 }}>
+                      <DeskPlaque desk="Elite" elite reached={allMastered} caption={allMastered ? 'Every chapter mastered.' : 'Master every chapter (3★) to take the seat.'} />
+                    </div>
+                  );
+                }
+                if (it.kind === 'cache') {
+                  return <VaultCache key={it.cache.id} cache={it.cache} style={{ left: it.cx - 40, top: it.y }} onClaim={claim} />;
+                }
+                const { n, cx, y } = it;
+                const i = n.index;
+                const isActive = i === active;
+                const left = cx < W / 2 + (phone ? 6 : GAUGE / 2);
+                const panel = left ? { left: cx + NODE / 2 + 14, right: 0 } : { left: phone ? 16 : GAUGE + 8, right: W - (cx - NODE / 2 - 14) };
+                const room = left ? cx - NODE / 2 - (phone ? 12 : GAUGE + 8) : W - (cx + NODE / 2);
+                const valeOut = room >= 84;
+                const cap = caption(n, i);
+                const hot = hover ? hover === n.id : isActive;
+                return (
+                  <div key={n.id} className={`pch2 ${isActive ? 'is-active' : ''}`} ref={isActive ? activeRef : null} onPointerEnter={fine ? () => setHover(n.id) : undefined} onPointerLeave={fine ? () => setHover(null) : undefined}>
+                    <PathNode
+                      n={n}
+                      active={isActive}
+                      style={{ left: cx - NODE / 2, top: y + 14 }}
+                      onOpen={open}
+                      prefetch={n.state === 'locked' ? undefined : prefetchProps(`/learn/${n.id}`)}
+                    />
+                    {isActive && valeOut && (
+                      <div className="path-vale" style={left ? { left: cx - NODE / 2 - 84, top: y + 10 } : { left: cx + NODE / 2 + 10, top: y + 10 }}>
+                        <Vale size={66} label="Vale, your mentor" />
+                      </div>
+                    )}
+                    <div className={`pp ${left ? '' : 'pp--r'} ${phone ? 'pp--col' : ''} is-${n.state}`} style={{ ...panel, top: y + (phone ? 0 : 6) }}>
+                      <span className={`relic ${hot && relicsReady ? 'is-hot' : ''}`} style={{ width: RELIC, height: RELIC }} data-relic={can3d ? n.id : undefined} data-kind={RELIC_OF[n.id]}>
+                        <img src={posterUrl(RELIC_OF[n.id])} alt="" width={RELIC} height={RELIC} loading="lazy" decoding="async" onError={(e) => { e.currentTarget.hidden = true; }} />
+                      </span>
+                      <span className="pp-text">
+                        <span className="pp-title">{n.title}</span>
+                        {cap && <span className="pp-cap">{cap}</span>}
+                        {(isActive || n.state === 'progress') && (
+                          <span className="pp-go">
+                            <MagneticButton className="btn btn--primary btn--sm pp-start" onClick={() => open(n)} {...prefetchProps(`/learn/${n.id}`)}>
+                              <Play size={14} aria-hidden="true" /> {n.state === 'progress' ? 'Resume' : 'Start'}
+                            </MagneticButton>
+                            {isActive && !valeOut && <Vale size={50} />}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        ) : (
-          <Chapter
-            key={it.n.id}
-            n={{ ...it.n, index: it.i }}
-            cx={it.cx}
-            y={it.y}
-            W={W}
-            isActive={it.i === active}
-            activeRef={it.i === active ? activeRef : null}
-            onOpen={open}
-          />
-        )))}
-      </div>
-
-    </Page>
-  );
-}
-
-function Chapter({ n, cx, y, W, isActive, activeRef, onOpen }) {
-  const Icon = ICONS[n.icon] ?? Star;
-  const state = n.tierLocked ? 'locked' : !n.reachable ? 'closed' : n.stars === 3 ? 'gold' : n.stars > 0 ? 'done' : isActive ? 'active' : 'open';
-  const left = cx < W / 2;
-  const panel = left ? { left: cx + NODE / 2 + 16, right: 0 } : { left: 0, right: W - (cx - NODE / 2 - 16) };
-  const label = `${n.title}. ${n.tierLocked ? `Locked: ${TIER_LABEL[LEVEL_TIER[n.level]]}.` : !n.reachable ? 'Not open yet.' : `${n.stars} of 3 stars.`}`;
-  return (
-    <div className={`pch is-${state}`} ref={activeRef}>
-      <motion.button
-        type="button"
-        className="pnode"
-        style={{ left: cx - NODE / 2, top: y + 14 }}
-        onClick={() => onOpen(n)}
-        whileTap={{ scale: 0.96 }}
-        transition={spring.snappy}
-        aria-label={label}
-        {...(n.tierLocked || !n.reachable ? {} : prefetchProps(`/learn/${n.id}`))}
-      >
-        {isActive && <span className="pnode-ring" aria-hidden="true" />}
-        <span className="pnode-edge" aria-hidden="true" />
-        <span className="pnode-face" aria-hidden="true">
-          {state === 'locked' || state === 'closed' ? <Lock size={22} strokeWidth={1.8} /> : <Icon size={26} strokeWidth={1.6} />}
-        </span>
-      </motion.button>
-      <span className="pstars" style={{ left: cx - 36, top: y + 14 + NODE + 10 }} aria-hidden="true">
-        {[1, 2, 3].map((k) => <Star key={k} size={15} className={k <= n.stars ? 'is-on' : ''} />)}
-      </span>
-      <div className={`ppanel ${left ? '' : 'ppanel--r'}`} style={{ ...panel, top: y + 4 }}>
-        <Artifact kind={n.artifact} />
-        <p className="ppanel-title">{n.title}</p>
-        {isActive && !n.tierLocked ? (
-          <motion.button type="button" className="btn btn--primary btn--sm pstart" onClick={() => onOpen(n)} whileTap={{ scale: 0.96 }} {...prefetchProps(`/learn/${n.id}`)}>
-            Start
-          </motion.button>
-        ) : (
-          <p className="t-cap">
-            {n.tierLocked ? `Opens with ${TIER_LABEL[LEVEL_TIER[n.level]]}` : !n.reachable ? 'Opens at 1★ on the last chapter' : n.stars === 3 ? 'Mastered' : n.stars > 0 ? 'Replay for 3 stars' : '6 questions · 2 min'}
-          </p>
+        </div>
+        {rail && (
+          <div className="desk-rail">
+            <TodaysDesk me={me} board={board} due={due} />
+          </div>
         )}
       </div>
-    </div>
-  );
-}
-
-/** Small platinum and smoked-glass solids, turning slowly beside each chapter. */
-function Artifact({ kind }) {
-  if (kind === 'rings') {
-    return (
-      <span className="art art--rings" aria-hidden="true">
-        <span className="art-spin"><i /><i /><i /></span>
-      </span>
-    );
-  }
-  if (kind === 'pyramid') {
-    return (
-      <span className="art art--pyramid" aria-hidden="true">
-        <span className="art-spin"><i /><i /><i /><i /></span>
-      </span>
-    );
-  }
-  return (
-    <span className="art art--cube" aria-hidden="true">
-      <span className="art-spin"><i /><i /><i /><i /><i /><i /></span>
-    </span>
+      {can3d && armed && slots.length > 0 && (
+        <Suspense fallback={null}>
+          <RelicLayer slots={slots} hot={hover ?? nodes[active]?.id ?? null} onReady={() => setRelicsReady(true)} />
+        </Suspense>
+      )}
+    </Page>
   );
 }
 
 function PathSkeleton() {
   return (
     <Page wide className="screen path-screen">
-      <Skeleton height={56} />
-      <div className="stack-24" style={{ alignItems: 'center' }}>
-        {[0, 1, 2, 3].map((k) => <Skeleton key={k} height={76} width={76} radius={38} />)}
+      <div className="desk">
+        <div className="desk-main">
+          <Skeleton height={56} radius={999} />
+          <div className="stack-24" style={{ alignItems: 'center', marginTop: 32 }}>
+            {[0, 1, 2, 3].map((k) => <Skeleton key={k} height={80} width={80} radius={40} />)}
+          </div>
+        </div>
       </div>
     </Page>
   );

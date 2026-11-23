@@ -17,6 +17,7 @@ import { loaders } from './app/routes';
 import { useScrollMemory, useSwipeBack } from './app/fluid';
 import ErrorBoundary from './components/ErrorBoundary';
 import CookieBanner from './components/CookieBanner';
+import AppHud from './components/AppHud';
 import { LEGAL_ORDER } from './content/legal';
 import { track } from './lib/analytics';
 
@@ -146,6 +147,7 @@ function Gate() {
     <div className={`app ${signedIn && !focus ? 'has-sidebar' : ''}`}>
       <a href="#main" className="skip" onClick={(e) => { e.preventDefault(); const m = document.getElementById('main') ?? document.querySelector('main'); m?.setAttribute('tabindex', '-1'); m?.focus(); }}>Skip to content</a>
       {signedIn && !focus && <Sidebar />}
+      {signedIn && !focus && <AppHud desk={me.profile.level} />}
       <div className="app-main">
         <ErrorBoundary resetKey={location.pathname}>
           <Suspense fallback={loader}>
