@@ -42,11 +42,14 @@ export default function Ranking() {
   const podium = rows.slice(0, 3);
   const rest = rows.slice(3);
   const meInList = rows.some((r) => r.is_me);
+  const mine = rows.find((r) => r.is_me) ?? data?.me;
+  // The exact gap to each of the three players directly ahead of you.
+  const gapTo = (r) => (mine?.rank && r.rank < mine.rank && mine.rank - r.rank <= 3 ? Math.max(1, r.points - mine.points + 1) : null);
 
   return (
     <Page wide>
       <PullIndicator {...ptr} />
-      <LargeTitle title="Ranking" eyebrow={data ? `${number(data.players)} players ranked` : 'Leaderboard'} />
+      <LargeTitle title="Rank" eyebrow={data ? `${number(data.players)} players ranked` : 'Leaderboard'} />
       <Item className="rank-scope"><Segmented value={scope} onChange={setScope} options={SCOPES} label="Time range" /></Item>
 
       {data && <Item><NextMove data={data} me={me} scope={scope} /></Item>}
@@ -59,7 +62,7 @@ export default function Ranking() {
           <Item className="stack-12">
             {rest.length > 0 && (
               <motion.ol key={scope} className="rank-list" variants={group(stagger.children)} initial="hidden" animate="show">
-                {rest.map((r) => <Row key={`${r.rank}-${r.name}`} r={r} />)}
+                {rest.map((r) => <Row key={`${r.rank}-${r.name}`} r={r} gap={gapTo(r)} />)}
               </motion.ol>
             )}
             {!meInList && data.me?.rank && (
@@ -83,7 +86,8 @@ function NextMove({ data, me, scope }) {
   const rows = data.rows ?? [];
   const i = rows.findIndex((r) => r.is_me);
   const mine = i >= 0 ? rows[i] : data.me;
-  const above = i > 0 ? rows[i - 1] : null;
+  // Ranked but below the visible board: the gap is to the last seat shown.
+  const above = i > 0 ? rows[i - 1] : i < 0 && mine?.rank > 1 && rows.length ? rows[rows.length - 1] : null;
   const when = scope === 'week' ? 'this week' : scope === 'month' ? 'this month' : 'all time';
   const daily = me?.daily && me.daily.status !== 'correct' && me.daily.status !== 'wrong' ? me.daily : null;
   const deal = daily ?? me?.continue?.[0] ?? null;
@@ -94,7 +98,7 @@ function NextMove({ data, me, scope }) {
     line = rows.length ? `${number(rows.length)} ${rows.length === 1 ? 'player has' : 'players have'} scored ${when}. Take your place.` : `No one has scored ${when} yet. The first close takes the top seat.`;
   } else if (above) {
     const gap = Math.max(1, above.points - mine.points + 1);
-    title = <><b className="fig-mono">{number(gap)}</b> pts to pass {above.name.split(' ')[0]}.</>;
+    title = <><b className="fig-mono">{number(gap)}</b> XP to pass {above.name.split(' ')[0]}.</>;
     line = gap <= 15 ? 'One fast, correct deal closes the gap.' : `You’re #${mine.rank} ${when}. Every first-time close counts.`;
   } else {
     title = `You lead ${when}.`;
@@ -141,7 +145,7 @@ function Lines({ points }) {
   );
 }
 
-function Row({ r }) {
+function Row({ r, gap = null }) {
   return (
     <motion.li variants={item} className={`rank-row ${r.is_me ? 'is-me' : ''}`} aria-current={r.is_me ? 'true' : undefined}>
       {r.is_me && <BorderBeam duration={7} />}
@@ -154,7 +158,10 @@ function Row({ r }) {
           {r.school && <span className="t-cap ellipsis">{r.school}</span>}
         </span>
       </span>
-      <span className="fig rank-pts">{number(r.points)}</span>
+      <span className="stack-4 rank-right">
+        <span className="fig rank-pts">{number(r.points)}</span>
+        {gap != null && <span className="rank-gap fig-mono">+{number(gap)} XP to pass</span>}
+      </span>
     </motion.li>
   );
 }

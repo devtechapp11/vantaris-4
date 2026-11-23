@@ -62,12 +62,12 @@ export async function drawShareCard({ kind = 'deal', title, subtitle, points, le
   const g = c.getContext('2d');
   const ui = cssVar('--font-ui', 'sans-serif');
   const display = cssVar('--font-display', 'serif');
-  const black = cssVar('--black', '#090A0B');
-  const platinum = cssVar('--platinum', '#E7E8E5');
-  const silver = cssVar('--silver', '#B9BEC0');
-  const aluminium = cssVar('--aluminium', '#858D92');
-  const aluDark = cssVar('--aluminium-dark', '#343A3E');
-  const gain = cssVar('--gain', '#35A77A');
+  const black = cssVar('--black', '#05070B');
+  const platinum = cssVar('--platinum', '#E4E8EE');
+  const silver = cssVar('--silver', '#B6BEC8');
+  const aluminium = cssVar('--aluminium', '#7E8896');
+  const aluDark = cssVar('--aluminium-dark', '#2A313B');
+  const gain = cssVar('--gain', '#38BDF8');
 
   // Flat black with a faint ruled grid, like a term sheet
   g.fillStyle = black;

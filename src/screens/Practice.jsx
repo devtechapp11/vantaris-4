@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Clock, Lock } from 'lucide-react';
+import { ArrowRight, Clock, Infinity as InfinityIcon, Lock } from 'lucide-react';
 import { api } from '../lib/api';
 import { useApp } from '../app/AppContext';
 import { Item, LargeTitle, Page, Segmented } from '../components/chrome';
+import PathSwitch from '../components/PathSwitch';
+import MetalWaves from '../components/gl/MetalWaves';
 import { DifficultyBadge, ProblemStatus, Skeleton, TIER_LABEL, TierBadge } from '../components/bits';
 import { Ring } from '../components/charts';
 import Mascot from '../components/Mascot';
@@ -23,7 +25,7 @@ const FILTERS = [
 ];
 
 export default function Practice() {
-  useMeta({ title: 'Deal library' });
+  useMeta({ title: 'Free training' });
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const focus = params.get('m');
@@ -57,6 +59,18 @@ export default function Practice() {
 
   return (
     <Page wide>
+      <MetalWaves />
+      <Item><PathSwitch value="free" /></Item>
+      <Item>
+        <motion.button type="button" className="drill metal metal--live" onClick={() => navigate('/learn/drill')} whileTap={{ scale: 0.96 }} {...prefetchProps('/learn/drill')}>
+          <span className="drill-icon" aria-hidden="true"><InfinityIcon size={24} /></span>
+          <span className="grow stack-4">
+            <span className="t-headline">Infinite drill</span>
+            <span className="t-foot">Six fresh questions from every chapter you’ve opened. New numbers every round, generated on the fly.</span>
+          </span>
+          <ArrowRight size={18} aria-hidden="true" />
+        </motion.button>
+      </Item>
       <LargeTitle title="Deal library" eyebrow={totals ? `${totals.solved} of ${totals.total} closed · ${totals.modules} desks` : 'Every desk, every deal'} />
       <Item className="practice-bar">
         <div className="practice-filter"><Segmented value={filter} onChange={setFilter} options={FILTERS} label="Filter deals" /></div>

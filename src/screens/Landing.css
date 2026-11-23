@@ -27,6 +27,13 @@ html.lenis, html.lenis body { height: auto; }
   z-index: 0;
 }
 .stage-canvas { position: absolute; inset: 0; }
+/* The glacier crystal: right of the headline, docks in the corner on later chapters */
+.stage-ice {
+  position: absolute; z-index: 0;
+  width: min(640px, 50vw); aspect-ratio: 1;
+  left: 50%; top: 50%; margin-top: calc(min(640px, 50vw) / -2);
+  will-change: transform;
+}
 .stage-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(0deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 85%, transparent) 38%, transparent 62%); }
 .stage-svg { position: absolute; z-index: 0; }
 .stage-svg video, .stage-svg img { width: 100%; height: auto; display: block; }
@@ -111,7 +118,7 @@ html.lenis, html.lenis body { height: auto; }
   .mch--hero { gap: var(--sp-5); padding-top: calc(var(--safe-top) + 64px); padding-bottom: var(--sp-16); }
   .mch--hero .chapter-copy { gap: var(--sp-3); }
   .mch .chapter-copy { max-width: none; pointer-events: auto; }
-  .mch-mascot { align-self: center; max-width: 100%; }
+  .mch-ice { align-self: center; width: min(300px, 82vw); aspect-ratio: 1 / 0.78; margin-block: calc(var(--sp-4) * -1) calc(var(--sp-2) * -1); }
   .mch-visual { width: 100%; min-width: 0; }
   .mch-visual .sheet-panel { padding: var(--sp-5) var(--sp-4); gap: var(--sp-4); font-size: var(--fs-sm); overflow: hidden; }
   .mch-visual .ledger-row { flex-wrap: wrap; gap: var(--sp-1) var(--sp-4); }
@@ -130,6 +137,7 @@ html.lenis, html.lenis body { height: auto; }
 .still-ch { display: grid; gap: var(--sp-8); align-items: center; padding: var(--sp-16) var(--gutter-r) var(--sp-16) var(--gutter); max-width: var(--col-wide); margin: 0 auto; width: 100%; border-top: var(--hairline) solid var(--line); }
 .still-ch--hero { border-top: 0; padding-top: calc(var(--safe-top) + 120px); }
 @media (min-width: 900px) { .still-ch { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.still-ice { width: min(420px, 90vw); aspect-ratio: 1; justify-self: center; }
 .still-visual .panel-score, .still-visual .panel-irr, .still-visual .bub { opacity: 1; transform: none; }
 
 /* ---------- Sections after the film ---------- */
@@ -160,6 +168,13 @@ html.lenis, html.lenis body { height: auto; }
 .hc-score small { font-family: var(--font-ui); font-size: var(--fs-sm); font-weight: var(--fw-medium); color: var(--fg-3); letter-spacing: 0; margin-left: 4px; text-shadow: none; }
 .hc-score { font-size: 34px; font-weight: var(--fw-semibold); letter-spacing: -0.05em; line-height: 1; color: var(--pos); text-shadow: 0 0 24px color-mix(in srgb, var(--gain) 45%, transparent); }
 .hero-case .cta-wrap { margin-top: var(--sp-1); }
+/* Wall Street potential: the first number a visitor earns */
+.hc-potential { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: var(--sp-2) var(--sp-3); padding: var(--sp-3) var(--sp-4); border-radius: var(--r-md); background: color-mix(in srgb, var(--ice-deep) 40%, transparent); box-shadow: var(--ice-glow); }
+.hc-potential-score { font-size: 40px; line-height: 1; color: var(--white-metal); letter-spacing: -0.04em; text-shadow: 0 0 24px color-mix(in srgb, var(--ice) 60%, transparent); }
+.hc-potential-score small { font-size: var(--fs-sm); color: var(--ice-pale); margin-left: 2px; letter-spacing: 0; text-shadow: none; }
+.hc-potential-bar { grid-column: 1 / -1; display: block; height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--ice) 14%, transparent); overflow: hidden; }
+.hc-potential-bar i { display: block; height: 100%; transform-origin: left center; background: linear-gradient(90deg, var(--ice-deep), var(--ice) 60%, var(--ice-pale)); box-shadow: 0 0 12px var(--ice); }
+.hero-case.is-right { box-shadow: var(--lift), var(--ice-glow); }
 .hero-case .btn--primary { width: 100%; }
 @media (min-width: 900px) {
   .hero-case { padding: var(--sp-5); }

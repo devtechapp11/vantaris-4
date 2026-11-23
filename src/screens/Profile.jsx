@@ -36,7 +36,7 @@ const TABS = [
 ];
 
 export default function Profile() {
-  useMeta({ title: 'Vault & profile' });
+  useMeta({ title: 'Vault' });
   const { me, openPaywall, refreshMe, showToast } = useApp();
   const navigate = useNavigate();
   const prefs = usePrefs();
@@ -57,7 +57,7 @@ export default function Profile() {
 
   return (
     <Page wide>
-      <LargeTitle title="Vault & profile" eyebrow={profile.school || 'Your desk'} />
+      <LargeTitle title="Vault" eyebrow={profile.school || 'Your desk'} />
 
       <Item className="pf-id">
         <div className="row-16">

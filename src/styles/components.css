@@ -10,7 +10,7 @@
 }
 @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
   .glass {
-    background: var(--glass-noise), var(--glass-bg);
+    background: var(--ice-edge) top / 100% 1px no-repeat, var(--glass-noise), var(--glass-bg);
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   }
@@ -685,7 +685,7 @@ button.chip::after, a.chip::after, .copy-btn::after, .term-val::after { content:
 }
 .sound-toggle[aria-pressed='true'] { color: var(--fg-2); }
 @media (hover: hover) { .sound-toggle:hover { color: var(--fg); } }
-.sound-toggle:active { transform: scale(0.92); }
+.sound-toggle:active { transform: scale(0.96); }
 
 .climb { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; max-width: 360px; }
 .climb-step { position: relative; display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
@@ -847,8 +847,8 @@ button.chip::after, a.chip::after, .copy-btn::after, .term-val::after { content:
 .medal-disc { position: relative; width: 44px; height: 44px; flex: none; display: grid; place-items: center; border-radius: 50%; }
 .medal.is-earned .medal-disc {
   color: var(--black);
-  background: radial-gradient(circle at 32% 26%, #fff, transparent 42%), conic-gradient(from 210deg, var(--platinum), var(--silver), var(--white-metal), var(--aluminium), var(--platinum));
-  box-shadow: inset 0 1px 0 #fff, inset 0 -2px 4px rgba(0,0,0,0.25), 0 0 0 1px color-mix(in srgb, var(--platinum) 40%, transparent), 0 6px 18px -6px color-mix(in srgb, var(--white-metal) 55%, transparent);
+  background: radial-gradient(circle at 32% 26%, var(--white-metal), transparent 42%), conic-gradient(from 210deg, var(--platinum), var(--silver), var(--white-metal), var(--aluminium), var(--platinum));
+  box-shadow: inset 0 1px 0 var(--white-metal), inset 0 -2px 4px rgba(0,0,0,0.25), 0 0 0 1px color-mix(in srgb, var(--platinum) 40%, transparent), 0 6px 18px -6px color-mix(in srgb, var(--white-metal) 55%, transparent);
 }
 .medal.is-locked .medal-disc {
   color: color-mix(in srgb, var(--platinum) 16%, transparent);
@@ -867,3 +867,25 @@ button.chip::after, a.chip::after, .copy-btn::after, .term-val::after { content:
 .finish-stats dd { margin: 4px 0 0; font-size: var(--fs-xl); color: var(--fg); }
 .finish-actions { display: flex; flex-direction: column; gap: var(--sp-2); width: 100%; max-width: 420px; margin-top: var(--sp-2); }
 .finish-actions .btn { width: 100%; }
+
+/* =========================================================
+   Path switch: guided path ⇄ free training, one segmented control
+   ========================================================= */
+.pswitch { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: var(--r-full); width: 100%; max-width: 440px; margin-inline: auto; }
+.pswitch-opt {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 var(--sp-3);
+  border: 0; border-radius: var(--r-full); background: none; color: var(--fg-3); font-size: var(--fs-sm); font-weight: var(--fw-semibold); white-space: nowrap;
+  -webkit-tap-highlight-color: transparent; transition: color var(--dur-base);
+}
+.pswitch-opt > svg, .pswitch-opt > span:not(.pswitch-thumb) { position: relative; z-index: 1; }
+.pswitch-opt.is-on { color: var(--black); }
+@media (hover: hover) { .pswitch-opt:not(.is-on):hover { color: var(--fg); } }
+.pswitch-thumb {
+  position: absolute; inset: 0; border-radius: inherit;
+  background: var(--brush), var(--metal-fill);
+  box-shadow: inset 0 1px 0 var(--white-metal), 0 0 0 1px color-mix(in srgb, var(--ice-pale) 30%, transparent), 0 6px 18px -6px color-mix(in srgb, var(--ice) 45%, transparent);
+}
+
+/* Small chips that act as buttons keep a 48px hit area around them */
+button.chip { position: relative; }
+button.chip::after { content: ''; position: absolute; inset: -12px -4px; }

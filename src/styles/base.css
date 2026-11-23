@@ -35,10 +35,10 @@ button { cursor: pointer; }
 button, a, [role="button"], [role="radio"], [role="tab"], label { touch-action: manipulation; }
 a { color: inherit; }
 :focus { outline: none; }
-:focus-visible { outline: var(--ring) solid var(--silver); outline-offset: var(--ring); border-radius: var(--r-xs); }
+:focus-visible { outline: var(--ring) solid var(--ice-pale); outline-offset: var(--ring); border-radius: var(--r-xs); }
 [hidden] { display: none !important; }
 main:focus { outline: none; }
-::selection { background: var(--aluminium-dark); color: var(--fg); }
+::selection { background: var(--ice-deep); color: var(--white-metal); }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { background: var(--aluminium-dark); border-radius: var(--r-full); border: 3px solid transparent; background-clip: padding-box; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -46,14 +46,12 @@ main:focus { outline: none; }
 svg.lucide { stroke-width: 1.5px; }
 
 /* ---------- Type ---------- */
-/* Headlines: Newsreader, tight like a front page. Optical sizing picks the
-   display cut at large sizes and the text cut at small ones. */
+/* Headlines: Space Grotesk, set tight (-0.03em) like an engraved plate. */
 .t-display {
   font-family: var(--font-display);
   font-size: var(--fs-display);
   font-weight: var(--fw-display);
-  font-optical-sizing: auto;
-  line-height: 0.98;
+  line-height: 0.96;
   letter-spacing: var(--tracking-tight);
   margin: 0;
   text-wrap: balance;
@@ -80,7 +78,7 @@ svg.lucide { stroke-width: 1.5px; }
   margin: 0;
 }
 .fig { font-family: var(--font-figure); font-variant-numeric: tabular-nums lining-nums; letter-spacing: -0.01em; }
-.fig-hero { font-variant-numeric: tabular-nums lining-nums; font-size: var(--fs-5xl); font-weight: var(--fw-medium); letter-spacing: -0.04em; line-height: 1; }
+.fig-hero { font-family: var(--font-mono); font-variant-numeric: tabular-nums lining-nums; font-size: var(--fs-5xl); font-weight: var(--fw-medium); letter-spacing: -0.04em; line-height: 1; }
 /* Terminal figures: term sheets, formulas, scores. Monospaced so every digit
    sits in the same column, like a market data screen. */
 .fig-mono, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums slashed-zero; font-feature-settings: 'zero' 0; letter-spacing: -0.02em; }
@@ -99,6 +97,27 @@ svg.lucide { stroke-width: 1.5px; }
 .c-3 { color: var(--fg-3); }
 .c-pos { color: var(--pos); }
 .c-neg { color: var(--neg); }
+
+/* ---------- Film grain: 2%, over every screen, never in the way ---------- */
+body::after {
+  content: '';
+  position: fixed; inset: -8%;
+  z-index: 2147483000;
+  pointer-events: none;
+  background-image: var(--grain);
+  background-size: 160px 160px;
+  opacity: 0.02;
+  animation: grain 0.9s steps(5) infinite;
+}
+@keyframes grain {
+  0% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-3%, 2%, 0); }
+  40% { transform: translate3d(2%, -4%, 0); }
+  60% { transform: translate3d(-4%, -1%, 0); }
+  80% { transform: translate3d(3%, 3%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@media print { body::after { display: none; } }
 
 /* ---------- Layout ---------- */
 .app { min-height: 100dvh; display: flex; flex-direction: column; position: relative; }

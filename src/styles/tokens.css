@@ -1,37 +1,39 @@
 /*
   Vantaris design tokens: the only place raw values live.
 
-  Identity: monochrome. Black, carbon, aluminium, silver, platinum.
-  Colour appears only as data: --gain and --loss, for +/- and ▲/▼ figures.
-  Chrome (a metallic gradient) is reserved for the mascot, the wordmark and
-  the hero headline. Liquid Glass is reserved for floating layers. Everything
-  else is flat: whitespace, type, 1px dividers.
+  Identity: obsidian, steel, chrome, brushed platinum, pure white, and one
+  light: refracted glacier blue. No other hue exists in the product: a correct
+  answer and a gain glow glacier; a miss and a loss go cold steel.
 
-  Type is a financial-press trio: Newsreader (an editorial serif with optical
-  sizes) for headlines, Inter for everything people read and tap, and
-  JetBrains Mono for data that has to line up like a terminal (term sheets,
-  formulas, scores). Every figure is tabular. Dark only: there is no light theme.
+  Type: Space Grotesk (architectural, tight) for display and headings, Inter
+  for everything people read and tap, JetBrains Mono with tabular figures for
+  every number: counters, multiples, tickers, scores, formulas.
 
-  Metal: interactive cards get a 1px brushed platinum edge (--metal-edge) and
-  a specular sweep on hover; the primary button and progress bars are brushed
-  platinum. Emerald (--gain) is reserved for a correct answer and gains.
+  Surfaces carry a 2% film grain, frosted glass on floating layers, and a 1px
+  specular edge (chrome to glacier) that follows the pointer or the tilt of
+  the page (src/app/feel.js sets --spec).
 
   Motion values are mirrored in src/design/tokens.js for Motion.
-  Colours are read from here at runtime by the 3D mascot and the share card
+  Colours are read from here at runtime by WebGL scenes and the share card
   (see cssVar in tokens.js), so this file stays the single source of truth.
 */
 :root {
   color-scheme: dark;
 
   /* ---------- Palette (the only colours in the product) ---------- */
-  --black: #090A0B;
-  --carbon: #171A1D;
-  --aluminium-dark: #343A3E;
-  --aluminium: #858D92;
-  --silver: #B9BEC0;
-  --platinum: #E7E8E5;
-  --gain: #35A77A;
-  --loss: #D45B60;
+  --black: #05070B;
+  --carbon: #10141B;
+  --aluminium-dark: #2A313B;
+  --aluminium: #7E8896;
+  --silver: #B6BEC8;
+  --platinum: #E4E8EE;
+  --ice-deep: #1B2452;
+  --ice: #38BDF8;
+  --ice-pale: #BAE6FD;
+  --steel: #8E9AAF;
+  /* Data: gains and right answers catch the glacier light, misses go cold steel */
+  --gain: var(--ice);
+  --loss: var(--steel);
 
   /* ---------- Surfaces ---------- */
   --bg: var(--black);
@@ -55,16 +57,17 @@
   --neg: var(--loss);
 
   /* ---------- Chrome: mascot, wordmark, hero headline only ---------- */
-  --chrome: linear-gradient(180deg, var(--platinum) 0%, var(--silver) 38%, var(--aluminium) 52%, var(--platinum) 64%, var(--silver) 100%);
+  --chrome: linear-gradient(180deg, var(--white-metal) 0%, var(--silver) 36%, var(--aluminium) 50%, color-mix(in srgb, var(--ice-pale) 60%, var(--platinum)) 60%, var(--platinum) 70%, var(--silver) 100%);
   --edge-highlight: inset 0 1px 0 color-mix(in srgb, var(--platinum) 14%, transparent);
 
   /* ---------- Metal: brushed edges, platinum fills, specular light ---------- */
-  --white-metal: #F6F7F4;
-  --platinum-shade: #C9CDCD;
+  --white-metal: #F8FAFC;
+  --platinum-shade: #C6CDD6;
   /* 1px card edge: light catches the top-left corner, fades along the sides */
-  --metal-edge: linear-gradient(135deg,
+  --metal-edge: linear-gradient(calc(95deg + var(--spec, 0.45) * 90deg),
     color-mix(in srgb, var(--platinum) 58%, transparent) 0%,
-    color-mix(in srgb, var(--aluminium) 26%, transparent) 26%,
+    color-mix(in srgb, var(--ice-pale) 30%, transparent) 18%,
+    color-mix(in srgb, var(--aluminium) 26%, transparent) 30%,
     color-mix(in srgb, var(--platinum) 16%, transparent) 50%,
     color-mix(in srgb, var(--aluminium-dark) 70%, transparent) 74%,
     color-mix(in srgb, var(--silver) 40%, transparent) 100%);
@@ -90,22 +93,31 @@
   --glow: 0 0 0 1px color-mix(in srgb, var(--platinum) 22%, transparent), 0 0 20px -2px color-mix(in srgb, var(--platinum) 18%, transparent);
   --glow-soft: 0 0 14px -2px color-mix(in srgb, var(--platinum) 30%, transparent);
   --glow-gain: 0 0 0 1px color-mix(in srgb, var(--gain) 50%, transparent), 0 0 24px -4px color-mix(in srgb, var(--gain) 38%, transparent);
+  /* Glacier light: refracted blue for combos, surges and live highlights */
+  --ice-glow: 0 0 0 1px color-mix(in srgb, var(--ice) 55%, transparent), 0 0 28px -4px color-mix(in srgb, var(--ice) 45%, transparent);
+  --ice-edge: linear-gradient(calc(100deg + var(--spec, 0.5) * 140deg),
+    color-mix(in srgb, var(--white-metal) 70%, transparent) 0%,
+    color-mix(in srgb, var(--ice-pale) 55%, transparent) 30%,
+    color-mix(in srgb, var(--ice) 22%, transparent) 55%,
+    color-mix(in srgb, var(--silver) 30%, transparent) 100%);
+  /* 2% cinematic film grain over every screen */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)'/%3E%3C/svg%3E");
   --lift: 0 1px 0 color-mix(in srgb, var(--black) 70%, transparent), 0 14px 32px -18px color-mix(in srgb, var(--black) 90%, transparent);
 
   /* ---------- Liquid Glass: floating layers only (max three at once) ---------- */
   --glass-bg: color-mix(in srgb, var(--carbon) 64%, transparent);
   --glass-solid: var(--carbon);
-  --glass-blur: 24px;
-  --glass-saturate: 120%;
-  --glass-edge: inset 0 1px 0 color-mix(in srgb, var(--platinum) 16%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--platinum) 7%, transparent);
+  --glass-blur: 40px;
+  --glass-saturate: 140%;
+  --glass-edge: inset 0 1px 0 color-mix(in srgb, var(--ice-pale) 14%, color-mix(in srgb, var(--platinum) 14%, transparent)), inset 0 0 0 1px color-mix(in srgb, var(--platinum) 7%, transparent);
   /* 2% monochrome grain so large glass areas don't band */
   --glass-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
 
   /* ---------- Type ---------- */
   --font-ui: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-display: 'Newsreader Variable', 'Iowan Old Style', 'Times New Roman', Georgia, serif;
+  --font-display: 'Space Grotesk Variable', 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  --font-figure: var(--font-ui);
+  --font-figure: var(--font-mono);
   /* Phones: reading text never below 16px. Desktop steps up (see below). */
   --fs-2xs: 11px;
   --fs-xs: 12px;
@@ -119,8 +131,8 @@
   --fs-4xl: 44px;
   --fs-5xl: 60px;
   --fs-display: clamp(44px, 11vw, 104px);
-  --fw-display: 460;
-  --fw-heading: 500;
+  --fw-display: 560;
+  --fw-heading: 560;
   --fw-regular: 400;
   --fw-medium: 500;
   --fw-semibold: 600;
@@ -128,7 +140,7 @@
   --lh-tight: 1.04;
   --lh-snug: 1.25;
   --lh-body: 1.6;
-  --tracking-tight: -0.02em;
+  --tracking-tight: -0.03em;
   --tracking-wide: 0.08em;
   --tracking-wider: 0.14em;
 

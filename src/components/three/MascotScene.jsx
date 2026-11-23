@@ -111,8 +111,8 @@ function useFloorTexture(colors) {
     const g = c.getContext('2d');
     const grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
     const dark = `#${colors.aluDark.getHexString()}`;
-    grd.addColorStop(0, 'rgba(9,10,11,1)');
-    grd.addColorStop(0.4, 'rgba(9,10,11,0.85)');
+    grd.addColorStop(0, 'rgba(5,7,11,1)');
+    grd.addColorStop(0.4, 'rgba(5,7,11,0.85)');
     grd.addColorStop(0.62, `${dark}66`);
     grd.addColorStop(1, `${dark}00`);
     g.fillStyle = grd;
@@ -333,11 +333,11 @@ function Vale({ state, lookAt, pulse, interactive, poseRef, onReady, colors }) {
 /** Palette as three.js colours (read once from tokens.css). */
 function usePalette() {
   return useMemo(() => ({
-    black: new Color(cssVar('--black', '#090A0B')),
-    carbon: new Color(cssVar('--carbon', '#171A1D')),
-    aluDark: new Color(cssVar('--aluminium-dark', '#343A3E')),
-    silver: new Color(cssVar('--silver', '#B9BEC0')),
-    platinum: new Color(cssVar('--platinum', '#E7E8E5')),
+    black: new Color(cssVar('--black', '#05070B')),
+    carbon: new Color(cssVar('--carbon', '#10141B')),
+    aluDark: new Color(cssVar('--aluminium-dark', '#2A313B')),
+    silver: new Color(cssVar('--silver', '#B6BEC8')),
+    platinum: new Color(cssVar('--platinum', '#E4E8EE')),
   }), []);
 }
 

@@ -52,4 +52,27 @@ export function installFeel() {
   document.addEventListener('pointermove', (e) => e.pointerType === 'mouse' && place(e), { passive: true });
   // Touch: light the spot you press
   document.addEventListener('pointerdown', (e) => e.pointerType !== 'mouse' && place(e), { passive: true });
+
+  // One light for the whole page: --spec (0–1) swings the 1px chrome/glacier
+  // edges with the mouse, the tilt of a phone, or the scroll position.
+  const root = document.documentElement;
+  let spec = 0.45;
+  let target = 0.45;
+  let lightFrame = 0;
+  const glide = () => {
+    spec += (target - spec) * 0.12;
+    root.style.setProperty('--spec', spec.toFixed(3));
+    lightFrame = Math.abs(target - spec) > 0.002 ? requestAnimationFrame(glide) : 0;
+  };
+  const aim = (v) => {
+    target = Math.max(0, Math.min(1, v));
+    if (!lightFrame) lightFrame = requestAnimationFrame(glide);
+  };
+  document.addEventListener('pointermove', (e) => e.pointerType === 'mouse' && aim(e.clientX / window.innerWidth), { passive: true });
+  window.addEventListener('scroll', () => {
+    if (window.matchMedia('(pointer: coarse)').matches) aim(0.5 + 0.5 * Math.sin(window.scrollY / 380));
+  }, { passive: true });
+  window.addEventListener('deviceorientation', (e) => {
+    if (e.gamma != null) aim(0.5 + e.gamma / 70);
+  }, { passive: true });
 }

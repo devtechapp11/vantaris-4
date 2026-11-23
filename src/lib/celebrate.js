@@ -12,9 +12,9 @@ function allowed() {
   return !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 }
 
-const palette = () => [cssVar('--platinum', '#E7E8E5'), cssVar('--silver', '#B9BEC0'), cssVar('--aluminium', '#858D92')];
-// Polished metal: the house metals plus pure white highlights.
-const metals = () => ['#FFFFFF', ...palette()];
+// Chrome shards catching glacier light: platinum, silver, pure white and refracted blue.
+const palette = () => [cssVar('--platinum', '#E4E8EE'), cssVar('--silver', '#B6BEC8'), cssVar('--ice-pale', '#BAE6FD'), cssVar('--ice', '#38BDF8')];
+const metals = () => [cssVar('--white-metal', '#F8FAFC'), ...palette()];
 
 // Metal shards and slivers instead of paper confetti.
 let shards = null;
@@ -52,7 +52,7 @@ export async function feverBurst(x = 2, origin = { x: 0.5, y: 0.4 }) {
   const shapes = shardShapes(confetti);
   const n = x >= 5 ? 160 : x >= 3 ? 110 : 70;
   confetti({ particleCount: n, spread: 90 + x * 10, startVelocity: 40 + x * 3, gravity: 0.9, decay: 0.92, ticks: 220, scalar: 1.1, shapes, origin, colors, disableForReducedMotion: true, zIndex: 95 });
-  confetti({ particleCount: Math.round(n / 3), spread: 360, startVelocity: 18, gravity: 0.4, ticks: 160, scalar: 0.5, shapes: ['circle'], flat: true, origin, colors: ['#FFFFFF', '#E7E8E5'], disableForReducedMotion: true, zIndex: 95 });
+  confetti({ particleCount: Math.round(n / 3), spread: 360, startVelocity: 18, gravity: 0.4, ticks: 160, scalar: 0.5, shapes: ['circle'], flat: true, origin, colors: [cssVar('--white-metal', '#F8FAFC'), cssVar('--ice-pale', '#BAE6FD')], disableForReducedMotion: true, zIndex: 95 });
   if (x >= 5) {
     setTimeout(() => {
       confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0, y: 0.75 }, shapes, colors, zIndex: 95, disableForReducedMotion: true });

@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 // Preload the two font files every screen needs, so text paints in the right
 // face on first render (fontsource hashes the names, so this runs after bundling).
-const CRITICAL_FONTS = /(inter-latin-opsz-normal|newsreader-latin-opsz-normal)-[\w-]+\.woff2$/;
+const CRITICAL_FONTS = /(inter-latin-opsz-normal|space-grotesk-latin-wght-normal)-[\w-]+\.woff2$/;
 function preloadFonts(base) {
   return {
     name: 'vantaris-preload-fonts',
@@ -45,9 +45,13 @@ export default defineConfig(({ mode }) => {
         '@api-impl': fileURLToPath(new URL(mode === 'demo' ? './src/lib/api/demo.js' : './src/lib/api/real.js', import.meta.url)),
       },
     },
+    // Production output carries no source maps, no comments, no license banners.
+    esbuild: { legalComments: 'none' },
     build: {
       sourcemap: false,
-      chunkSizeWarningLimit: 900,
+      minify: 'esbuild',
+      cssMinify: 'esbuild',
+      chunkSizeWarningLimit: 1000,
       rollupOptions: mode === 'demo' ? {} : {
         output: {
           manualChunks(id) {

@@ -1,6 +1,7 @@
 // Vantaris sound engine: a few synthesized, quiet sounds (no audio files).
-// Felt clicks on taps, a glassy chime on a correct answer (brighter as the
-// combo grows), a muted thud on a miss, and an arpeggio for a promotion.
+// Felt clicks on taps, a glassy chime on a correct answer (a semitone higher
+// for each answer in a row), a muted thud on a miss, a struck-metal impact
+// when a star docks, and an arpeggio for a promotion.
 // Respects the in-app "Sound" setting; nothing plays before a user gesture.
 import { getPrefs } from '../app/prefs';
 
@@ -121,6 +122,20 @@ export const sound = {
     const base = 1046.5 * 2 ** ((Math.min(level, 3) * 2) / 12);
     tone(ac, { freq: base, decay: 0.12, gain: 0.08, at: 0.32 });
     tone(ac, { freq: base * 1.5, decay: 0.28, gain: 0.08, at: 0.4 });
+  },
+  /**
+   * Struck platinum: inharmonic partials of a small metal bar, plus the
+   * contact tick. `k` (1–3) lifts the pitch for each star in turn.
+   */
+  impact(k = 1) {
+    const ac = audio();
+    if (!ac) return;
+    const f0 = 620 * 2 ** ((k - 1) * 4 / 12);
+    [[1, 0.16, 0.9], [2.76, 0.07, 0.55], [5.4, 0.035, 0.3], [8.93, 0.02, 0.16]].forEach(([m, gain, decay]) => {
+      tone(ac, { freq: f0 * m, decay, gain, attack: 0.002 });
+    });
+    tone(ac, { freq: 95, glideTo: 55, decay: 0.18, gain: 0.22 });
+    tick(ac, { freq: 5200, q: 2, gain: 0.12, decay: 0.03 });
   },
   /** Promotion: a bright four-note arpeggio. */
   rankUp() {

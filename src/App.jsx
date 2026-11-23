@@ -56,7 +56,7 @@ export default function App() {
 }
 
 // Screens that show the tab bar on phones (the tabs plus the two desk screens).
-const TAB_PATHS = new Set([...TABS.map((t) => t.to), '/practice', '/ranking']);
+const TAB_PATHS = new Set([...TABS.map((t) => t.to), '/practice']);
 // Focus screens: no sidebar, no tabs, nothing between the player and the question.
 const isFocus = (path) => path.startsWith('/learn/');
 // Sign in, sign up and forgot password are one screen: switching between them

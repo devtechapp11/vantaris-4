@@ -41,3 +41,7 @@
 .rank-row--mark { border-top-style: dashed; color: var(--fg-3); }
 .rank-row--mark .rank-pts { color: var(--fg-3); }
 .rank-row.is-me { position: relative; border-radius: var(--r-sm); }
+
+/* The exact XP to catch the players just ahead */
+.rank-right { align-items: flex-end; flex: none; }
+.rank-gap { font-size: var(--fs-2xs); color: var(--ice-pale); white-space: nowrap; padding: 2px 8px; border-radius: var(--r-full); background: color-mix(in srgb, var(--ice-deep) 55%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ice) 30%, transparent); }

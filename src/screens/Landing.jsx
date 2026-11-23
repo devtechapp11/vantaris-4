@@ -3,15 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import { ArrowRight, Check, X } from 'lucide-react';
 import Logo from '../components/Logo';
-import Mascot from '../components/Mascot';
 import { Magnetic, Spotlight } from '../components/effects';
 import { TierBadge } from '../components/bits';
 import PlanCard, { BillingToggle } from '../components/PlanCard';
-import Scene3D from '../components/three/Scene3D';
-import { useCan3D, useMedia } from '../app/useDevice';
+import IceCrystal from '../components/gl/IceCrystal';
+import { useMedia } from '../app/useDevice';
 import { usePlans } from '../app/usePlans';
 import { usePrefs } from '../app/prefs';
-import { CHAPTERS, HERO_LOOP, LADDER, SAMPLE_DEAL } from '../content/landing';
+import { CHAPTERS, LADDER, SAMPLE_DEAL } from '../content/landing';
 import { duration, ease, spring } from '../design/tokens';
 import { BRAND } from '../lib/config';
 import { track } from '../lib/analytics';
@@ -20,7 +19,8 @@ import { ProgressBar } from '../components/ui';
 import { SoundToggle } from '../components/Momentum';
 import { sound } from '../lib/sound';
 import { haptic } from '../app/prefs';
-import { burst, originOf } from '../lib/celebrate';
+import { feverBurst, originOf } from '../lib/celebrate';
+import { NumberTicker } from '../components/Momentum';
 import './Landing.css';
 import { useMeta } from '../app/useMeta';
 
@@ -104,8 +104,10 @@ function Film() {
   const [index, setIndex] = useState(0);
   const mobile = !useMedia('(min-width: 900px)');
   const { scrollY } = useScroll();
+  const spin = useRef(0);
 
-  useMotionValueEvent(scrollY, 'change', () => {
+  useMotionValueEvent(scrollY, 'change', (v) => {
+    spin.current = v / window.innerHeight;
     const line = window.innerHeight * (mobile ? 0.72 : 0.5);
     const els = chapters.current;
     let next = 0;
@@ -121,7 +123,7 @@ function Film() {
 
   return (
     <section ref={ref} id="film" className="film" aria-label="How Vantaris works">
-      <Stage index={index} t={t} mobile={mobile} />
+      <Stage index={index} t={t} spin={spin} />
       <div className="film-chapters">
         {CHAPTERS.map((c, i) => (
           <article key={c.id} ref={(el) => { chapters.current[i] = el; }} className={`chapter chapter--${c.id} ${i === index ? 'is-active' : ''}`} aria-labelledby={`ch-${c.id}`}>
@@ -142,42 +144,23 @@ function Film() {
   );
 }
 
-/** Mascot poses per chapter: fractions of the half viewport (3D) and CSS for the SVG. */
+/** The crystal's two poses: hero (large, right of the headline) and docked in the corner. */
 const POSE = {
-  hero: { xf: 0.42, yf: -0.05, scale: 1.05, bg: 1 },
-  rest: { xf: 0.8, yf: 0.5, scale: 0.3, bg: 0 },
-  heroMobile: { xf: 0, yf: 0.32, scale: 0.62, bg: 1 },
-  restMobile: { xf: 0.62, yf: -0.1, scale: 0.22, bg: 0 },
+  hero: { x: '0vw', y: '0vh', scale: 1 },
+  rest: { x: '9vw', y: '-30vh', scale: 0.3 },
 };
 
-function Stage({ index, t, mobile }) {
+function Stage({ index, t, spin }) {
   const c = CHAPTERS[index];
-  const can3D = useCan3D();
   const hero = c.visual === 'hero';
-  const pose = useRef({ ...POSE.hero });
-  useEffect(() => {
-    pose.current = { ...(hero ? (mobile ? POSE.heroMobile : POSE.hero) : (mobile ? POSE.restMobile : POSE.rest)) };
-  }, [hero, mobile]);
-  const lookAt = hero ? 'pointer' : { x: -0.9, y: 0.5 };
   const local = useTransform(t, (v) => Math.max(0, Math.min(1, v - index + 0.5)));
-  // The SVG fallback follows the same poses with CSS transforms.
-  const svgPose = hero
-    ? (mobile ? { left: '50%', top: '10%', width: 200, x: '-50%' } : { left: '62%', top: '22%', width: 380, x: '0%' })
-    : (mobile ? { left: '78%', top: '54%', width: 64, x: '0%' } : { left: '84%', top: '10%', width: 120, x: '0%' });
-  const state = c.vale;
 
   return (
     <div className="film-stage" aria-hidden="true">
       <div className="stage-scrim" />
-      {can3D ? (
-        <div className="stage-canvas">
-          <Scene3D scene="mascot" state={state} lookAt={lookAt} interactive background="liquid" poseRef={pose} camera={7} fallback={null} />
-        </div>
-      ) : (
-        <motion.div className="stage-svg" initial={false} animate={svgPose} transition={spring.gentle}>
-          {HERO_LOOP && hero && !mobile ? <HeroVideo /> : <Mascot state={state} lookAt={lookAt} size={svgPose.width} decorative />}
-        </motion.div>
-      )}
+      <motion.div className="stage-ice" initial={false} animate={hero ? POSE.hero : POSE.rest} transition={{ type: 'spring', stiffness: 70, damping: 18, mass: 1.2 }}>
+        <IceCrystal scrollRef={spin} />
+      </motion.div>
       <AnimatePresence mode="wait">
         {!hero && (
           <motion.div
@@ -339,11 +322,14 @@ function TutorBubble({ p, metal }) {
  */
 function MobileFilm() {
   const hero = CHAPTERS[0];
+  const { scrollY } = useScroll();
+  const spin = useRef(0);
+  useMotionValueEvent(scrollY, 'change', (v) => { spin.current = v / window.innerHeight; });
   return (
     <section id="film" className="mfilm" aria-label="How Vantaris works">
       <article className="mch mch--hero" aria-labelledby={`ch-${hero.id}`}>
-        <div className="mch-mascot" aria-hidden="true">
-          <Mascot state={hero.vale} lookAt="pointer" size={112} decorative />
+        <div className="mch-ice" aria-hidden="true">
+          <IceCrystal scrollRef={spin} />
         </div>
         <div className="chapter-copy">
           <p className="t-eyebrow">{hero.eyebrow}</p>
@@ -383,19 +369,6 @@ function MobileChapter({ c }) {
   );
 }
 
-/** Desktop browsers without WebGL can show the Higgsfield loop (never on Save-Data or reduced motion). */
-function HeroVideo() {
-  const saveData = typeof navigator !== 'undefined' && navigator.connection?.saveData;
-  const base = import.meta.env.BASE_URL;
-  if (saveData) return <img src={`${base}mascot/hero-loop.webp`} alt="" width="380" height="380" />;
-  return (
-    <video autoPlay muted loop playsInline preload="metadata" poster={`${base}mascot/hero-loop.webp`} width="380" height="380">
-      <source src={`${base}mascot/hero-loop.webm`} type="video/webm" />
-      <source src={`${base}mascot/hero-loop.mp4`} type="video/mp4" />
-    </video>
-  );
-}
-
 /** Reduced motion: the same story as plain sections, nothing scrubbed. */
 function StillFilm() {
   const still = useMotionValue(1);
@@ -409,7 +382,7 @@ function StillFilm() {
             <p className="t-lead">{c.body}</p>
             {i === 0 && <HeroCase />}
           </div>
-          {i === 0 ? <Mascot state="idle" size={220} decorative /> : <div className="still-visual"><Visual kind={c.visual} p={still} /></div>}
+          {i === 0 ? <div className="still-ice" aria-hidden="true"><IceCrystal still /></div> : <div className="still-visual"><Visual kind={c.visual} p={still} /></div>}
         </article>
       ))}
     </section>
@@ -429,6 +402,7 @@ const ASSOCIATE_AT = 251;
 function HeroCase() {
   const [pick, setPick] = useState(null);
   const [pts, setPts] = useState(0);
+  const [potential, setPotential] = useState(0);
   const shown = useRef(0);
   const card = useRef(null);
   // The speed bonus clock starts when the case is on screen
@@ -441,11 +415,13 @@ function HeroCase() {
     const earned = i === HERO_CASE.answer ? Math.round(10 * (1 + 0.5 * Math.max(0, 1 - secs / 60))) : 0;
     setPick(i);
     setPts(earned);
+    // Wall Street potential: accuracy first, then speed against a 30-second read.
+    setPotential(earned ? Math.round(Math.max(74, Math.min(99, 99 - Math.max(0, secs - 4) * 0.9))) : Math.round(Math.max(41, 63 - secs * 0.4)));
     track('hero_case', { correct: i === HERO_CASE.answer });
     if (earned) {
       sound.correct(1);
       haptic([12, 40, 18]);
-      setTimeout(() => burst(originOf(card.current?.querySelector('.hc-score')) ?? undefined), 140);
+      setTimeout(() => feverBurst(3, originOf(card.current?.querySelector('.hc-score')) ?? undefined), 60);
     } else {
       sound.wrong();
       haptic([24, 50, 24]);
@@ -478,6 +454,11 @@ function HeroCase() {
       <AnimatePresence initial={false}>
         {pick != null && (
           <motion.div className="hc-verdict" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={spring.gentle} aria-live="polite">
+            <div className="hc-potential">
+              <span className="t-eyebrow">Wall Street potential</span>
+              <span className="hc-potential-score fig-mono"><NumberTicker value={potential} delay={0.05} /><small>/100</small></span>
+              <span className="hc-potential-bar" aria-hidden="true"><motion.i initial={{ scaleX: 0 }} animate={{ scaleX: potential / 100 }} transition={{ type: 'spring', stiffness: 90, damping: 16, delay: 0.1 }} /></span>
+            </div>
             {right ? (
               <>
                 <div className="hc-score-row">

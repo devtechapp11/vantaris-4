@@ -23,3 +23,15 @@
 .prow:active { background: var(--press); }
 .prow-meta { align-items: flex-end; flex: none; }
 .prow--locked { opacity: 0.6; }
+
+/* Infinite drill: the first thing in free training */
+.drill {
+  display: flex; align-items: center; gap: var(--sp-4); width: 100%; min-height: 72px; padding: var(--sp-4) var(--sp-5);
+  border: 0; color: var(--fg); text-align: left; -webkit-tap-highlight-color: transparent;
+}
+.drill > svg { flex: none; color: var(--ice-pale); }
+.drill-icon {
+  flex: none; width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; color: var(--black);
+  background: radial-gradient(circle at 34% 26%, var(--white-metal), transparent 45%), conic-gradient(from 200deg, var(--platinum), var(--ice-pale), var(--white-metal), var(--silver), var(--platinum));
+  box-shadow: inset 0 1px 0 var(--white-metal), var(--ice-glow);
+}

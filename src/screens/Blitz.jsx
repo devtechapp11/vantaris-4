@@ -11,7 +11,7 @@ import { multiplierFor } from '../lib/momentum';
 import { rng } from '../content/lessons';
 import { BLITZ_SECONDS, nextBlitz, windowFor } from '../content/blitz';
 import { Page } from '../components/chrome';
-import { NumberTicker } from '../components/Momentum';
+import { NumberTicker, SoundToggle } from '../components/Momentum';
 import { spring } from '../design/tokens';
 import { useMeta } from '../app/useMeta';
 import './Blitz.css';
@@ -155,7 +155,7 @@ export default function Blitz() {
     const { left, win } = hud;
     const mult = multiplierFor(state.run);
     return (
-      <main className="blitz blitz--play" aria-label="Market Blitz in progress">
+      <main className={`blitz blitz--play ${mult > 1 ? 'is-surge' : ''}`} data-surge={mult} aria-label="Market Blitz in progress">
         <header className="blitz-hud">
           <span className={`blitz-time fig-mono ${left < 10 ? 'is-low' : ''}`} aria-label={`${Math.ceil(left)} seconds left`}>{Math.ceil(left)}s</span>
           <span className="blitz-score fig-mono" aria-live="polite">{state.score}</span>
@@ -164,6 +164,7 @@ export default function Blitz() {
               ×{mult}
             </motion.span>
           </AnimatePresence>
+          <SoundToggle className="blitz-mute" />
         </header>
         <div className="blitz-clock bar bar--sm" aria-hidden="true"><i style={{ transform: `scaleX(${left / BLITZ_SECONDS})` }} /></div>
 

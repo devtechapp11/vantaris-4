@@ -1,11 +1,13 @@
 import { useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowRight, Building2, Calculator, FileSpreadsheet, Flame, History, LibraryBig, LifeBuoy, Lock, Merge, Puzzle, Repeat2, Scale, Star, Zap } from 'lucide-react';
+import { Building2, Calculator, FileSpreadsheet, Flame, History, LifeBuoy, Lock, Merge, Puzzle, Repeat2, Scale, Star, Zap } from 'lucide-react';
 import { useApp } from '../app/AppContext';
 import { useRank } from '../app/useRank';
 import { useMedia } from '../app/useDevice';
 import { Page } from '../components/chrome';
+import PathSwitch from '../components/PathSwitch';
+import MetalWaves from '../components/gl/MetalWaves';
 import { Skeleton, TIER_LABEL } from '../components/bits';
 import { LEVEL_TIER } from '../app/usePlans';
 import { isLocked } from '../lib/modules';
@@ -92,6 +94,7 @@ export default function Path() {
 
   return (
     <Page wide className="screen path-screen">
+      <MetalWaves />
       <header className="pbar glass" aria-label="Your standing">
         <Link to="/ranking" className="pbar-stat pbar-rank" aria-label={`${careerName(me.profile.level)}${rank ? `, rank ${rank}` : ''}. Open the ranking`}>
           <span className="pbar-badge">{me.profile.level}</span>
@@ -105,6 +108,8 @@ export default function Path() {
         </span>
       </header>
 
+      <PathSwitch value="guided" />
+
       <div className="path-chips">
         {due > 0 && (
           <motion.button type="button" className="pchip pchip--review" whileTap={{ scale: 0.96 }} onClick={() => navigate('/learn/review')} {...prefetchProps('/learn/review')}>
@@ -112,7 +117,7 @@ export default function Path() {
           </motion.button>
         )}
         <motion.button type="button" className="pchip" whileTap={{ scale: 0.96 }} onClick={() => navigate('/blitz')} {...prefetchProps('/blitz')}>
-          <Zap size={17} aria-hidden="true" /> Market Blitz · 60s{me.blitz_best ? <> · best <b className="fig-mono">{me.blitz_best}</b></> : null}
+          <Zap size={17} aria-hidden="true" /> Blitz · 60s{me.blitz_best ? <> · best <b className="fig-mono">{me.blitz_best}</b></> : null}
         </motion.button>
       </div>
 
@@ -121,7 +126,7 @@ export default function Path() {
           <defs>
             <linearGradient id="trail-metal" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0" stopColor="var(--white-metal)" />
-              <stop offset="0.5" stopColor="var(--silver)" />
+              <stop offset="0.5" stopColor="var(--ice-pale)" />
               <stop offset="1" stopColor="var(--platinum)" />
             </linearGradient>
           </defs>
@@ -150,11 +155,6 @@ export default function Path() {
         )))}
       </div>
 
-      <Link to="/practice" className="path-foot" {...prefetchProps('/practice')}>
-        <LibraryBig size={18} aria-hidden="true" />
-        <span className="grow stack-4"><span className="t-label c-fg">Deal library</span><span className="t-cap">Full timed cases, scored for the ranking</span></span>
-        <ArrowRight size={16} aria-hidden="true" />
-      </Link>
     </Page>
   );
 }
