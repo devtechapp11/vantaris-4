@@ -118,6 +118,12 @@ function requireUser() {
   }
 }
 
+function credit(amount) {
+  if (amount <= 0) return;
+  state.profile.points += amount;
+  state.ledger.push({ amount, local_date: localDate(), at: new Date().toISOString() });
+}
+
 function statusOf(a) {
   if (!a) return 'new';
   if (a.submitted_at) return a.correct ? 'correct' : 'wrong';
@@ -413,6 +419,57 @@ export const api = {
     save();
     return me();
   },
+  // Mirrors the phase 6 migration (claim_vault_cache, get_desk, credit_*).
+  async claimCache(cacheId) {
+    await wait(200);
+    requireUser();
+    state.desk ??= { caches: [], freezes: 0, credits: [], demo: false };
+    const ids = MODULES.map((m) => m.id);
+    const pos = ids.indexOf(String(cacheId).replace(/^cache-/, ''));
+    if (pos < 0 || pos % 3 !== 2 || pos === ids.length - 1) throw new ApiError('INVALID_CACHE', 'Unknown cache.');
+    if ((state.path[ids[pos]] ?? 0) < 1) throw new ApiError('CACHE_LOCKED', 'Clear the chapter before it first.');
+    const reward = Math.floor(pos / 3) % 2 === 0 ? 'xp' : 'freeze';
+    if (state.desk.caches.includes(cacheId)) return { credited: false, reward, me: me() };
+    state.desk.caches.push(cacheId);
+    if (reward === 'xp') credit(50);
+    else state.desk.freezes = Math.min(2, state.desk.freezes + 1);
+    save();
+    return { credited: true, reward, me: me() };
+  },
+  async getDesk() {
+    await wait(80);
+    requireUser();
+    const d = state.desk ?? { caches: [], freezes: 0 };
+    return { caches: d.caches, freezes: d.freezes, freeze_used: false, mastery: {} };
+  },
+  async creditLesson({ node, correct = 0, bestRun = 0 }) {
+    await wait(120);
+    requireUser();
+    state.desk ??= { caches: [], freezes: 0, credits: [], demo: false };
+    state.desk.credits ??= [];
+    const today = localDate();
+    const recent = state.desk.credits.find((c) => c.node === node && Date.now() - c.at < 10 * 60e3);
+    if (recent) return { credited: 0, me: me() };
+    const done = state.desk.credits.filter((c) => c.date === today).reduce((s, c) => s + c.amount, 0);
+    const amount = Math.max(0, Math.min(Math.min(Math.max(correct, 0), 12) * 10 + (bestRun >= 5 ? 25 : 0), 400 - done));
+    state.desk.credits = [...state.desk.credits.filter((c) => c.date === today), { node, amount, date: today, at: Date.now() }];
+    credit(amount);
+    save();
+    return { credited: amount, me: me() };
+  },
+  async creditDemo(xp) {
+    await wait(100);
+    requireUser();
+    state.desk ??= { caches: [], freezes: 0, credits: [], demo: false };
+    if (state.desk.demo) return { credited: 0, reason: 'ALREADY' };
+    state.desk.demo = true;
+    const amount = Math.max(0, Math.min(60, Math.round(xp ?? 0)));
+    credit(amount);
+    save();
+    return { credited: amount, me: me() };
+  },
+  async nextExercise() { return null; },
+  async submitExercise() { return null; },
   async saveBlitz(score) {
     await wait(150);
     requireUser();

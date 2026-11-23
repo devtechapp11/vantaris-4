@@ -1,7 +1,7 @@
 /**
  * The demo result, kept on this device until the visitor creates an account.
- * Crediting it to the account is a server-side step (it changes XP), planned
- * with the server-validated XP work; nothing here grants points.
+ * Crediting it to the account is a server-side step (credit_demo_xp, capped
+ * and once per account); nothing on this device grants points.
  */
 const KEY = 'vantaris.demo.v1';
 
@@ -23,5 +23,13 @@ export function readDemoScore(): DemoScore | null {
     return typeof v?.xp === 'number' && typeof v?.right === 'number' ? v : null;
   } catch {
     return null;
+  }
+}
+
+export function clearDemoScore() {
+  try {
+    localStorage.removeItem(KEY);
+  } catch {
+    /* ignore */
   }
 }

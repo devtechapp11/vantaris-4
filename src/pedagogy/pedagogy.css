@@ -15,3 +15,12 @@
 .brief-rows dt { font-size: 10px; letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--steel-300); }
 .brief-rows dd { margin: 0; font-size: var(--fs-sm); line-height: 1.5; color: var(--fg-2); }
 .brief-formula { display: block; width: fit-content; margin-bottom: 4px; padding: 3px 8px; border-radius: 6px; font-size: var(--fs-xs); color: var(--fg); background: color-mix(in srgb, var(--platinum) 8%, transparent); box-shadow: inset 0 0 0 1px var(--line); }
+
+/* Vault « Briefs » */
+.vbriefs { margin-top: var(--sp-4); }
+.vbriefs-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.vbriefs-item { display: flex; flex-direction: column; align-items: flex-end; overflow: hidden; }
+.vbriefs-item > .brief { align-self: stretch; }
+.vbriefs-remove { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 10px; border: 0; background: none; color: var(--steel-300); font-size: var(--fs-xs); cursor: pointer; }
+.vbriefs-remove:hover { color: var(--fg); }
+.learn-brief { margin-top: var(--sp-3); text-align: left; }

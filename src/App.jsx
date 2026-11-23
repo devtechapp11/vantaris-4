@@ -21,6 +21,7 @@ import AppHud from './components/AppHud';
 import MetalBurst from './fx/MetalBurst';
 import { useSfxUnlock } from './lib/sfx/useSfx';
 import PromotionCeremony from './exercise/PromotionCeremony';
+import DemoCredit from './exercise/DemoCredit';
 import { LEGAL_ORDER } from './content/legal';
 import { track } from './lib/analytics';
 
@@ -58,6 +59,7 @@ export default function App() {
           <Toast />
           <MetalBurst />
           <PromotionCeremony />
+          <DemoCredit />
         </AppProvider>
       </MotionConfig>
     </Router>

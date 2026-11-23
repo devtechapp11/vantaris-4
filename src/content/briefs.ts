@@ -1,4 +1,4 @@
-import { CHAPTERS } from './path';
+import { CHAPTERS } from './path.js';
 
 export type Brief = { id: string; rule: string; trap: string; realWorld: string; formula?: string };
 

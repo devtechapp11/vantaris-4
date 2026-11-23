@@ -12,6 +12,8 @@ import './Vault.css';
  * stars. Tap a card to turn it over: the golden rule on the front, the memory
  * hook and a banker's tip on the back.
  */
+import VaultBriefs from '../pedagogy/VaultBriefs';
+
 export default function Vault({ stars = {}, review }) {
   const owned = CHAPTERS.filter((c) => (stars[c.id] ?? 0) >= VAULT_STARS).length;
   const due = review?.due?.length ?? 0;
@@ -24,12 +26,13 @@ export default function Vault({ stars = {}, review }) {
           <span className="t-label c-fg">{fragile ? `${fragile} fragile ${fragile === 1 ? 'notion' : 'notions'}` : 'No fragile notions'}</span>
           <span className="t-cap">{due ? `${due} due for review now` : fragile ? 'They come back on a 1-3-7-14-30 day rhythm' : 'Misses come back here on a spaced schedule'}</span>
         </span>
-        {due > 0 && <Link to="/learn/review" className="btn btn--primary btn--sm">Review</Link>}
+        {due > 0 && <Link to="/learn/review" className="btn btn--primary btn--sm">Review ({due})</Link>}
       </div>
       <p className="t-foot"><span className="fig-mono c-fg">{owned}</span> of {CHAPTERS.length} Platinum cards · two stars on a chapter unlock its card</p>
       <div className="vault-grid">
         {CHAPTERS.map((c) => <VaultCard key={c.id} chapter={c} stars={stars[c.id] ?? 0} />)}
       </div>
+      <VaultBriefs />
     </div>
   );
 }

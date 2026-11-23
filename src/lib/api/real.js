@@ -46,6 +46,24 @@ async function invoke(name, body) {
   throw new ApiError('UNKNOWN', 'Something went wrong. Try again in a moment.');
 }
 
+// Phase 6 server functions ship as a migration applied separately: until it
+// is, these calls resolve to null and the app keeps working on this device.
+const MISSING = /PGRST202|Could not find the function|does not exist|404/i;
+async function softRpc(fn, args) {
+  const { data, error } = await supabase.rpc(fn, args);
+  if (!error) return data;
+  if (MISSING.test(`${error.code ?? ''} ${error.message ?? ''}`)) return null;
+  throw fromSupabase(error);
+}
+async function softInvoke(name, body) {
+  try {
+    return await invoke(name, body);
+  } catch (err) {
+    if (err?.code === 'NETWORK' || err?.code === 'UNKNOWN') return null;
+    throw err;
+  }
+}
+
 const redirectTo = (path) => `${window.location.origin}${path}`;
 
 export const api = {
@@ -106,6 +124,13 @@ export const api = {
   getLeaderboard: (scope) => rpc('get_leaderboard', { p_scope: scope, p_limit: 50 }),
   saveLesson: ({ node, stars, firstTry, missed = [], cleared = [] }) =>
     rpc('save_lesson', { p_node: node, p_stars: stars ?? null, p_first_try: firstTry ?? null, p_missed: missed, p_cleared: cleared }),
+  claimCache: (cacheId) => softRpc('claim_vault_cache', { p_cache: cacheId }),
+  getDesk: () => softRpc('get_desk'),
+  creditLesson: ({ node, correct, bestRun }) =>
+    softRpc('credit_lesson_xp', { p_node: node, p_correct: Math.max(0, Math.round(correct ?? 0)), p_best_run: Math.max(0, Math.round(bestRun ?? 0)) }),
+  creditDemo: (xp) => softRpc('credit_demo_xp', { p_xp: Math.max(0, Math.round(xp ?? 0)) }),
+  nextExercise: (skill) => softInvoke('generate-exercise', { skill }),
+  submitExercise: (id, choice) => softInvoke('submit-answer', { exercise_id: id, choice }),
   saveBlitz: (score) => rpc('save_blitz', { p_score: Math.max(0, Math.min(5000, Math.round(score))) }),
 
   // Public (no sign-in needed): landing page and sign-up screen.

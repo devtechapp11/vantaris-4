@@ -16,9 +16,9 @@ import { LEVEL_TIER } from '../app/usePlans';
 import { isLocked } from '../lib/modules';
 import { prefetchProps } from '../app/routes';
 import { useMeta } from '../app/useMeta';
-import { sound } from '../lib/sound';
-import { haptic } from '../app/prefs';
-import { feverBurst, originOf } from '../lib/celebrate';
+import { sfx } from '../lib/sfx/engine';
+import { haptics, HAPTIC } from '../lib/haptics';
+import { metalBurst } from '../fx/MetalBurst';
 import { fieldBus } from '../fx/field/fieldBus';
 import { api } from '../lib/api';
 import StatsBar from '../path/StatsBar';
@@ -84,7 +84,18 @@ export default function Path() {
   const [armed, setArmed] = useState(false);
   const can3d = fine && !reduce && prefs.effects3d && hasWebGL() && !lowPower();
 
-  const model = useMemo(() => (me ? buildPath(me) : null), [me]);
+  // Caches opened and freezes banked on the server (null until the phase 6 migration is live).
+  const [desk, setDesk] = useState(null);
+  useEffect(() => {
+    let live = true;
+    api.getDesk?.().then((d) => {
+      if (!live || !d) return;
+      setDesk(d);
+      if (d.freeze_used) showToast('A streak freeze covered yesterday. Your streak is safe.', 'success');
+    }).catch(() => {});
+    return () => { live = false; };
+  }, [showToast]);
+  const model = useMemo(() => (me ? buildPath({ ...me, desk }) : null), [me, desk]);
 
   // Bring the next chapter into view on arrival.
   useEffect(() => {
@@ -147,16 +158,17 @@ export default function Path() {
   }, [can3d, layout]);
 
   const claim = useCallback(async (cache, el) => {
-    sound.impact(2);
-    haptic([20, 40, 30]);
+    sfx.starImpact(2);
+    haptics.fire(HAPTIC.promotion);
     valeBus.react('celebrate');
     fieldBus.pulse(el);
-    feverBurst(3, originOf(el) ?? undefined);
+    metalBurst.burst(el, 3);
     let credited = false;
     try {
-      const res = await api.claimCache?.(cache.id, cache.reward);
+      const res = await api.claimCache?.(cache.id);
       if (res?.me) setMe(res.me);
-      credited = Boolean(res?.credited);
+      if (res) setDesk((d) => ({ ...(d ?? {}), caches: [...(d?.caches ?? []), cache.id] }));
+      credited = Boolean(res);
     } catch {
       credited = false;
     }
@@ -175,7 +187,7 @@ export default function Path() {
   const open = (n) => {
     if (n.tierLocked) return openPaywall('level', { level: n.level });
     if (!n.reachable) return showToast(`Earn a star on “${nodes[n.index - 1]?.title}” to open this chapter.`);
-    sound.tap();
+    sfx.press();
     navigate(`/learn/${n.id}`);
     return undefined;
   };

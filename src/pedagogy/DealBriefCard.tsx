@@ -5,6 +5,7 @@ import SpecularCard from '../components/fx/SpecularCard';
 import { springs } from '../motion/springs';
 import type { Brief } from '../content/briefs';
 import { isSaved, saveBrief } from './briefVault';
+import { parseBrief } from './dealBrief';
 import './pedagogy.css';
 
 type Props = { brief: Brief; title?: string; className?: string; collapsible?: boolean; defaultOpen?: boolean };
@@ -13,6 +14,7 @@ type Props = { brief: Brief; title?: string; className?: string; collapsible?: b
 export default function DealBriefCard({ brief, title = 'Deal Brief — to remember', className = '', collapsible = false, defaultOpen = true }: Props) {
   const [open, setOpen] = useState(!collapsible || defaultOpen);
   const [saved, setSaved] = useState(() => isSaved(brief.id));
+  if (!parseBrief(brief)) return null;
   const save = () => {
     if (saved) return;
     saveBrief(brief);

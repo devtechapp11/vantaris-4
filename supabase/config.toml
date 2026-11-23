@@ -14,3 +14,10 @@ verify_jwt = false
 
 [functions.tutor]
 verify_jwt = false
+
+# Deal cases: both check the player's session themselves (see _shared/http.ts).
+[functions.generate-exercise]
+verify_jwt = false
+
+[functions.submit-answer]
+verify_jwt = false

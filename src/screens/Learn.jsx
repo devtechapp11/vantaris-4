@@ -11,6 +11,9 @@ import { metalBurst } from '../fx/MetalBurst';
 import { CHAPTERS, chapterOf, chapterOfConcept, starsFor } from '../content/path';
 import { LESSONS, TEMPLATES, answerText, grade, makeQuestion } from '../content/lessons';
 import { drawPairs } from '../content/pairs';
+import { finQuestion } from '../lib/finance/toQuestion';
+import { templatesFor } from '../lib/finance/templates';
+import DealBriefCard from '../pedagogy/DealBriefCard';
 import { SoundToggle } from '../components/Momentum';
 import SoundBars from '../landing/hud/SoundBars';
 import MetalPlate from '../components/fx/MetalPlate';
@@ -30,6 +33,7 @@ import '../exercise/exercise.css';
 const seed = () => Math.floor(Math.random() * 2 ** 31);
 let uid = 0;
 const item = (tid, original, extra = {}) => ({ key: `q${(uid += 1)}`, tid, seed: seed(), original, ...extra });
+const finItem = (template, difficulty = 2) => ({ key: `q${(uid += 1)}`, tid: template, seed: seed(), original: true, fin: template, difficulty });
 const pairsItem = (chapter) => ({ key: `q${(uid += 1)}`, tid: `${chapter}.pairs`, seed: seed(), original: false, pairs: chapter, warmup: true });
 
 /**
@@ -54,7 +58,11 @@ function plan(node, me, state) {
     const picks = [];
     while (picks.length < 6 && pool.length) picks.push(...pool.splice(Math.floor(Math.random() * pool.length), 1));
     const warm = open[Math.floor(Math.random() * open.length)]?.id ?? 'statements';
-    return [pairsItem(warm), ...picks.sort((a, b) => a.pos - b.pos).map((t) => item(t.id, true))];
+    // Two deal cases built by the finance engine, on skills already open.
+    const fins = open.flatMap((c) => templatesFor(c.id));
+    const cases = [];
+    while (cases.length < 2 && fins.length) cases.push(fins.splice(Math.floor(Math.random() * fins.length), 1)[0]);
+    return [pairsItem(warm), ...picks.slice(0, 6 - cases.length).sort((a, b) => a.pos - b.pos).map((t) => item(t.id, true)), ...cases.map((t) => finItem(t))];
   }
   if (!LESSONS[node]) return [];
   return [pairsItem(node), ...LESSONS[node].map((t) => item(t.id, true))];
@@ -109,6 +117,22 @@ function Learn() {
     }
   }, [locked, level, navigate, openPaywall]);
 
+  // Deal cases: ask the server for a pooled or freshly written variant of the
+  // same template (it records the attempt and moves the Elo rating). Without
+  // the server the local, deterministic version is used as is.
+  useEffect(() => {
+    let live = true;
+    queue.forEach((e) => {
+      if (!e.fin || e.poolId) return;
+      api.nextExercise?.(e.fin.split('.')[0]).then((ex) => {
+        if (!live || !ex?.id || ex.template !== e.fin) return;
+        setQueue((q) => q.map((x) => (x.key === e.key ? { ...x, seed: ex.seed, difficulty: ex.difficulty, narrative: ex.prompt, served: ex.brief, poolId: ex.id } : x)));
+      }).catch(() => {});
+    });
+    return () => { live = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // The background breathes with the run: brighter filaments at x2, x3, x5.
   useEffect(() => {
     fieldBus.setMultiplier(comboOf(tally.run));
@@ -140,6 +164,7 @@ function Learn() {
       };
     });
 
+    if (entry.poolId) api.submitExercise?.(entry.poolId, entry.choice).catch(() => {});
     if (correct) {
       const tier = comboOf(run);
       sfx.correct(tier);
@@ -167,7 +192,15 @@ function Learn() {
       valeBus.react('encourage');
       if (!reduce && el) shake(el, { x: [-6, 6, -4, 4, 0] }, { duration: 0.22 });
       // A fresh variant comes back in the « Second look » segment at the end.
-      if (!entry.warmup) setQueue((q) => [...q, item(entry.tid, false)]);
+      // A fresh variant comes back two or three questions later.
+      if (!entry.warmup) {
+        setQueue((q) => {
+          const i = q.findIndex((x) => x.key === entry.key);
+          const at = Math.min(q.length, (i < 0 ? q.length : i) + 3);
+          const variant = entry.fin ? { ...finItem(entry.fin, entry.difficulty), original: false } : item(entry.tid, false);
+          return [...q.slice(0, at), variant, ...q.slice(at)];
+        });
+      }
     }
   }, [tally.run, tally.bonus, reduce, scope, shake]);
 
@@ -185,7 +218,16 @@ function Learn() {
     try {
       const updated = await api.saveLesson({ node: free ? 'review' : node, stars, firstTry: final.firstTry, missed: final.missed, cleared: final.cleared });
       setMe(updated);
-      setFinished((f) => ({ ...f, saving: false }));
+      // XP is credited by the server, which recomputes and caps it.
+      let credit = 'pending';
+      try {
+        const res = await api.creditLesson?.({ node, correct: final.right, bestRun: final.bestRun });
+        if (res?.me) setMe(res.me);
+        if (res) credit = 'credited';
+      } catch {
+        credit = 'pending';
+      }
+      setFinished((f) => ({ ...f, saving: false, credit }));
     } catch (err) {
       setFinished((f) => ({ ...f, saving: false, error: err.message }));
       showToast(err.message, 'error');
@@ -275,7 +317,11 @@ function Learn() {
 function Step({ entry, chapter, retry, onGraded, onNext }) {
   const reduce = useReducedMotion();
   const pairs = useMemo(() => (entry.pairs ? drawPairs(entry.pairs, entry.seed) : null), [entry]);
-  const q = useMemo(() => (entry.pairs ? null : makeQuestion(entry.tid, entry.seed)), [entry]);
+  const q = useMemo(() => {
+    if (entry.pairs) return null;
+    if (entry.fin) return finQuestion(entry.fin, entry.seed, entry.difficulty ?? 2, entry.narrative, entry.served);
+    return makeQuestion(entry.tid, entry.seed);
+  }, [entry]);
   const initial = !q ? null : q.type === 'slider' ? q.start : q.type === 'build' ? q.answer.map(() => null) : null;
   const [value, setValue] = useState(initial);
   const [verdict, setVerdict] = useState(null);
@@ -290,7 +336,7 @@ function Step({ entry, chapter, retry, onGraded, onNext }) {
     const labels = q.type === 'build' ? value.map((i) => q.tokens[i]) : value;
     const ok = grade(q, labels);
     setVerdict(ok);
-    onGraded(ok, entry, cardRef.current);
+    onGraded(ok, { ...entry, choice: value }, cardRef.current);
   }, [q, ready, verdict, value, entry, onGraded]);
 
   const pairsDone = (n) => {
@@ -420,7 +466,8 @@ function Feedback({ q, pairs, slips, ok, chapter, onNext, warmup }) {
         {!ok && q && <p className="t-label">Answer: <span className="c-fg fig-mono">{answerText(q)}</span></p>}
         {q && <p className="t-callout c-2">{q.explain}</p>}
         {pairs && <p className="t-callout c-2">{ok ? 'Four for four on the first tap.' : 'Every pair is locked in now. Read them once more before the six questions.'}</p>}
-        {chapter && !warmup && (
+        {q?.brief && <DealBriefCard brief={q.brief} collapsible defaultOpen={!ok} className="learn-brief" />}
+        {chapter && !warmup && !q?.brief && (
           <div className="learn-rule">
             <span className="t-eyebrow">Golden rule</span>
             <p className="learn-rule-text">{chapter.vault.rule}</p>
