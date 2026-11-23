@@ -46,7 +46,7 @@ async function invoke(name, body) {
   throw new ApiError('UNKNOWN', 'Something went wrong. Try again in a moment.');
 }
 
-// Phase 6 server functions ship as a migration applied separately: until it
+// The server-XP functions ship as a migration applied separately: until it
 // is, these calls resolve to null and the app keeps working on this device.
 const MISSING = /PGRST202|Could not find the function|does not exist|404/i;
 async function softRpc(fn, args) {

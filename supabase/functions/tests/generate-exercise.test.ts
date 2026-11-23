@@ -1,9 +1,9 @@
-// deno test --allow-env generate-exercise/index.test.ts   (VANTARIS_TEST=1)
+// Run with npm run test:functions.
 import { assert, assertEquals } from 'jsr:@std/assert@1';
 import { makeExercise } from '../_shared/templates.ts';
 
 Deno.env.set('VANTARIS_TEST', '1');
-const { acceptNarrative } = await import('./index.ts');
+const { acceptNarrative } = await import('../generate-exercise/index.ts');
 
 const ex = makeExercise('dcf.gordon', 7, 2);
 const brief = { rule: 'Next year cash flow over the spread.', trap: 'Growing the cash flow twice.', realWorld: 'Most of a DCF sits in this number.', formula: 'TV = FCF₁ ÷ (WACC − g)' };

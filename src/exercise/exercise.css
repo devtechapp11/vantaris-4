@@ -14,7 +14,7 @@
 .ex-strip-line { margin: 0; font-size: var(--fs-sm); color: var(--fg-2); }
 .ex-strip-line b { color: var(--fg); }
 
-.ex-flash { position: fixed; top: calc(var(--safe-top) + 72px); left: 0; right: 0; z-index: var(--z-overlay); display: flex; justify-content: center; pointer-events: none; }
+.ex-flash { position: fixed; top: calc(var(--safe-top) + 132px); left: 0; right: 0; z-index: var(--z-overlay); display: flex; justify-content: center; pointer-events: none; }
 .ex-flash .fx-plate { letter-spacing: var(--tracking-wider); box-shadow: 0 18px 40px -16px rgba(0, 0, 0, 0.9), 0 0 32px -8px color-mix(in srgb, var(--chrome-hi) 60%, transparent); }
 
 /* A chrome sweep along the border on a correct answer */

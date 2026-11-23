@@ -1,6 +1,6 @@
 // Pointer effects, used sparingly. Both come from React Bits (see
 // src/components/vendor/react-bits/LICENSE.md and THIRD_PARTY.md), tuned to
-// the brief: the magnet moves at most 4px, the spotlight is platinum at 6%.
+// stay quiet: the magnet moves at most 4px, the spotlight is platinum at 6%.
 // Neither runs on touch or with reduced motion.
 import { usePrefs } from '../app/prefs';
 import Magnet from './vendor/react-bits/Magnet';

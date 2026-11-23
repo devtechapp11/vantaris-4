@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Share2, X } from 'lucide-react';
 import { useApp } from '../app/AppContext';
@@ -35,12 +36,14 @@ export default function PromotionCeremony() {
   const shareBtn = useRef<HTMLButtonElement>(null);
 
   // A new desk since the last time this device saw the player: celebrate once.
+  // Never over a session or its results: the ceremony waits for the way out.
+  const inSession = useLocation().pathname.startsWith('/learn');
   useEffect(() => {
-    if (!level) return;
+    if (!level || inSession) return;
     const prev = seen().level;
     markSeen({ level });
     if (prev && ORDER.indexOf(level) > ORDER.indexOf(prev)) setDesk(level);
-  }, [level]);
+  }, [level, inSession]);
 
   const label = desk ? `${careerName(desk)} desk`.toUpperCase() : '';
 

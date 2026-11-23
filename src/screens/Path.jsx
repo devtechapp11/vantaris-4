@@ -84,7 +84,7 @@ export default function Path() {
   const [armed, setArmed] = useState(false);
   const can3d = fine && !reduce && prefs.effects3d && hasWebGL() && !lowPower();
 
-  // Caches opened and freezes banked on the server (null until the phase 6 migration is live).
+  // Caches opened and freezes banked on the server (null until the server-XP migration is applied).
   const [desk, setDesk] = useState(null);
   useEffect(() => {
     let live = true;

@@ -374,7 +374,6 @@ function Step({ entry, chapter, retry, onGraded, onNext }) {
   }, [q, verdict, ready, check]);
 
   const keyFor = () => {
-    if (!IS_DEMO) return undefined;
     if (pairs) return JSON.stringify(pairs.answer);
     return JSON.stringify(q.type === 'slider' ? Math.round((q.answer - q.min) / q.step) : q.answer);
   };
@@ -387,8 +386,7 @@ function Step({ entry, chapter, retry, onGraded, onNext }) {
       exit={reduce ? { opacity: 0 } : { opacity: 0, x: -40 }}
       transition={springs.snappy}
       aria-live="polite"
-      data-key={keyFor()}
-      data-type={pairs ? 'pairs' : q.type}
+      {...(IS_DEMO ? { 'data-key': keyFor(), 'data-type': pairs ? 'pairs' : q.type } : {})}
     >
       <div className={`learn-body ${verdict === true ? 'is-sweep' : ''}`} ref={cardRef}>
         <p className="t-eyebrow learn-stage">

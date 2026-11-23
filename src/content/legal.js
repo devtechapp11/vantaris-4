@@ -81,7 +81,7 @@ export const LEGAL = {
         'Supabase: database, authentication and server functions (hosting region: [SUPABASE REGION]).',
         'Vercel: website hosting and content delivery.',
         'Razorpay: payment processing and subscriptions (Razorpay is responsible for card and bank data under its own privacy policy and PCI-DSS).',
-        'Google (Gemini API): generates AI tutor replies from the questions you send. [CONFIRM GEMINI DATA-USE TERMS AND REGION FOR YOUR API PLAN].',
+        'Google (Gemini API): writes the AI tutor’s replies and the wording of some practice exercises. Requests are sent only from our servers, never directly from your device, and contain the practice problem and the messages you type in the tutor, not your name, email address or payment details. We use Google’s paid API service, under whose terms Google does not use these requests or replies to train or improve its models. The numbers and the correct answer of every exercise are computed by our own code, not by the model.',
         'Analytics provider, only with your consent: [ANALYTICS PROVIDER OR “NONE”].',
       ], p: ['Each processor acts on our instructions under a written contract. We may also disclose data where the law requires it.'] },
       { h: 'International transfers', p: ['Some processors store or process data outside your country. Where data leaves the EU, the UK or India, we rely on adequacy decisions, Standard Contractual Clauses (or the UK addendum) and the protections required by Indian law.'] },

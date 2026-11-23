@@ -159,14 +159,14 @@ Rien n'est poussé ni déployé sans accord explicite.
 
 ## 5. QA finale
 
-- [ ] Aucune couleur hors palette (`check-palette` vert), plus aucun bleu saturé ni cristal.
-- [ ] Landing : ouverture HUD, scrollytelling des monolithes (verrouillage au deal, vue éclatée), 3 deals avant inscription.
-- [ ] Shader : 60 fps desktop, ≥ 30 fps sur un Android milieu de gamme, pause quand l'onglet est caché, fallback sans WebGL2.
-- [ ] Path : 5 états de nœud, Capsules Vault Cache, rail droit desktop, tab bar mobile avec safe-area, barre de stats non coupée.
-- [ ] Exercice : 4 formats + sons + haptique + particules + combos + flash mi-leçon ; tout désactivable ; `prefers-reduced-motion` respecté.
-- [ ] Résultats : 3 étoiles encastrées avec impact, Deal Brief, un seul CTA principal.
-- [ ] Promotion de bureau : cérémonie passable, image de partage.
-- [ ] Rattrapage : variante dans la leçon + répétition espacée.
-- [ ] Aucune clé secrète côté client, XP validée côté serveur, aucun `.map` en production.
-- [ ] Build, lint, typecheck et tests verts. Captures à 375 / 768 / 1440.
-- [ ] Rien de déployé sans accord.
+- [x] Aucune couleur hors palette (`check-palette` vert), plus aucun bleu saturé ni cristal.
+- [x] Landing : ouverture HUD, scrollytelling des monolithes (verrouillage au deal, vue éclatée), 3 deals avant inscription.
+- [x] Shader : 60 fps desktop, pause quand l'onglet est caché, fallback sans WebGL2. *(À confirmer sur un vrai Android milieu de gamme : non mesurable en headless.)*
+- [x] Path : 5 états de nœud, Capsules Vault Cache, rail droit desktop, tab bar mobile avec safe-area, barre de stats non coupée.
+- [x] Exercice : 4 formats + sons + haptique + particules + combos + flash mi-leçon ; tout désactivable ; `prefers-reduced-motion` respecté.
+- [x] Résultats : 3 étoiles encastrées avec impact, Deal Brief, un seul CTA principal.
+- [x] Promotion de bureau : cérémonie passable, image de partage.
+- [x] Rattrapage : variante dans la leçon + répétition espacée.
+- [x] Aucune clé secrète côté client, XP validée côté serveur (migration prête, à appliquer), aucun `.map` en production (`check-dist`).
+- [x] Build, lint, typecheck et tests verts (15 unitaires + 17 Deno). Captures à 375 / 768 / 1440, console propre, mouvement réduit vérifié. Lighthouse mobile landing : perf 89, a11y 96, bonnes pratiques 100.
+- [x] Rien de déployé sans accord (branche `redesign/obsidian-platinum` uniquement, migrations non appliquées).

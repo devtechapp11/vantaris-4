@@ -1,6 +1,21 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath } from 'node:url';
+import { transform } from 'esbuild';
+
+// Vite 8 transforms app code with Oxc, so `esbuild.drop` alone misses the
+// bundled dependencies: strip console/debugger from every output chunk too.
+function dropConsole() {
+  return {
+    name: 'vantaris-drop-console',
+    apply: 'build',
+    async renderChunk(code, chunk) {
+      if (!chunk.fileName.endsWith('.js')) return null;
+      const out = await transform(code, { drop: ['console', 'debugger'], legalComments: 'none', minify: true, target: 'es2020', format: 'esm' });
+      return { code: out.code, map: null };
+    },
+  };
+}
 
 // Preload the two font files every screen needs, so text paints in the right
 // face on first render (fontsource hashes the names, so this runs after bundling).
@@ -35,19 +50,22 @@ function preloadFonts(base) {
 // `vite build --mode demo` → a self-contained preview with a local backend.
 // The alias swaps the whole backend module, so the real build never contains
 // the preview code or the answer key.
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
   const base = mode === 'demo' ? './' : '/';
+  const production = command === 'build' && mode === 'production';
   return {
-    plugins: [react(), preloadFonts(base)],
+    plugins: [react(), preloadFonts(base), ...(production ? [dropConsole()] : [])],
     base,
     resolve: {
       alias: {
         '@api-impl': fileURLToPath(new URL(mode === 'demo' ? './src/lib/api/demo.js' : './src/lib/api/real.js', import.meta.url)),
       },
     },
-    // Production output carries no source maps, no comments, no license banners.
-    esbuild: { legalComments: 'none' },
+    // Production output carries no source maps, no comments, no license
+    // banners, and no console or debugger statements.
+    esbuild: production ? { drop: ['console', 'debugger'], legalComments: 'none' } : { legalComments: 'none' },
     build: {
+      target: 'es2020',
       sourcemap: false,
       minify: 'esbuild',
       cssMinify: 'esbuild',

@@ -419,7 +419,7 @@ export const api = {
     save();
     return me();
   },
-  // Mirrors the phase 6 migration (claim_vault_cache, get_desk, credit_*).
+  // Mirrors supabase/migrations/20261123120000_phase6_server_xp.sql.
   async claimCache(cacheId) {
     await wait(200);
     requireUser();
