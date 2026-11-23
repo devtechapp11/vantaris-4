@@ -1,44 +1,56 @@
 /*
-  Vantaris design tokens: the only place raw values live.
+  Vantaris design tokens « Obsidian Platinum »: the only place raw colours live.
+  scripts/check-palette.mjs fails the build on any colour outside this file's
+  palette.
 
-  Identity: obsidian, steel, chrome, brushed platinum, pure white, and one
-  light: refracted glacier blue. No other hue exists in the product: a correct
-  answer and a gain glow glacier; a miss and a loss go cold steel.
+  Identity: obsidian surfaces, steel structure, brushed platinum and liquid
+  chrome, pure white text. Glacier and slate are cold reflections only (never
+  a flat fill, never above 12% opacity). Gain and loss are desaturated and only
+  mark a right or wrong answer, always next to an icon.
 
-  Type: Space Grotesk (architectural, tight) for display and headings, Inter
-  for everything people read and tap, JetBrains Mono with tabular figures for
-  every number: counters, multiples, tickers, scores, formulas.
+  Type: Space Grotesk for display and headings, Inter for reading, JetBrains
+  Mono with tabular, slashed-zero figures for every number.
 
-  Surfaces carry a 2% film grain, frosted glass on floating layers, and a 1px
-  specular edge (chrome to glacier) that follows the pointer or the tilt of
-  the page (src/app/feel.js sets --spec).
-
-  Motion values are mirrored in src/design/tokens.js for Motion.
-  Colours are read from here at runtime by WebGL scenes and the share card
-  (see cssVar in tokens.js), so this file stays the single source of truth.
+  The legacy names (--black, --carbon, --silver…) are aliases kept so every
+  screen reads the new palette without a rewrite.
 */
 :root {
   color-scheme: dark;
 
-  /* ---------- Palette (the only colours in the product) ---------- */
-  --black: #05070B;
-  --carbon: #10141B;
-  --aluminium-dark: #2A313B;
-  --aluminium: #7E8896;
-  --silver: #B6BEC8;
-  --platinum: #E4E8EE;
-  --ice-deep: #1B2452;
-  --ice: #38BDF8;
-  --ice-pale: #BAE6FD;
-  --steel: #8E9AAF;
-  /* Data: gains and right answers catch the glacier light, misses go cold steel */
-  --gain: var(--ice);
-  --loss: var(--steel);
+  /* ---------- Palette (locked) ---------- */
+  --obsidian: #05070B;
+  --obsidian-2: #0A0D13;
+  --graphite: #12161D;
+  --steel-800: #1C222B;
+  --steel-700: #2A3039;
+  --steel-500: #5B6470;
+  --steel-300: #9AA3AE;
+  --platinum: #C9CED6;
+  --chrome-hi: #E6E9EE;
+  --white: #F8FAFC;
+  --glacier: #8FA3B8;
+  --slate: #3B4A5C;
+  --gain: #7FB89A;
+  --loss: #C98A8A;
+  --engraved: #4A515B;
+  --metal-brushed: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 3px),
+                   linear-gradient(180deg, #E6E9EE 0%, #B9BFC8 45%, #8E96A1 100%);
+  --metal-chrome: linear-gradient(180deg, #FFFFFF 0%, #D5D9DF 30%, #7C848F 52%, #E6E9EE 70%, #A9B0BA 100%);
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+
+  /* Legacy aliases */
+  --black: var(--obsidian);
+  --carbon: var(--graphite);
+  --aluminium-dark: var(--steel-700);
+  --aluminium: var(--steel-500);
+  --silver: var(--steel-300);
 
   /* ---------- Surfaces ---------- */
   --bg: var(--black);
   --surface: var(--carbon);
-  --surface-2: color-mix(in srgb, var(--carbon) 70%, var(--aluminium-dark));
+  --surface-2: var(--steel-800);
   --surface-3: var(--aluminium-dark);
   --line: color-mix(in srgb, var(--platinum) 9%, transparent);
   --line-strong: var(--aluminium-dark);
@@ -47,9 +59,9 @@
   --scrim: color-mix(in srgb, var(--black) 72%, transparent);
 
   /* ---------- Text ---------- */
-  --fg: var(--platinum);
-  --fg-2: var(--silver);
-  --fg-3: var(--aluminium);
+  --fg: var(--white);
+  --fg-2: var(--steel-300);
+  --fg-3: var(--steel-500);
   --fg-inverse: var(--black);
 
   /* ---------- Data colour (figures only) ---------- */
@@ -57,16 +69,16 @@
   --neg: var(--loss);
 
   /* ---------- Chrome: mascot, wordmark, hero headline only ---------- */
-  --chrome: linear-gradient(180deg, var(--white-metal) 0%, var(--silver) 36%, var(--aluminium) 50%, color-mix(in srgb, var(--ice-pale) 60%, var(--platinum)) 60%, var(--platinum) 70%, var(--silver) 100%);
+  --chrome: linear-gradient(180deg, var(--white) 0%, var(--chrome-hi) 22%, var(--steel-300) 46%, var(--platinum) 62%, var(--chrome-hi) 78%, var(--steel-300) 100%);
   --edge-highlight: inset 0 1px 0 color-mix(in srgb, var(--platinum) 14%, transparent);
 
   /* ---------- Metal: brushed edges, platinum fills, specular light ---------- */
-  --white-metal: #F8FAFC;
-  --platinum-shade: #C6CDD6;
+  --white-metal: var(--white);
+  --platinum-shade: #B9BFC8;
   /* 1px card edge: light catches the top-left corner, fades along the sides */
   --metal-edge: linear-gradient(calc(95deg + var(--spec, 0.45) * 90deg),
     color-mix(in srgb, var(--platinum) 58%, transparent) 0%,
-    color-mix(in srgb, var(--ice-pale) 30%, transparent) 18%,
+    color-mix(in srgb, var(--glacier) 12%, transparent) 18%,
     color-mix(in srgb, var(--aluminium) 26%, transparent) 30%,
     color-mix(in srgb, var(--platinum) 16%, transparent) 50%,
     color-mix(in srgb, var(--aluminium-dark) 70%, transparent) 74%,
@@ -81,8 +93,8 @@
     var(--carbon) 38%,
     color-mix(in srgb, var(--carbon) 70%, var(--black)) 100%);
   /* Brushed platinum fill (primary button, progress bars) */
-  --metal-fill: linear-gradient(180deg, var(--white-metal) 0%, var(--platinum) 34%, var(--platinum-shade) 54%, var(--platinum) 80%, var(--white-metal) 100%);
-  --metal-fill-press: linear-gradient(180deg, var(--platinum-shade) 0%, var(--silver) 50%, var(--platinum-shade) 100%);
+  --metal-fill: linear-gradient(180deg, #E6E9EE 0%, #B9BFC8 45%, #8E96A1 100%);
+  --metal-fill-press: linear-gradient(180deg, #B9BFC8 0%, #8E96A1 60%, #7C848F 100%);
   --metal-bar: linear-gradient(90deg, var(--aluminium) 0%, var(--silver) 42%, var(--platinum) 78%, var(--white-metal) 100%);
   /* Hairline brushing, barely visible: gives fills a grain instead of plastic */
   --brush: repeating-linear-gradient(180deg, color-mix(in srgb, var(--black) 3.5%, transparent) 0 1px, transparent 1px 2px);
@@ -93,23 +105,23 @@
   --glow: 0 0 0 1px color-mix(in srgb, var(--platinum) 22%, transparent), 0 0 20px -2px color-mix(in srgb, var(--platinum) 18%, transparent);
   --glow-soft: 0 0 14px -2px color-mix(in srgb, var(--platinum) 30%, transparent);
   --glow-gain: 0 0 0 1px color-mix(in srgb, var(--gain) 50%, transparent), 0 0 24px -4px color-mix(in srgb, var(--gain) 38%, transparent);
-  /* Glacier light: refracted blue for combos, surges and live highlights */
-  --ice-glow: 0 0 0 1px color-mix(in srgb, var(--ice) 55%, transparent), 0 0 28px -4px color-mix(in srgb, var(--ice) 45%, transparent);
-  --ice-edge: linear-gradient(calc(100deg + var(--spec, 0.5) * 140deg),
-    color-mix(in srgb, var(--white-metal) 70%, transparent) 0%,
-    color-mix(in srgb, var(--ice-pale) 55%, transparent) 30%,
-    color-mix(in srgb, var(--ice) 22%, transparent) 55%,
-    color-mix(in srgb, var(--silver) 30%, transparent) 100%);
+  /* Cold specular light: a 1px chrome edge that catches a glacier reflection (≤12%) */
+  --spec-glow: 0 0 0 1px color-mix(in srgb, var(--platinum) 30%, transparent), 0 0 24px -6px color-mix(in srgb, var(--chrome-hi) 30%, transparent);
+  --spec-edge: linear-gradient(calc(100deg + var(--spec, 0.5) * 140deg),
+    color-mix(in srgb, var(--white) 55%, transparent) 0%,
+    color-mix(in srgb, var(--glacier) 12%, transparent) 30%,
+    color-mix(in srgb, var(--platinum) 14%, transparent) 55%,
+    color-mix(in srgb, var(--steel-300) 20%, transparent) 100%);
   /* 2% cinematic film grain over every screen */
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)'/%3E%3C/svg%3E");
   --lift: 0 1px 0 color-mix(in srgb, var(--black) 70%, transparent), 0 14px 32px -18px color-mix(in srgb, var(--black) 90%, transparent);
 
   /* ---------- Liquid Glass: floating layers only (max three at once) ---------- */
-  --glass-bg: color-mix(in srgb, var(--carbon) 64%, transparent);
+  --glass-bg: color-mix(in srgb, var(--obsidian-2) 70%, transparent);
   --glass-solid: var(--carbon);
   --glass-blur: 40px;
   --glass-saturate: 140%;
-  --glass-edge: inset 0 1px 0 color-mix(in srgb, var(--ice-pale) 14%, color-mix(in srgb, var(--platinum) 14%, transparent)), inset 0 0 0 1px color-mix(in srgb, var(--platinum) 7%, transparent);
+  --glass-edge: inset 0 1px 0 color-mix(in srgb, var(--chrome-hi) 14%, color-mix(in srgb, var(--platinum) 14%, transparent)), inset 0 0 0 1px color-mix(in srgb, var(--platinum) 7%, transparent);
   /* 2% monochrome grain so large glass areas don't band */
   --glass-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
 
@@ -142,7 +154,7 @@
   --lh-body: 1.6;
   --tracking-tight: -0.03em;
   --tracking-wide: 0.08em;
-  --tracking-wider: 0.14em;
+  --tracking-wider: 0.18em;
 
   /* ---------- Space (4px grid) ---------- */
   --sp-0: 2px;
@@ -163,9 +175,9 @@
 
   /* ---------- Shape: 2-6px, sheets up to 16px ---------- */
   --r-xs: 2px;
-  --r-sm: 4px;
-  --r-md: 6px;
-  --r-sheet: 16px;
+  --r-sm: var(--radius-sm);
+  --r-md: var(--radius-md);
+  --r-sheet: var(--radius-lg);
   --r-full: 999px;
   --hairline: 1px;
   --ring: 2px;

@@ -6,7 +6,6 @@ import Logo from '../components/Logo';
 import { Magnetic, Spotlight } from '../components/effects';
 import { TierBadge } from '../components/bits';
 import PlanCard, { BillingToggle } from '../components/PlanCard';
-import IceCrystal from '../components/gl/IceCrystal';
 import { useMedia } from '../app/useDevice';
 import { usePlans } from '../app/usePlans';
 import { usePrefs } from '../app/prefs';
@@ -104,10 +103,8 @@ function Film() {
   const [index, setIndex] = useState(0);
   const mobile = !useMedia('(min-width: 900px)');
   const { scrollY } = useScroll();
-  const spin = useRef(0);
 
-  useMotionValueEvent(scrollY, 'change', (v) => {
-    spin.current = v / window.innerHeight;
+  useMotionValueEvent(scrollY, 'change', () => {
     const line = window.innerHeight * (mobile ? 0.72 : 0.5);
     const els = chapters.current;
     let next = 0;
@@ -123,7 +120,7 @@ function Film() {
 
   return (
     <section ref={ref} id="film" className="film" aria-label="How Vantaris works">
-      <Stage index={index} t={t} spin={spin} />
+      <Stage index={index} t={t} />
       <div className="film-chapters">
         {CHAPTERS.map((c, i) => (
           <article key={c.id} ref={(el) => { chapters.current[i] = el; }} className={`chapter chapter--${c.id} ${i === index ? 'is-active' : ''}`} aria-labelledby={`ch-${c.id}`}>
@@ -144,13 +141,7 @@ function Film() {
   );
 }
 
-/** The crystal's two poses: hero (large, right of the headline) and docked in the corner. */
-const POSE = {
-  hero: { x: '0vw', y: '0vh', scale: 1 },
-  rest: { x: '9vw', y: '-30vh', scale: 0.3 },
-};
-
-function Stage({ index, t, spin }) {
+function Stage({ index, t }) {
   const c = CHAPTERS[index];
   const hero = c.visual === 'hero';
   const local = useTransform(t, (v) => Math.max(0, Math.min(1, v - index + 0.5)));
@@ -158,9 +149,6 @@ function Stage({ index, t, spin }) {
   return (
     <div className="film-stage" aria-hidden="true">
       <div className="stage-scrim" />
-      <motion.div className="stage-ice" initial={false} animate={hero ? POSE.hero : POSE.rest} transition={{ type: 'spring', stiffness: 70, damping: 18, mass: 1.2 }}>
-        <IceCrystal scrollRef={spin} />
-      </motion.div>
       <AnimatePresence mode="wait">
         {!hero && (
           <motion.div
@@ -322,15 +310,9 @@ function TutorBubble({ p, metal }) {
  */
 function MobileFilm() {
   const hero = CHAPTERS[0];
-  const { scrollY } = useScroll();
-  const spin = useRef(0);
-  useMotionValueEvent(scrollY, 'change', (v) => { spin.current = v / window.innerHeight; });
   return (
     <section id="film" className="mfilm" aria-label="How Vantaris works">
       <article className="mch mch--hero" aria-labelledby={`ch-${hero.id}`}>
-        <div className="mch-ice" aria-hidden="true">
-          <IceCrystal scrollRef={spin} />
-        </div>
         <div className="chapter-copy">
           <p className="t-eyebrow">{hero.eyebrow}</p>
           <h1 id={`ch-${hero.id}`} className="t-display hero-title text-chrome text-chrome--live">{hero.title}</h1>
@@ -382,7 +364,7 @@ function StillFilm() {
             <p className="t-lead">{c.body}</p>
             {i === 0 && <HeroCase />}
           </div>
-          {i === 0 ? <div className="still-ice" aria-hidden="true"><IceCrystal still /></div> : <div className="still-visual"><Visual kind={c.visual} p={still} /></div>}
+          {i === 0 ? null : <div className="still-visual"><Visual kind={c.visual} p={still} /></div>}
         </article>
       ))}
     </section>

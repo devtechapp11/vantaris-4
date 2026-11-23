@@ -334,10 +334,10 @@ function Vale({ state, lookAt, pulse, interactive, poseRef, onReady, colors }) {
 function usePalette() {
   return useMemo(() => ({
     black: new Color(cssVar('--black', '#05070B')),
-    carbon: new Color(cssVar('--carbon', '#10141B')),
-    aluDark: new Color(cssVar('--aluminium-dark', '#2A313B')),
-    silver: new Color(cssVar('--silver', '#B6BEC8')),
-    platinum: new Color(cssVar('--platinum', '#E4E8EE')),
+    carbon: new Color(cssVar('--carbon', '#12161D')),
+    aluDark: new Color(cssVar('--aluminium-dark', '#2A3039')),
+    silver: new Color(cssVar('--silver', '#9AA3AE')),
+    platinum: new Color(cssVar('--platinum', '#C9CED6')),
   }), []);
 }
 

@@ -49,8 +49,8 @@ export default function MetalWaves({ className = '' }) {
     const canvas = ref.current;
     if (!canvas || !hasWebGL()) return undefined;
     const colors = {
-      uBlack: rgb('--black', '#05070B'), uCarbon: rgb('--carbon', '#10141B'), uSteel: rgb('--silver', '#B6BEC8'),
-      uIce: rgb('--ice', '#38BDF8'), uIcePale: rgb('--ice-pale', '#BAE6FD'), uDeep: rgb('--ice-deep', '#1B2452'),
+      uBlack: rgb('--black', '#05070B'), uCarbon: rgb('--graphite', '#12161D'), uSteel: rgb('--steel-300', '#9AA3AE'),
+      uIce: rgb('--glacier', '#8FA3B8'), uIcePale: rgb('--platinum', '#C9CED6'), uDeep: rgb('--slate', '#3B4A5C'),
     };
     const run = runShader(canvas, FRAG, {
       still: reduce,

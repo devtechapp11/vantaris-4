@@ -26,7 +26,7 @@ export default function RankCard({ name, level, points, rank, since }) {
   const gy = useTransform(sy, [0, 1], ['0%', '100%']);
   const holo = useTransform(sx, [0, 1], [0, 360]);
   const light = useMotionTemplate`radial-gradient(circle at ${gx} ${gy}, rgba(255,255,255,0.55), rgba(255,255,255,0) 46%)`;
-  const iris = useMotionTemplate`linear-gradient(${holo}deg, rgba(255,255,255,0) 20%, rgba(231,232,229,0.38) 38%, rgba(160,166,170,0.12) 50%, rgba(255,255,255,0.42) 62%, rgba(255,255,255,0) 80%)`;
+  const iris = useMotionTemplate`linear-gradient(${holo}deg, rgba(255,255,255,0) 20%, rgba(230,233,238,0.38) 38%, rgba(154,163,174,0.12) 50%, rgba(255,255,255,0.42) 62%, rgba(255,255,255,0) 80%)`;
 
   const idx = Math.max(0, CAREER.findIndex((c) => c.level === level));
   const nextFloor = CAREER[idx + 1]?.floor;

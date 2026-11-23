@@ -40,11 +40,11 @@
 .path { position: relative; margin: var(--sp-2) auto 0; max-width: 100%; }
 .path-trail { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
 .trail-base { fill: none; stroke: color-mix(in srgb, var(--platinum) 9%, transparent); stroke-width: 10; stroke-linecap: round; }
-.trail-lit { fill: none; stroke: url(#trail-metal); stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--ice) 55%, transparent)); }
+.trail-lit { fill: none; stroke: url(#trail-metal); stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--platinum) 55%, transparent)); }
 
 .punit {
   position: absolute; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: var(--sp-2);
-  font-size: var(--fs-2xs); font-weight: var(--fw-semibold); letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--fg-3);
+  font-size: var(--fs-2xs); font-weight: var(--fw-semibold); letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--steel-300);
 }
 .punit span { padding: 6px 14px; border-radius: var(--r-full); background: var(--bg); box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--fg-2); }
 .punit em { display: inline-flex; align-items: center; gap: 4px; font-style: normal; padding: 6px 10px; border-radius: var(--r-full); background: var(--bg); box-shadow: inset 0 0 0 1px var(--line); }
@@ -57,7 +57,7 @@
 .pnode-edge, .pnode-face { position: absolute; left: 0; width: 76px; height: 76px; border-radius: 50%; }
 .pnode-edge {
   top: 8px;
-  background: linear-gradient(180deg, #8d9396, #4d5356);
+  background: linear-gradient(180deg, #8E96A1, #4A515B);
   box-shadow: 0 10px 22px -8px rgba(0, 0, 0, 0.9);
 }
 .pnode-face {
@@ -79,23 +79,23 @@
 }
 .is-locked .pnode-face, .is-closed .pnode-face {
   color: var(--fg-3);
-  background: radial-gradient(circle at 34% 26%, color-mix(in srgb, var(--platinum) 14%, transparent), transparent 45%), linear-gradient(160deg, #2a2e31, #15181a);
+  background: radial-gradient(circle at 34% 26%, color-mix(in srgb, var(--platinum) 14%, transparent), transparent 45%), linear-gradient(160deg, #2A3039, #12161D);
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--platinum) 18%, transparent), 0 0 0 1px var(--line-strong);
 }
-.is-locked .pnode-edge, .is-closed .pnode-edge { background: linear-gradient(180deg, #1d2023, #0b0c0d); }
+.is-locked .pnode-edge, .is-closed .pnode-edge { background: linear-gradient(180deg, #1C222B, #0A0D13); }
 .is-open .pnode-face { filter: saturate(0.6) brightness(0.82); }
 
 /* The next chapter: a pulsing platinum ring lit from inside by glacier blue */
 .pnode-ring {
   position: absolute; left: -12px; top: -12px; width: 100px; height: 100px; border-radius: 50%; pointer-events: none;
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--white-metal) 80%, transparent), 0 0 0 5px color-mix(in srgb, var(--ice) 22%, transparent), 0 0 32px 4px color-mix(in srgb, var(--ice) 40%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--white-metal) 80%, transparent), 0 0 0 5px color-mix(in srgb, var(--platinum) 22%, transparent), 0 0 32px 4px color-mix(in srgb, var(--platinum) 40%, transparent);
   animation: ring-pulse 2.2s var(--ease-in-out) infinite;
 }
 @keyframes ring-pulse { 0%, 100% { transform: scale(0.94); opacity: 0.55; } 50% { transform: scale(1.04); opacity: 1; } }
 
 .pstars { position: absolute; width: 72px; display: flex; justify-content: center; gap: 3px; pointer-events: none; }
 .pstars svg { color: color-mix(in srgb, var(--platinum) 28%, transparent); }
-.pstars svg.is-on { color: var(--white-metal); fill: var(--platinum); filter: drop-shadow(0 0 5px color-mix(in srgb, var(--ice-pale) 70%, transparent)); }
+.pstars svg.is-on { color: var(--white-metal); fill: var(--platinum); filter: drop-shadow(0 0 5px color-mix(in srgb, var(--chrome-hi) 70%, transparent)); }
 
 .ppanel { position: absolute; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; }
 .ppanel--r { align-items: flex-end; text-align: right; }
@@ -105,7 +105,7 @@
 @media (min-width: 768px) { .ppanel-title { font-size: var(--fs-xl); } }
 
 /* Floating solids: platinum edges, smoked glass faces refracting glacier light, compositor-only motion */
-.art { display: block; width: 56px; height: 60px; perspective: 300px; animation: art-float 5s var(--ease-in-out) infinite alternate; filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 14px color-mix(in srgb, var(--ice) 18%, transparent)); }
+.art { display: block; width: 56px; height: 60px; perspective: 300px; animation: art-float 5s var(--ease-in-out) infinite alternate; filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 14px color-mix(in srgb, var(--platinum) 18%, transparent)); }
 .art-spin { position: relative; display: block; width: 30px; height: 30px; margin: 15px 13px; transform-style: preserve-3d; animation: art-spin 16s linear infinite; }
 .art i { position: absolute; inset: 0; display: block; }
 @keyframes art-spin { from { transform: rotateX(-18deg) rotateY(0deg); } to { transform: rotateX(-18deg) rotateY(360deg); } }
@@ -114,8 +114,8 @@
 /* The monolith: a tall slab of smoked glass framed in platinum */
 .art--cube .art-spin { width: 24px; height: 48px; margin: 6px 16px; }
 .art--cube i {
-  background: linear-gradient(165deg, color-mix(in srgb, var(--white-metal) 42%, transparent) 0%, color-mix(in srgb, var(--ice-pale) 20%, transparent) 30%, color-mix(in srgb, var(--ice-deep) 60%, transparent) 64%, color-mix(in srgb, var(--black) 75%, transparent) 100%);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--platinum) 62%, transparent), inset 0 0 12px color-mix(in srgb, var(--ice) 22%, transparent);
+  background: linear-gradient(165deg, color-mix(in srgb, var(--white-metal) 42%, transparent) 0%, color-mix(in srgb, var(--chrome-hi) 20%, transparent) 30%, color-mix(in srgb, var(--steel-800) 60%, transparent) 64%, color-mix(in srgb, var(--black) 75%, transparent) 100%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--platinum) 62%, transparent), inset 0 0 12px color-mix(in srgb, var(--platinum) 22%, transparent);
 }
 .art--cube i:nth-child(1) { transform: translateZ(8px); }
 .art--cube i:nth-child(2) { transform: rotateY(180deg) translateZ(8px); }
@@ -126,7 +126,7 @@
 
 .art--pyramid i {
   clip-path: polygon(50% 0, 100% 100%, 0 100%); transform-origin: 50% 100%;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--white-metal) 75%, transparent), color-mix(in srgb, var(--ice-pale) 30%, transparent) 40%, color-mix(in srgb, var(--ice-deep) 70%, transparent));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--white-metal) 75%, transparent), color-mix(in srgb, var(--chrome-hi) 30%, transparent) 40%, color-mix(in srgb, var(--steel-800) 70%, transparent));
 }
 .art--pyramid i:nth-child(1) { transform: translateZ(15px) rotateX(27deg); }
 .art--pyramid i:nth-child(2) { transform: rotateY(90deg) translateZ(15px) rotateX(27deg); opacity: 0.8; }
@@ -134,7 +134,7 @@
 .art--pyramid i:nth-child(4) { transform: rotateY(270deg) translateZ(15px) rotateX(27deg); opacity: 0.8; }
 
 .art--rings i { border-radius: 50%; box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--platinum) 80%, transparent), 0 0 8px -2px color-mix(in srgb, var(--white-metal) 50%, transparent); }
-.art--rings i:nth-child(2) { transform: rotateY(60deg); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--ice-pale) 85%, transparent), 0 0 10px -2px color-mix(in srgb, var(--ice) 60%, transparent); }
+.art--rings i:nth-child(2) { transform: rotateY(60deg); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--chrome-hi) 85%, transparent), 0 0 10px -2px color-mix(in srgb, var(--platinum) 60%, transparent); }
 .art--rings i:nth-child(3) { transform: rotateY(120deg); }
 .art--rings .art-spin { animation-duration: 11s; }
 

@@ -1,5 +1,6 @@
 import { useId } from 'react';
 import { BRAND } from '../lib/config';
+import VantarisWordmark from './VantarisWordmark';
 
 /** The Vantaris V: two faceted arms meeting at a point, in chrome. */
 export function VMark({ size = 32, className = '' }) {
@@ -25,12 +26,8 @@ export function VMark({ size = 32, className = '' }) {
   );
 }
 
-export function Wordmark({ className = '' }) {
-  return (
-    <span className={`wordmark text-chrome ${className}`} style={{ font: 'var(--fw-semibold) var(--fs-md)/1 var(--font-ui)', letterSpacing: 'var(--tracking-wider)' }}>
-      {BRAND.name.toUpperCase()}
-    </span>
-  );
+export function Wordmark({ className = '', height = 13 }) {
+  return <VantarisWordmark height={height} title={BRAND.name} className={`wordmark ${className}`} />;
 }
 
 export default function Logo({ size = 28, word = true }) {

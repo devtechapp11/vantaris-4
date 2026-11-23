@@ -35,10 +35,10 @@ button { cursor: pointer; }
 button, a, [role="button"], [role="radio"], [role="tab"], label { touch-action: manipulation; }
 a { color: inherit; }
 :focus { outline: none; }
-:focus-visible { outline: var(--ring) solid var(--ice-pale); outline-offset: var(--ring); border-radius: var(--r-xs); }
+:focus-visible { outline: var(--ring) solid var(--chrome-hi); outline-offset: var(--ring); border-radius: var(--r-xs); }
 [hidden] { display: none !important; }
 main:focus { outline: none; }
-::selection { background: var(--ice-deep); color: var(--white-metal); }
+::selection { background: var(--steel-800); color: var(--white-metal); }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { background: var(--aluminium-dark); border-radius: var(--r-full); border: 3px solid transparent; background-clip: padding-box; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -74,14 +74,14 @@ svg.lucide { stroke-width: 1.5px; }
   font-weight: var(--fw-semibold);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
-  color: var(--fg-3);
+  color: var(--steel-300);
   margin: 0;
 }
-.fig { font-family: var(--font-figure); font-variant-numeric: tabular-nums lining-nums; letter-spacing: -0.01em; }
+.fig { font-family: var(--font-figure); font-variant-numeric: tabular-nums lining-nums slashed-zero; font-feature-settings: 'ss01' 1, 'cv01' 1, 'cv11' 1, 'zero' 1; letter-spacing: -0.01em; }
 .fig-hero { font-family: var(--font-mono); font-variant-numeric: tabular-nums lining-nums; font-size: var(--fs-5xl); font-weight: var(--fw-medium); letter-spacing: -0.04em; line-height: 1; }
 /* Terminal figures: term sheets, formulas, scores. Monospaced so every digit
    sits in the same column, like a market data screen. */
-.fig-mono, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums slashed-zero; font-feature-settings: 'zero' 0; letter-spacing: -0.02em; }
+.fig-mono, .mono, .ticker { font-family: var(--font-mono); font-variant-numeric: tabular-nums slashed-zero; font-feature-settings: 'ss01' 1, 'cv01' 1, 'cv11' 1, 'zero' 1; letter-spacing: -0.02em; }
 /* Chrome text: wordmark and hero headline only */
 .text-chrome {
   background: var(--chrome);

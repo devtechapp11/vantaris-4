@@ -24,7 +24,7 @@
 .tab-pill {
   position: absolute; top: 6px; left: 50%; width: 56px; height: 30px; margin-left: -28px; border-radius: var(--r-full);
   background: linear-gradient(180deg, color-mix(in srgb, var(--platinum) 16%, transparent), color-mix(in srgb, var(--platinum) 5%, transparent));
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--white-metal) 30%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--ice-pale) 18%, transparent), 0 0 18px -6px color-mix(in srgb, var(--ice) 55%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--white-metal) 30%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--chrome-hi) 18%, transparent), 0 0 18px -6px color-mix(in srgb, var(--platinum) 55%, transparent);
 }
 /* Frosted platinum: the glass bar catches a little metal light along its top */
 .tabbar::before {
@@ -32,9 +32,9 @@
   background: linear-gradient(180deg, color-mix(in srgb, var(--platinum) 7%, transparent), transparent 60%);
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--platinum) 22%, transparent);
 }
-.tabbar::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 1px; pointer-events: none; background: var(--ice-edge); opacity: 0.7; }
+.tabbar::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 1px; pointer-events: none; background: var(--spec-edge); opacity: 0.7; }
 .tab[aria-current='page'] { color: var(--fg); }
-.tab-mark { position: absolute; top: 0; left: 30%; right: 30%; height: 2px; border-radius: 0 0 2px 2px; background: linear-gradient(90deg, var(--platinum), var(--ice-pale), var(--ice)); box-shadow: 0 0 12px color-mix(in srgb, var(--ice) 80%, transparent); }
+.tab-mark { position: absolute; top: 0; left: 30%; right: 30%; height: 2px; border-radius: 0 0 2px 2px; background: linear-gradient(90deg, var(--platinum), var(--chrome-hi), var(--platinum)); box-shadow: 0 0 12px color-mix(in srgb, var(--platinum) 80%, transparent); }
 
 .sidebar { display: none; }
 

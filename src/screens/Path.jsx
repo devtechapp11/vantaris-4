@@ -126,7 +126,7 @@ export default function Path() {
           <defs>
             <linearGradient id="trail-metal" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0" stopColor="var(--white-metal)" />
-              <stop offset="0.5" stopColor="var(--ice-pale)" />
+              <stop offset="0.5" stopColor="var(--chrome-hi)" />
               <stop offset="1" stopColor="var(--platinum)" />
             </linearGradient>
           </defs>

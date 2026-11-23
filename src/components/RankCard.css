@@ -3,16 +3,16 @@
 .rcard {
   position: relative; aspect-ratio: 1.586; width: 100%; border-radius: 18px; overflow: hidden;
   transform-style: preserve-3d; will-change: transform; isolation: isolate;
-  color: #141618;
+  color: #12161D;
   background:
     repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, rgba(0,0,0,0.035) 1px 3px),
-    linear-gradient(135deg, #f4f5f3 0%, #c9cdce 26%, #eef0ee 48%, #a9aeb1 72%, #e3e5e2 100%);
+    linear-gradient(135deg, #F8FAFC 0%, #C9CED6 26%, #E6E9EE 48%, #A9B0BA 72%, #E6E9EE 100%);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -1px 0 rgba(0,0,0,0.25),
     0 1px 2px rgba(0,0,0,0.5), 0 24px 50px -18px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.18);
   cursor: grab; user-select: none; -webkit-user-select: none;
 }
-.rcard-guilloche { position: absolute; inset: 0; width: 100%; height: 100%; fill: none; stroke: rgba(20,22,24,0.07); stroke-width: 0.8; pointer-events: none; }
+.rcard-guilloche { position: absolute; inset: 0; width: 100%; height: 100%; fill: none; stroke: rgba(18,22,29,0.07); stroke-width: 0.8; pointer-events: none; }
 .rcard-iris, .rcard-light { position: absolute; inset: 0; pointer-events: none; }
 .rcard-iris {
   mix-blend-mode: overlay; opacity: 0.9;
@@ -22,23 +22,23 @@
 .rcard-light { mix-blend-mode: soft-light; }
 @keyframes rcard-drift { from { background-position: 0% 0%; } to { background-position: 100% 100%; } }
 .rcard-body { position: relative; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: clamp(16px, 5%, 24px); transform: translateZ(30px); }
-.rcard-brand { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.22em; color: #202326; }
-.rcard-brand svg { color: #202326; }
-.rcard-rank { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; color: #2a2e31; }
+.rcard-brand { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.22em; color: #1C222B; }
+.rcard-brand svg { color: #1C222B; }
+.rcard-rank { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; color: #2A3039; }
 .rcard-mid { display: flex; align-items: center; gap: 14px; }
 .rcard-chip {
   width: 42px; height: 32px; border-radius: 6px; flex: none;
-  background: linear-gradient(135deg, #dfe1de, #9aa0a3 45%, #e9ebe8 60%, #8c9295);
+  background: linear-gradient(135deg, #D5D9DF, #9AA3AE 45%, #E6E9EE 60%, #8E96A1);
   box-shadow: inset 0 0 0 1px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.7);
 }
 .rcard-title {
   font-family: var(--font-display); font-size: clamp(18px, 5.4vw, 26px); font-weight: 500; letter-spacing: 0.08em;
-  background: linear-gradient(180deg, #2c3033, #0d0f10 60%, #4a4f53); -webkit-background-clip: text; background-clip: text; color: transparent;
+  background: linear-gradient(180deg, #2A3039, #0A0D13 60%, #4A515B); -webkit-background-clip: text; background-clip: text; color: transparent;
   text-shadow: 0 1px 0 rgba(255,255,255,0.4);
 }
 .rcard-foot { display: flex; flex-direction: column; gap: 6px; }
-.rcard-name { font-size: clamp(15px, 4.4vw, 19px); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #15171a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.rcard-meta { font-size: 11px; letter-spacing: 0.12em; color: #3a3f43; }
-.rcard-track { display: block; height: 2px; border-radius: 2px; background: rgba(20,22,24,0.14); overflow: hidden; }
-.rcard-track i { display: block; height: 100%; background: linear-gradient(90deg, #2a2e31, #6a7074); transform-origin: left; transition: transform 1.2s var(--ease-out); }
+.rcard-name { font-size: clamp(15px, 4.4vw, 19px); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #12161D; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rcard-meta { font-size: 11px; letter-spacing: 0.12em; color: #2A3039; }
+.rcard-track { display: block; height: 2px; border-radius: 2px; background: rgba(18,22,29,0.14); overflow: hidden; }
+.rcard-track i { display: block; height: 100%; background: linear-gradient(90deg, #2A3039, #5B6470); transform-origin: left; transition: transform 1.2s var(--ease-out); }
 @media (hover: hover) and (pointer: fine) { .rcard:active { cursor: grabbing; } }
