@@ -56,5 +56,19 @@ Contrôle les hex, `rgb()/rgba()` (triplets des couleurs autorisées acceptés) 
 ## Mesures
 - **Phase 2 (shader v2)** : headless SwiftShader (rendu CPU, non représentatif) ≈ 8 fps à 1440 px, rendu correct, console propre. Garde-fou : si les 120 premières frames mesurées sur desktop tombent sous ~50 fps (intervalle moyen > 20 ms), la trame se coupe pour la session. Le seuil « 14 ms » du brief est mesuré ici en intervalle rAF : à 60 Hz l'intervalle vaut toujours 16,7 ms, donc 20 ms est le seuil utile. Mobile : 30 fps plafonnés, cellules plus grandes, trame à 60 %. **À mesurer sur un vrai appareil** (desktop GPU et Android milieu de gamme).
 
+- **Phase 8 — Lighthouse mobile, landing (build preview, même protocole que la référence)** : performance **85–87** (référence avant Director's Cut : 88), accessibilité 96, bonnes pratiques 100, CLS 0, TBT 80–130 ms. LCP 3,5–3,7 s en throttling simulé (référence 3,3 s) : **l'objectif LCP < 2,5 s n'est pas atteint**, ni avant ni après ; c'est le temps du premier rendu du texte prérendu sous 4G simulée.
+  - Régression trouvée et corrigée : le dégradé du titre en `background-clip: text` (remplissage transparent) faisait passer le LCP au bloc React après hydratation (79). Le même dégradé est maintenant un masque d'opacité sur texte opaque.
+- **Budget JS/CSS** : +16 KB gzip hors chunk `three` (budget +60 KB). La police Instrument Serif italique latin ajoute 22 KB (woff2, préchargée).
+- **fps** : non mesurables de façon représentative en headless (SwiftShader CPU). À mesurer sur appareil réel.
+
 ## Phase 8 — QA finale
-(cochée en fin d'exécution)
+- [x] `npm run lint && npm run typecheck && npm run build` (check-palette, check-dist) : OK après chaque phase.
+- [x] `npm test` : 15/15. Fonctions Edge (Deno) : 17/17, `deno check` de `billing` OK.
+- [x] Parcours complets 375 / 768 / 1440 et 375 en mouvement réduit : aucune erreur console, aucun débordement horizontal (un lancement en mouvement réduit a échoué une fois sur un délai du script, OK à la relance).
+- [x] Vérité des données : badges hero = précision du visiteur (« — » avant de jouer), nombre réel de deals (`get_public_stats`, rien sinon), desk provisoire ; tickets et aperçu radar/graphe marqués EXAMPLE ; économies annuelles calculées depuis les prix configurés ; aucun faux joueur ajouté (le ghost run = vos 30 jours précédents).
+- [x] Reçu : « PAID » seulement après vérification serveur, champs lus côté serveur ; preview tamponnée « Preview · not charged » ; jamais « Invoice » ; mention e-mail seulement si `invoice_emailed`.
+- [x] Mouvement réduit : pas de particules, glyphes figés, médaillons figés, impression instantanée, splash 400 ms, rail de l'échelle plein.
+- [x] Accessibilité : bouton à maintenir utilisable au clavier (Espace / Entrée) et désactivable (« Hold to confirm »), Vale masquable (« Show Vale »), cibles ≥ 44 px, couleur jamais seul signal (CORRECT / REVIEWED écrits).
+- [ ] **Non déployé** : `billing` (reçu serveur). Tant qu'elle n'est pas redéployée, le paiement réel affiche la confirmation sans reçu (jamais de valeurs client).
+- [ ] **Donnée manquante** : Elo / maîtrise par compétence (`skill_mastery`, migration non appliquée). Le radar utilise étoiles ÷ 3 ; aucun Elo affiché.
+- [ ] À mesurer sur appareils réels : fps desktop/mobile du shader v2 et de la scène 3D, LCP réel.

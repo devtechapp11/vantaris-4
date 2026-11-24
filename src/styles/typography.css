@@ -21,16 +21,18 @@
   font-weight: 600;
   line-height: 0.92;
   letter-spacing: -0.045em;
-  background: linear-gradient(180deg, #F8FAFC 0%, #C9CED6 55%, #5B6470 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
+  /* #F8FAFC → #C9CED6 → #5B6470 on the obsidian ground, drawn as an opacity
+     mask over opaque text (a transparent text fill would keep the title out
+     of LCP and push it to hydration). */
+  color: #F8FAFC;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.81) 55%, rgba(0, 0, 0, 0.37) 100%);
+  mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.81) 55%, rgba(0, 0, 0, 0.37) 100%);
 }
 .hero-title .editorial {
   display: inline-block;
-  padding-right: 0.06em; /* italic overhang stays inside the clip */
+  padding-right: 0.06em; /* italic overhang */
   font-size: 1.08em;
   letter-spacing: -0.02em;
-  background: var(--metal-chrome);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 
 .kicker { font: 500 11px/1 var(--font-mono); letter-spacing: 0.22em; text-transform: uppercase; color: var(--steel-300); }
