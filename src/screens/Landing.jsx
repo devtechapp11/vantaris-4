@@ -6,7 +6,8 @@ import Logo from '../components/Logo';
 import { Magnetic } from '../components/effects';
 import SpecularCard from '../components/fx/SpecularCard';
 import { TierBadge } from '../components/bits';
-import PlanCard, { BillingToggle } from '../components/PlanCard';
+import PlanCard from '../components/PlanCard';
+import { money } from '../lib/format';
 import { useMedia } from '../app/useDevice';
 import { usePlans } from '../app/usePlans';
 import { usePrefs } from '../app/prefs';
@@ -21,6 +22,8 @@ import Shutter from '../landing/hud/Shutter';
 import HudOverlay from '../landing/hud/HudOverlay';
 import './Landing.css';
 import { fieldBus } from '../fx/field/fieldBus';
+import Ladder from '../landing/ladder/Ladder';
+import BillingSwitch from '../components/pricing/BillingSwitch';
 import { useMeta } from '../app/useMeta';
 
 const YEAR = new Date().getFullYear();
@@ -70,6 +73,7 @@ export default function Landing() {
       <LandingNav />
       <main id="main" tabIndex={-1}>
         {reduce ? <StillFilm /> : wide ? <Film /> : <MobileFilm />}
+        <Ladder />
         <Pricing />
       </main>
       <Footer />
@@ -414,6 +418,15 @@ function Pricing() {
   const { data } = usePlans();
   const [cycle, setCycle] = useState('monthly');
   const tiers = data?.tiers.filter((t) => t.id !== 'free') ?? [];
+  // Savings come from the configured prices only: 12 × monthly − annual.
+  const savings = tiers.map((t) => {
+    const m = data?.plans.find((x) => x.tier === t.id && x.interval === 'monthly');
+    const y = data?.plans.find((x) => x.tier === t.id && x.interval === 'yearly');
+    return m && y ? { saving: m.amount * 12 - y.amount, currency: y.currency } : null;
+  }).filter(Boolean);
+  const hasAnnual = savings.length > 0;
+  const best = savings.reduce((a, b) => (b.saving > (a?.saving ?? 0) ? b : a), null);
+  const savingsLabel = best && best.saving > 0 ? `Save up to ${money(best.saving, best.currency)} a year` : undefined;
   return (
     <section id="pricing" className="lsec" aria-labelledby="pricing-title">
       <header className="lsec-head" data-ledger="membership">
@@ -421,7 +434,11 @@ function Pricing() {
         <h2 id="pricing-title" className="chapter-title">Start free. Scale when you’re ready.</h2>
         <p className="t-lead">Three deals a week, free for as long as you like. Paid plans open every desk, the full debriefs and Vale. Cancel anytime.</p>
       </header>
-      <BillingToggle cycle={cycle} onChange={setCycle} />
+      {hasAnnual && (
+        <div className="billing-row">
+          <BillingSwitch annual={cycle === 'yearly'} onChange={(on) => setCycle(on ? 'yearly' : 'monthly')} savingsLabel={savingsLabel} />
+        </div>
+      )}
       {data ? (
         <div className="plans-grid">
           {tiers.map((t) => {
@@ -430,7 +447,7 @@ function Pricing() {
             if (!plan) return null;
             return (
               <PlanCard
-                key={t.id} tier={t} plan={plan} monthly={monthly} featured={t.id === 'pro'}
+                key={t.id} tier={t} plan={plan} monthly={monthly} featured={t.id === 'pro'} glass
                 onSelect={() => { track('upgrade_click', { plan: t.id, interval: cycle, source: 'landing' }); navigate('/signup'); }}
                 cta={`Start with ${t.name}`}
               />

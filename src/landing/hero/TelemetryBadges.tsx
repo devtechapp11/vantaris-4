@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useFrame } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
+import { ledger } from './ledger';
 import { useHero, type HeroState } from './heroStore';
 
 type V3 = [number, number, number];
@@ -26,7 +28,14 @@ export default function TelemetryBadges({ isMobile }: { isMobile: boolean }) {
     const id = requestAnimationFrame(() => setOn(true));
     return () => cancelAnimationFrame(id);
   }, []);
-  if (!on) return null;
+  // Only in the hero pose: once the sculpture orbits away with the page, the
+  // badges would float over the next sections.
+  const [inHero, setInHero] = useState(true);
+  useFrame(() => {
+    const next = ledger.orbit < 0.08 && ledger.explode < 0.05 && ledger.reassemble < 0.05;
+    if (next !== inHero) setInHero(next);
+  });
+  if (!on || !inHero) return null;
   return (
     <>
       {badgesOf(hero).filter((b) => !isMobile || b.mobile).map((b0) => {

@@ -41,3 +41,8 @@
 .billing-thumb { position: absolute; inset: 0; border-radius: inherit; background: var(--surface-2); box-shadow: var(--edge-highlight); }
 .billing-badge { position: absolute; left: calc(100% + var(--sp-2)); white-space: nowrap; }
 @media (max-width: 520px) { .billing-badge { position: static; } .billing { flex-direction: column; } }
+
+/* Glass variant (landing Membership) */
+.plan--glass .plan-inner.glass-stat { border-radius: 28px; padding: var(--sp-10) var(--sp-5) var(--sp-6); }
+.plan--glass.plan--featured .plan-inner { box-shadow: inset 0 1px 0 rgba(248, 250, 252, 0.16), inset 0 0 0 1px rgba(201, 206, 214, 0.18), inset 0 -36px 70px -30px rgba(201, 206, 214, 0.3), 0 30px 70px -36px rgba(5, 7, 11, 0.95); }
+.plan--glass .plan-cta { width: 100%; }

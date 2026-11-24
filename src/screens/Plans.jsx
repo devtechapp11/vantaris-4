@@ -8,16 +8,18 @@ import { useApp } from '../app/AppContext';
 import { usePlans } from '../app/usePlans';
 import { haptic } from '../app/prefs';
 import { Item, NavBar, Page, Sheet } from '../components/chrome';
-import { Skeleton, TIER_LABEL } from '../components/bits';
+import { Skeleton, TIER_LABEL, Spinner } from '../components/bits';
 import PlanCard, { BillingToggle, DrawCheck } from '../components/PlanCard';
 import Mascot from '../components/Mascot';
 import { group } from '../design/motion';
 import { spring, stagger } from '../design/tokens';
 import { shower } from '../lib/celebrate';
 import { money } from '../lib/format';
-import { IS_DEMO } from '../lib/config';
+import { IS_DEMO, BRAND } from '../lib/config';
 import './Plans.css';
 import { track } from '../lib/analytics';
+import ThermalReceipt from '../components/receipt/ThermalReceipt';
+import '../components/fx/glass.css';
 import { useMeta } from '../app/useMeta';
 
 const LEVEL_SCOPE = { Analyst: 'Analyst', Associate: 'Up to Associate', VP: 'Up to VP', MD: 'All four, up to MD' };
@@ -69,14 +71,14 @@ export default function Plans() {
   const confirm = async (response, plan) => {
     setStage({ planId: plan.id, step: 'confirming' });
     try {
-      await api.confirmPayment(response);
+      const res = await api.confirmPayment(response);
       await refreshMe();
-      setSuccess(plan);
+      setSuccess({ plan, receipt: res?.receipt ?? null });
     } catch (err) {
       // If only the confirmation call failed (network), the webhook still
       // activates a real payment, so tell the player what to expect.
       const transient = ['NETWORK', 'UNKNOWN', 'INTERNAL', 'PAYMENT_PROVIDER_UNAVAILABLE'].includes(err.code);
-      showToast(transient ? 'Payment received. Your plan will appear within a minute; reopen the app if it doesn’t.' : err.message, transient ? 'info' : 'error');
+      showToast(transient ? 'Payment received. Your plan will appear within a minute; reopen the app if it doesn’t.' : `${err.message} Need help? Write to ${BRAND.support}.`, transient ? 'info' : 'error');
       refreshMe().catch(() => {});
     } finally {
       setStage(null);
@@ -180,7 +182,18 @@ export default function Plans() {
           await confirm({ demo: true, plan }, plan);
         }}
       />}
-      <Success plan={success} tiers={data?.tiers} onDone={() => { setSuccess(null); navigate('/', { replace: true }); }} />
+      <AnimatePresence>
+        {stage?.step === 'confirming' && (
+          <motion.div className="paid paid--confirming" role="status" aria-live="polite" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <div className="glass-stat paid-confirming">
+              <Spinner />
+              <p className="glass__eyebrow">Confirming payment…</p>
+              <p className="t-cap">Checking the payment with Razorpay on our server. Don’t close this page.</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <Success success={success} tiers={data?.tiers} onDone={() => { setSuccess(null); navigate('/', { replace: true }); }} />
     </>
   );
 }
@@ -207,8 +220,10 @@ function DemoCheckout({ checkout, onClose, onPay }) {
   );
 }
 
-function Success({ plan, tiers, onDone }) {
-  const tier = plan && tiers?.find((t) => t.id === plan.tier);
+function Success({ success, tiers, onDone }) {
+  const plan = success?.plan ?? null;
+  const receipt = success?.receipt ?? null;
+  const tier = plan && tiers?.find((t) => t.id === (receipt?.tier ?? plan.tier));
   useEffect(() => {
     if (!plan) return;
     shower();
@@ -227,7 +242,24 @@ function Success({ plan, tiers, onDone }) {
           exit={{ opacity: 0 }}
         >
           <motion.div className="paid-card stack-16 center-x center" initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }} transition={spring.gentle}>
-            <Mascot mood="levelup" size={170} />
+            {receipt ? (
+              <ThermalReceipt
+                className="paid-receipt"
+                heading="Payment receipt"
+                meta={receipt.preview ? 'Vantaris · preview' : 'Vantaris · Razorpay'}
+                lines={[
+                  { label: 'Plan', value: `${tier?.name ?? receipt.tier ?? plan.tier} · ${receipt.interval ?? plan.interval}` },
+                  ...(receipt.paid_at ? [{ label: 'Date', value: new Date(receipt.paid_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) }] : []),
+                  ...(receipt.method ? [{ label: 'Method', value: String(receipt.method).toUpperCase() }] : []),
+                  { label: 'Payment', value: receipt.payment_id },
+                  { label: 'Amount', value: money(receipt.amount, receipt.currency), strong: true },
+                ]}
+                stamp={receipt.preview ? 'Preview · not charged' : 'Paid'}
+                footnote={receipt.invoice_emailed ? 'A copy was sent to your email.' : undefined}
+              />
+            ) : (
+              <Mascot mood="levelup" size={170} />
+            )}
             <p className="t-eyebrow">Payment confirmed</p>
             <h1 id="paid-title" className="t-h1">Welcome to {tier?.name ?? 'your new plan'}</h1>
             <motion.ul className="paid-feats" variants={group(stagger.list, 0.3)} initial="hidden" animate="show">
@@ -238,7 +270,6 @@ function Success({ plan, tiers, onDone }) {
               ))}
             </motion.ul>
             <button type="button" className="btn btn--primary" onClick={onDone} autoFocus>Start practicing</button>
-            {api.mode === 'live' && <p className="t-cap">A receipt from Razorpay is on its way to your email.</p>}
           </motion.div>
         </motion.div>
       )}

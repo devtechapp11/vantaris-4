@@ -35,3 +35,6 @@ scripts/content.json.bak
 
 # Higgsfield source exports (npm run mascot writes the web versions to public/mascot)
 mascot-src/
+
+# local QA captures
+qa/

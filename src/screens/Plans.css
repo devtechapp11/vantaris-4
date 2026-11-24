@@ -15,3 +15,10 @@
 .paid { position: fixed; inset: 0; z-index: var(--z-overlay); display: grid; place-items: center; padding: var(--sp-6); background: var(--scrim); overflow-y: auto; }
 .paid-card { width: min(480px, 100%); padding: var(--sp-8) var(--sp-6); border-radius: var(--r-sheet); }
 .paid-feats { list-style: none; margin: 0; padding: var(--sp-4) 0 0; width: 100%; display: flex; flex-direction: column; gap: var(--sp-3); text-align: left; border-top: var(--hairline) solid var(--line); }
+
+/* Checkout: confirming card and the printed receipt */
+.paid--confirming { display: grid; place-items: center; }
+.paid-confirming { display: grid; justify-items: center; gap: 10px; max-width: 360px; text-align: center; }
+.paid-receipt { width: min(320px, 100%); }
+.paid { background: rgba(5, 7, 11, 0.94); }
+.paid-confirming.glass-stat { background: linear-gradient(180deg, #12161D, #0A0D13); }

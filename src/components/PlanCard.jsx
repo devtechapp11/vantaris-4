@@ -5,6 +5,9 @@ import { duration, ease, spring, stagger } from '../design/tokens';
 import { Spinner } from './bits';
 import { Spotlight } from './effects';
 import { BorderBeam } from './Momentum';
+import SpecularBorder from './fx/SpecularBorder';
+import MagneticButton from './fx/MagneticButton';
+import './fx/glass.css';
 import './PlanCard.css';
 
 const check = {
@@ -30,21 +33,21 @@ export function DrawCheck({ size = 18 }) {
  * One plan, as a flat column. `featured` (Pro) carries the page's one primary
  * button and a small "Most popular" label. Feature checks tick in one after another.
  */
-export default function PlanCard({ tier, plan, monthly, featured = false, current = false, busy = false, disabled = false, busyLabel, onSelect, cta, note }) {
+export default function PlanCard({ tier, plan, monthly, featured = false, current = false, busy = false, disabled = false, busyLabel, onSelect, cta, note, glass = false }) {
   const elite = tier.id === 'elite';
   const yearly = plan.interval === 'yearly';
   const saving = yearly && monthly ? monthly.amount * 12 - plan.amount : 0;
   return (
     <motion.article
-      className={`plan ${featured ? 'plan--featured' : ''} ${elite ? 'plan--elite' : ''}`}
+      className={`plan ${featured ? 'plan--featured' : ''} ${elite ? 'plan--elite' : ''} ${glass ? 'plan--glass' : ''}`}
       aria-labelledby={`plan-${tier.id}`}
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, amount: 0.3 }}
       variants={group(stagger.list, 0.15)}
     >
-      <Spotlight className={`plan-inner metal metal--live ${featured ? 'is-active' : ''}`}>
-      {featured && <BorderBeam duration={6} />}
+      <Spotlight className={`plan-inner ${glass ? 'glass-stat' : 'metal metal--live'} ${featured ? 'is-active' : ''}`}>
+      {featured && (glass ? <SpecularBorder strong /> : <BorderBeam duration={6} />)}
       {featured && <span className="plan-flag">Most popular</span>}
       {current && <span className="plan-flag plan-flag--current">Current plan</span>}
       <header className="stack-4">
@@ -95,14 +98,20 @@ export default function PlanCard({ tier, plan, monthly, featured = false, curren
           </motion.li>
         ))}
       </ul>
-      <button
-        type="button"
-        className={`btn ${featured ? 'btn--primary' : 'btn--secondary'} plan-cta`}
-        disabled={disabled || current}
-        onClick={onSelect}
-      >
-        {busy ? <><Spinner /> {busyLabel}</> : current ? 'Your current plan' : cta ?? `Continue with ${tier.name}`}
-      </button>
+      {glass ? (
+        <MagneticButton type="button" className={`btn ${featured ? 'btn--primary' : 'btn--secondary'} plan-cta`} disabled={disabled || current} onClick={onSelect}>
+          {busy ? <><Spinner /> {busyLabel}</> : current ? 'Your current plan' : cta ?? `Continue with ${tier.name}`}
+        </MagneticButton>
+      ) : (
+        <button
+          type="button"
+          className={`btn ${featured ? 'btn--primary' : 'btn--secondary'} plan-cta`}
+          disabled={disabled || current}
+          onClick={onSelect}
+        >
+          {busy ? <><Spinner /> {busyLabel}</> : current ? 'Your current plan' : cta ?? `Continue with ${tier.name}`}
+        </button>
+      )}
       {note && <p className="t-cap center">{note}</p>}
       </Spotlight>
     </motion.article>

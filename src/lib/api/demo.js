@@ -537,7 +537,12 @@ export const api = {
     else end.setMonth(end.getMonth() + 1);
     state.sub = { tier: plan.tier, plan_id: plan.id, status: 'active', current_end: end.toISOString(), cancel_at_cycle_end: false };
     save();
-    return { ok: true, status: 'active' };
+    // Preview only: nothing is charged, and the receipt says so.
+    return {
+      ok: true, status: 'active',
+      receipt: { preview: true, payment_id: 'PREVIEW', amount: plan.amount, currency: plan.currency, method: null, paid_at: new Date().toISOString(),
+        plan_id: plan.id, tier: plan.tier, interval: plan.interval, invoice_emailed: false },
+    };
   },
   async cancelSubscription() {
     await wait(500);

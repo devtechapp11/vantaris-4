@@ -293,7 +293,7 @@ async function verifyPayment(db: SupabaseClient, user: User, body: Record<string
   const signature = str(body, 'razorpay_signature', /^[0-9a-fA-F]{64}$/);
 
   // The subscription must be one we created for this player.
-  const { data: row, error } = await db.from('subscriptions').select('user_id, livemode')
+  const { data: row, error } = await db.from('subscriptions').select('user_id, livemode, plan_id')
     .eq('razorpay_subscription_id', subscriptionId).maybeSingle();
   if (error) throw error;
   if (!row || row.user_id !== user.id) throw new HttpError(404, 'NOT_FOUND', 'Subscription not found');
@@ -308,7 +308,7 @@ async function verifyPayment(db: SupabaseClient, user: User, body: Record<string
   // Never trust the browser for state: read both objects from Razorpay.
   const [subscription, payment] = await Promise.all([
     razorpay<Record<string, unknown> & { id: string; status: string }>(keys, `/subscriptions/${subscriptionId}`),
-    razorpay<Record<string, unknown> & { status: string }>(keys, `/payments/${paymentId}`),
+    razorpay<Record<string, unknown> & { id: string; status: string; amount: number; currency: string; method?: string; created_at?: number }>(keys, `/payments/${paymentId}`),
   ]);
   if (subscription.id !== subscriptionId) throw new HttpError(400, 'MISMATCH', 'Payment could not be verified');
 
@@ -325,7 +325,24 @@ async function verifyPayment(db: SupabaseClient, user: User, body: Record<string
   if (!['authorized', 'captured'].includes(payment.status)) {
     throw new HttpError(402, 'PAYMENT_NOT_COMPLETED', 'The payment did not go through. You have not been charged.');
   }
-  return { ok: true, status: subscription.status };
+  if (payment.id !== paymentId) throw new HttpError(400, 'MISMATCH', 'Payment could not be verified');
+
+  // The receipt the app prints: every field read on the server, from
+  // Razorpay's payment object and our plan row, never from the browser.
+  const { data: plan } = await db.from('plans').select('id, tier, interval').eq('id', row.plan_id).maybeSingle();
+  const receipt = {
+    payment_id: payment.id,
+    amount: payment.amount,
+    currency: payment.currency,
+    method: typeof payment.method === 'string' ? payment.method : null,
+    paid_at: typeof payment.created_at === 'number' ? new Date(payment.created_at * 1000).toISOString() : null,
+    plan_id: plan?.id ?? row.plan_id,
+    tier: plan?.tier ?? null,
+    interval: plan?.interval ?? null,
+    // No invoice e-mail is sent by this function.
+    invoice_emailed: false,
+  };
+  return { ok: true, status: subscription.status, receipt };
 }
 
 async function cancelSubscription(db: SupabaseClient, user: User) {

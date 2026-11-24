@@ -156,3 +156,5 @@ html.lenis, html.lenis body { height: auto; }
 .landing .plan-inner.metal { background: radial-gradient(320px circle at var(--mx, 50%) var(--my, -60%), color-mix(in srgb, var(--platinum) 7%, transparent), transparent 70%), var(--surface-glass); -webkit-backdrop-filter: blur(var(--blur-xl)); backdrop-filter: blur(var(--blur-xl)); border-radius: var(--radius-md); }
 .hero-demo { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-3); pointer-events: auto; }
 .hero-demo .dd-skip { margin-left: var(--sp-1); }
+
+.billing-row { display: flex; justify-content: center; margin: var(--sp-2) 0 var(--sp-6); }
