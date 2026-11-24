@@ -8,6 +8,7 @@ import '@fontsource-variable/inter/opsz.css';
 import '@fontsource-variable/space-grotesk/wght.css';
 import '@fontsource-variable/jetbrains-mono/index.css';
 import './styles/tokens.css';
+import './styles/typography.css';
 import './styles/base.css';
 import './styles/components.css';
 import './styles/shell.css';
