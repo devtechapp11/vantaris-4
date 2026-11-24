@@ -13,6 +13,10 @@ import './Vault.css';
  * hook and a banker's tip on the back.
  */
 import VaultBriefs from '../pedagogy/VaultBriefs';
+import SkillRadar from './viz/SkillRadar';
+import GlassStat from './fx/GlassStat';
+
+const SHORT = { statements: '3 statements', dcf: 'DCF', comps: 'Comps', precedents: 'Precedents', lbo: 'LBO', ma: 'M&A', restructuring: 'Restructuring', structuring: 'Structuring' };
 
 export default function Vault({ stars = {}, review }) {
   const owned = CHAPTERS.filter((c) => (stars[c.id] ?? 0) >= VAULT_STARS).length;
@@ -20,6 +24,19 @@ export default function Vault({ stars = {}, review }) {
   const fragile = review?.fragile ?? 0;
   return (
     <div className="vault stack-16">
+      <div className="vault-top">
+        <SkillRadar
+          skills={CHAPTERS.map((c, i) => ({
+            id: c.id,
+            label: SHORT[c.id] ?? c.title,
+            value: Math.min(1, (stars[c.id] ?? 0) / 3),
+            trainable: i === 0 || (stars[CHAPTERS[i - 1].id] ?? 0) >= 1,
+          }))}
+          trainHref={(id) => `/learn/${id}`}
+          caption="Mastery per chapter, from your stars."
+        />
+        <GlassStat eyebrow="To review" value={due} unit={due === 1 ? 'NOTION' : 'NOTIONS'} size="sm" delta={fragile ? `${fragile} fragile in rotation` : 'Nothing fragile right now'} />
+      </div>
       <div className="vault-review">
         <Repeat2 size={20} aria-hidden="true" />
         <span className="grow stack-4">

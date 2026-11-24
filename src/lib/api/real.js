@@ -122,6 +122,20 @@ export const api = {
   openProblem: (id) => rpc('open_problem', { p_problem_id: id }),
   submitAnswer: (id, choice) => rpc('submit_answer', { p_problem_id: id, p_choice: choice }),
   getLeaderboard: (scope) => rpc('get_leaderboard', { p_scope: scope, p_limit: 50 }),
+  /** XP per local day over the last `days` days, from the player's own ledger rows (RLS). */
+  async getHistory(days = 30) {
+    const end = new Date();
+    const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const start = new Date(end.getFullYear(), end.getMonth(), end.getDate() - (days - 1));
+    const { data, error } = await supabase.from('points_ledger').select('amount, local_date').gte('local_date', iso(start));
+    if (error) throw fromSupabase(error);
+    const by = {};
+    (data ?? []).forEach((r) => { by[r.local_date] = (by[r.local_date] ?? 0) + r.amount; });
+    return Array.from({ length: days }, (_, i) => {
+      const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+      return { date: iso(d), points: by[iso(d)] ?? 0 };
+    });
+  },
   saveLesson: ({ node, stars, firstTry, missed = [], cleared = [] }) =>
     rpc('save_lesson', { p_node: node, p_stars: stars ?? null, p_first_try: firstTry ?? null, p_missed: missed, p_cleared: cleared }),
   claimCache: (cacheId) => softRpc('claim_vault_cache', { p_cache: cacheId }),

@@ -13,6 +13,9 @@ import { duration, ease, spring, stagger } from '../design/tokens';
 import { number } from '../lib/format';
 import { CAREER } from '../lib/career';
 import './Ranking.css';
+import DotMatrixNumber from '../components/viz/DotMatrixNumber';
+import DotMatrixChart from '../components/viz/DotMatrixChart';
+import '../components/fx/glass.css';
 import { useMeta } from '../app/useMeta';
 
 const SCOPES = [
@@ -53,6 +56,7 @@ export default function Ranking() {
       <Item className="rank-scope"><Segmented value={scope} onChange={setScope} options={SCOPES} label="Time range" /></Item>
 
       {data && <Item><NextMove data={data} me={me} scope={scope} /></Item>}
+      {data && <Item><MyRun data={data} scope={scope} points={me?.profile?.points} /></Item>}
 
       {!data ? (
         <div className="stack-12"><Skeleton height={260} /><Skeleton height={320} /></div>
@@ -77,6 +81,59 @@ export default function Ranking() {
       )}
       <Item as="p" className="t-foot center">Points come from first-time correct answers. Faster answers earn up to 50% more.</Item>
     </Page>
+  );
+}
+
+/**
+ * Your own line: the rank in dot-matrix, the gap to the seat above, and the
+ * last 30 days of XP against your previous 30 (the ghost run). Your data only.
+ */
+function MyRun({ data, scope, points }) {
+  const [hist, setHist] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    const get = api.getHistory;
+    if (!get) return undefined;
+    get(60).then((h) => alive && setHist(h), () => alive && setHist([]));
+    return () => {
+      alive = false;
+    };
+  }, [points]);
+  const rows = data.rows ?? [];
+  const i = rows.findIndex((r) => r.is_me);
+  const mine = i >= 0 ? rows[i] : data.me;
+  const above = i > 0 ? rows[i - 1] : null;
+  const gap = above && mine?.rank ? Math.max(1, above.points - mine.points + 1) : null;
+  const last = hist?.slice(-30) ?? [];
+  const prev = hist?.length === 60 ? hist.slice(0, 30) : null;
+  const total = last.reduce((s, d) => s + d.points, 0);
+  const prevTotal = prev?.reduce((s, d) => s + d.points, 0) ?? null;
+  const when = scope === 'week' ? 'this week' : scope === 'month' ? 'this month' : 'all time';
+  return (
+    <section className="myrun glass-stat" aria-label="Your run">
+      <div className="myrun-top">
+        <div className="stack-4">
+          <p className="glass__eyebrow">Your rank · {when}</p>
+          <DotMatrixNumber value={mine?.rank ? `#${mine.rank}` : '—'} label={mine?.rank ? `Rank ${mine.rank}` : 'Not ranked yet'} dot={6} />
+        </div>
+        <p className="myrun-gap fig-mono">{gap != null ? `${number(gap)} XP to the seat above` : mine?.rank === 1 ? 'Top seat' : 'Close a deal to take a seat'}</p>
+      </div>
+      {hist && last.length > 0 && (
+        <>
+          <DotMatrixChart
+            values={last.map((d) => d.points)}
+            ghost={prev ? prev.map((d) => d.points) : undefined}
+            labels={last.map((d) => d.date.slice(8))}
+            labelEvery={5}
+            ariaLabel={`Your XP per day over the last 30 days, ${total} in total`}
+          />
+          <p className="t-cap">
+            <span className="fig-mono c-fg">{number(total)}</span> XP in 30 days
+            {prevTotal != null && <> · ghost run (previous 30 days): <span className="fig-mono">{number(prevTotal)}</span> XP</>}
+          </p>
+        </>
+      )}
+    </section>
   );
 }
 

@@ -5,6 +5,9 @@ import MagneticButton from '../components/fx/MagneticButton';
 import AnimatedNumber from '../components/fx/AnimatedNumber';
 import MetalPlate from '../components/fx/MetalPlate';
 import Vale from '../components/vale/Vale';
+import GlassStat from '../components/fx/GlassStat';
+import DotMatrixNumber from '../components/viz/DotMatrixNumber';
+import DotMatrixChart from '../components/viz/DotMatrixChart';
 import { careerName } from '../lib/career';
 import { prefetchProps } from '../app/routes';
 import DealBriefCard from '../pedagogy/DealBriefCard';
@@ -55,6 +58,7 @@ type Props = { me: Me; board: Board; due: number; compact?: boolean };
  */
 export default function TodaysDesk({ me, board, due, compact = false }: Props) {
   const navigate = useNavigate();
+  const week = me.week ?? [];
   const today = me.week?.[me.week.length - 1]?.points ?? 0;
   const bestDay = Math.max(0, ...(me.week ?? []).slice(0, -1).map((d) => d.points));
   const rows = board?.rows ?? [];
@@ -95,6 +99,21 @@ export default function TodaysDesk({ me, board, due, compact = false }: Props) {
           </MagneticButton>
         </div>
       </SpecularCard>
+
+      <GlassStat eyebrow="XP today" value={today} unit="XP" size="sm" className="td-card td-pulse">
+        <div className="td-streak">
+          <DotMatrixNumber value={p.streak} label={`${p.streak}-day streak`} dot={compact ? 4 : 5} />
+          <span className="t-eyebrow">Day streak</span>
+        </div>
+        {week.length > 0 && (
+          <DotMatrixChart
+            values={week.map((d) => d.points)}
+            labels={week.map((d) => new Date(`${d.date}T12:00:00`).toLocaleDateString('en-US', { weekday: 'narrow' }))}
+            rows={6}
+            ariaLabel={`XP over the last 7 days: ${week.map((d) => d.points).join(', ')}`}
+          />
+        )}
+      </GlassStat>
 
       {!compact || around.length ? (
         <SpecularCard className="td-card td-league">

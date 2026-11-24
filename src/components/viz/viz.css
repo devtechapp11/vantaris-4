@@ -1,0 +1,25 @@
+/* Dot-matrix chart */
+.dmc { margin: 0; display: grid; gap: 6px; }
+.dmc svg { width: 100%; height: auto; display: block; }
+.dmc__dot { fill: rgba(91, 100, 112, 0.22); }
+.dmc__dot.is-on { fill: #9AA3AE; }
+.dmc__dot.is-today { fill: #F8FAFC; }
+.dmc__dot.is-ghost { fill: none; stroke: #8FA3B8; stroke-width: 0.9; stroke-opacity: 0.7; }
+.dmc__label { font: 500 6px/1 var(--font-mono); letter-spacing: 0.04em; fill: #9AA3AE; }
+
+/* Dot-matrix number */
+.dmn { display: block; overflow: visible; }
+.dmn__on { fill: #F8FAFC; }
+.dmn__off { fill: rgba(91, 100, 112, 0.18); }
+
+/* Skill radar */
+.radar { margin: 0; display: grid; gap: 12px; justify-items: center; }
+.radar > svg { width: min(100%, 400px); height: auto; overflow: visible; }
+.radar__ring { fill: none; stroke: rgba(154, 163, 174, 0.18); stroke-width: 0.8; }
+.radar__axis { stroke: rgba(154, 163, 174, 0.16); stroke-width: 0.8; }
+.radar__shape { stroke: #C9CED6; stroke-width: 1.2; stroke-linejoin: round; }
+.radar__dot { fill: #E6E9EE; }
+.radar__dot.is-weak { fill: #05070B; stroke: #F8FAFC; stroke-width: 1.6; }
+.radar__label { font: 500 8px/1 var(--font-mono); letter-spacing: 0.08em; fill: #9AA3AE; text-transform: uppercase; }
+.radar__foot { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; text-align: center; }
+.radar__train { min-height: 44px; }

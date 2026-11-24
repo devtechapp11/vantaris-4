@@ -228,3 +228,7 @@
 .td--compact .td-card { padding: 14px 16px; }
 @media (min-width: 768px) { .td--compact { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 767px) { .td--compact .td-league { display: none; } }
+
+/* Today's desk: streak + 7-day dot chart in a glass card */
+.td-pulse .glass__figure { margin-top: 8px; }
+.td-streak { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }

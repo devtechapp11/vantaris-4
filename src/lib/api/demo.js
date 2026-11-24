@@ -479,6 +479,15 @@ export const api = {
     save();
     return { best: state.blitz.best, previous, record: s > previous && s > 0, runs: state.blitz.runs };
   },
+  async getHistory(days = 30) {
+    await wait(120);
+    requireUser();
+    const today = localDate();
+    return Array.from({ length: days }, (_, i) => {
+      const date = addDays(today, i - (days - 1));
+      return { date, points: state.ledger.filter((l) => l.local_date === date).reduce((s, l) => s + l.amount, 0) };
+    });
+  },
   async getLeaderboard(scope) {
     await wait(200);
     requireUser();
