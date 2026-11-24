@@ -79,8 +79,8 @@
 /* ---------- Promotion ceremony ---------- */
 .promo {
   position: fixed; inset: 0; z-index: calc(var(--z-overlay) + 20); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-6);
-  padding: var(--sp-6); background: color-mix(in srgb, var(--obsidian) 85%, transparent);
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  padding: var(--sp-6); background: color-mix(in srgb, var(--obsidian) 78%, transparent);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
 }
 .promo-skip { position: absolute; top: calc(var(--safe-top) + 12px); right: 12px; width: 48px; height: 48px; display: grid; place-items: center; border: 0; border-radius: 50%; background: none; color: var(--fg-2); }
 .promo-skip:hover { background: var(--hover); color: var(--fg); }
@@ -97,3 +97,4 @@
 .promo-line { margin: 0; font-size: var(--fs-lg); color: var(--fg); text-align: center; }
 .promo-actions { display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: center; }
 .promo-note { margin: 0; font-size: var(--fs-xs); color: var(--steel-300); }
+.promo-text .promo-desk { font-family: var(--font-editorial); font-style: italic; font-weight: 400; letter-spacing: -0.01em; font-size: 1.12em; }

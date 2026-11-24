@@ -20,6 +20,7 @@ import MonolithStage from '../landing/hero/MonolithStage';
 import Shutter from '../landing/hud/Shutter';
 import HudOverlay from '../landing/hud/HudOverlay';
 import './Landing.css';
+import { fieldBus } from '../fx/field/fieldBus';
 import { useMeta } from '../app/useMeta';
 
 const YEAR = new Date().getFullYear();
@@ -56,6 +57,10 @@ export default function Landing() {
   // where every panel sits in the flow under its chapter (nothing pinned, nothing overlaid).
   const wide = useMedia('(min-width: 900px)');
   useLenis(!reduce);
+  useEffect(() => {
+    fieldBus.setScene('landing');
+    return () => fieldBus.setScene('app');
+  }, []);
   useMeta({ path: '/' });
   return (
     <motion.div className="landing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: duration.slow }}>

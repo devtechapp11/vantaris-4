@@ -137,7 +137,13 @@ function Learn() {
   useEffect(() => {
     fieldBus.setMultiplier(comboOf(tally.run));
   }, [tally.run]);
-  useEffect(() => () => fieldBus.setMultiplier(1), []);
+  useEffect(() => {
+    fieldBus.setScene('exercise');
+    return () => {
+      fieldBus.setMultiplier(1);
+      fieldBus.setScene('app');
+    };
+  }, []);
 
   const onGraded = useCallback((correct, entry, el) => {
     const run = correct ? tally.run + 1 : 0;

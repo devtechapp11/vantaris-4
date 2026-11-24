@@ -54,7 +54,7 @@ Contrôle les hex, `rgb()/rgba()` (triplets des couleurs autorisées acceptés) 
 - **P8** : QA, cases ci-dessous.
 
 ## Mesures
-(complétées au fil des phases)
+- **Phase 2 (shader v2)** : headless SwiftShader (rendu CPU, non représentatif) ≈ 8 fps à 1440 px, rendu correct, console propre. Garde-fou : si les 120 premières frames mesurées sur desktop tombent sous ~50 fps (intervalle moyen > 20 ms), la trame se coupe pour la session. Le seuil « 14 ms » du brief est mesuré ici en intervalle rAF : à 60 Hz l'intervalle vaut toujours 16,7 ms, donc 20 ms est le seuil utile. Mobile : 30 fps plafonnés, cellules plus grandes, trame à 60 %. **À mesurer sur un vrai appareil** (desktop GPU et Android milieu de gamme).
 
 ## Phase 8 — QA finale
 (cochée en fin d'exécution)

@@ -45,7 +45,7 @@ export default function PromotionCeremony() {
     if (prev && ORDER.indexOf(level) > ORDER.indexOf(prev)) setDesk(level);
   }, [level, inSession]);
 
-  const label = desk ? `${careerName(desk)} desk`.toUpperCase() : '';
+  const label: string = desk ? String(careerName(desk)).toUpperCase() : '';
 
   useEffect(() => {
     if (!desk) return undefined;
@@ -54,6 +54,8 @@ export default function PromotionCeremony() {
     sfx.promotion();
     haptics.fire(HAPTIC.promotion);
     fieldBus.setMultiplier(5);
+    fieldBus.setScene('ceremony');
+    fieldBus.flash(1800);
     fieldBus.pulse(null);
     shower();
     const skip = window.setTimeout(() => setSkippable(true), 1500);
@@ -69,6 +71,7 @@ export default function PromotionCeremony() {
       window.clearTimeout(skip);
       window.clearInterval(engrave);
       fieldBus.setMultiplier(1);
+      fieldBus.setScene('app');
     };
   }, [desk, label, reduce]);
 
@@ -125,8 +128,9 @@ export default function PromotionCeremony() {
                 {label.split('').map((ch, i) => (
                   <span key={i} className={i < letters ? 'is-cut' : ''}>{ch === ' ' ? ' ' : ch}</span>
                 ))}
+                {' '}<span className={`editorial promo-desk ${letters >= label.length ? 'is-cut' : ''}`}>Desk</span>
               </span>
-              <span className="sr-only">{label}</span>
+              <span className="sr-only">{label} desk</span>
             </motion.div>
           </div>
           <motion.p className="promo-line" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springs.soft, delay: reduce ? 0 : 0.9 }}>

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import FRAG from './obsidianField.frag?raw';
 import { fieldBus } from './fieldBus';
+import { buildGlyphAtlas } from './glyphAtlas';
 import './field.css';
 
 const VERT = `#version 300 es
@@ -82,6 +83,23 @@ function start(canvas: HTMLCanvasElement, stillPref: boolean): (() => void) | un
   const uPointer = u('uPointer');
   const uIntensity = u('uIntensity');
   const uPulse = u('uPulse');
+  const uG = {
+    atlas: u('uGlyphs'), count: u('uGlyphCount'), cell: u('uCell'),
+    amount: u('uGlyphAmount'), flash: u('uGlyphFlash'), tcell: u('uTrameCell'), trame: u('uTrame'),
+  };
+
+  // Glyph atlas: a 1-pixel black placeholder until the real one is drawn.
+  const tex = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 255]));
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.uniform1i(uG.atlas, 0);
+  gl.uniform1f(uG.count, 1);
+  let disposed = false;
 
   const phone = matchMedia('(max-width: 767px), (pointer: coarse)').matches;
   const reduced = stillPref || matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -93,7 +111,13 @@ function start(canvas: HTMLCanvasElement, stillPref: boolean): (() => void) | un
   let raf = 0;
   let last = 0;
   let intensity = fieldBus.intensity;
+  let glyphs = fieldBus.glyphAmount;
   let shown = false;
+  // Frame-time guard (desktop): if the first 120 measured frames average
+  // below ~50 fps, the vector trame goes off for the rest of the session.
+  let probeFrames = 0;
+  let probeSum = 0;
+  let prevNow = 0;
 
   const draw = (now: number) => {
     ptr.x += (ptr.tx - ptr.x) * 0.06;
@@ -104,6 +128,11 @@ function start(canvas: HTMLCanvasElement, stillPref: boolean): (() => void) | un
     gl.uniform2f(uPointer, ptr.x, ptr.y);
     gl.uniform1f(uIntensity, intensity);
     gl.uniform3f(uPulse, fieldBus.pulseX, fieldBus.pulseY, reduced || age > 2.5 ? -1 : age);
+    glyphs += (fieldBus.glyphAmount - glyphs) * (reduced ? 1 : 0.05);
+    const fa = fieldBus.flashAt < 0 || reduced ? 1 : (now - fieldBus.flashAt) / fieldBus.flashDur;
+    gl.uniform1f(uG.amount, glyphs);
+    gl.uniform1f(uG.flash, fa < 1 ? Math.sin(Math.PI * fa) : 0);
+    gl.uniform1f(uG.trame, fieldBus.trame * (phone ? 0.6 : 1));
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     if (!shown) {
       shown = true;
@@ -114,6 +143,15 @@ function start(canvas: HTMLCanvasElement, stillPref: boolean): (() => void) | un
     raf = requestAnimationFrame(loop);
     if (now - last < minDt) return;
     last = now;
+    if (!phone && !fieldBus.trameOff && prevNow && probeFrames < 150) {
+      probeFrames += 1;
+      if (probeFrames > 30) probeSum += now - prevNow; // skip warm-up frames
+      if (probeFrames === 150 && probeSum / 120 > 20) {
+        fieldBus.trameOff = true;
+        fieldBus.trame = 0;
+      }
+    }
+    prevNow = now;
     draw(now);
   };
   const resize = () => {
@@ -121,6 +159,8 @@ function start(canvas: HTMLCanvasElement, stillPref: boolean): (() => void) | un
     canvas.height = Math.max(1, Math.floor(innerHeight * scale));
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.uniform2f(uRes, canvas.width, canvas.height);
+    gl.uniform1f(uG.cell, (phone ? 22 : 18) * scale);
+    gl.uniform1f(uG.tcell, (phone ? 44 : 36) * scale);
     if (reduced) draw(performance.now());
   };
   const onMove = (e: PointerEvent) => {
@@ -145,7 +185,26 @@ function start(canvas: HTMLCanvasElement, stillPref: boolean): (() => void) | un
   if (reduced) draw(performance.now());
   else raf = requestAnimationFrame(loop);
 
+  buildGlyphAtlas().then(({ canvas: atlas, count }) => {
+    if (disposed || gl.isContextLost()) return;
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, atlas);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.useProgram(prog);
+    gl.uniform1f(uG.count, count);
+    if (reduced) draw(performance.now());
+  }).catch(() => { /* no atlas: the matrix stays dark */ });
+
+  // While motion is reduced the still frame follows scene changes.
+  const sceneWatch = reduced ? window.setInterval(() => {
+    if (Math.abs(glyphs - fieldBus.glyphAmount) > 0.01) draw(performance.now());
+  }, 500) : 0;
+
   return () => {
+    disposed = true;
+    window.clearInterval(sceneWatch);
+    gl.deleteTexture(tex);
     cancelAnimationFrame(raf);
     removeEventListener('resize', resize);
     removeEventListener('pointermove', onMove);
