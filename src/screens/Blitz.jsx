@@ -15,6 +15,7 @@ import { Page } from '../components/chrome';
 import { NumberTicker, SoundToggle } from '../components/Momentum';
 import { spring } from '../design/tokens';
 import { useMeta } from '../app/useMeta';
+import HoldToConfirmButton from '../components/fx/HoldToConfirmButton';
 import './Blitz.css';
 
 /**
@@ -262,9 +263,11 @@ export default function Blitz() {
               {count || 'Go'}
             </motion.span>
           ) : (
-            <motion.button key="go" type="button" className="btn btn--primary btn--lg blitz-go" whileTap={{ scale: 0.96 }} onClick={start}>
-              <Zap size={18} aria-hidden="true" /> Start the clock
-            </motion.button>
+            <motion.span key="go" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <HoldToConfirmButton className="btn--lg blitz-go" onConfirm={start}>
+                <Zap size={18} aria-hidden="true" /> Start the clock
+              </HoldToConfirmButton>
+            </motion.span>
           )}
         </AnimatePresence>
       </div>

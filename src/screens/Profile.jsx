@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Accessibility, Box, Check, Cookie, CreditCard, FileText, LogOut, Mail, PartyPopper, Pencil, Shield, Trash2, Vibrate, X, Volume2, ArrowRight } from 'lucide-react';
+import { Accessibility, Box, Check, Cookie, CreditCard, FileText, LogOut, Mail, PartyPopper, Pencil, Shield, Trash2, Vibrate, X, Volume2, ArrowRight, Hand, Smile } from 'lucide-react';
 import { api } from '../lib/api';
 import { useApp } from '../app/AppContext';
 import { resetConsent } from '../app/consent';
@@ -27,6 +27,8 @@ const SETTINGS = [
   { key: 'celebrations', label: 'Celebrations', detail: 'A short burst when you close a deal or get promoted.', Icon: PartyPopper },
   { key: 'effects3d', label: '3D graphics', detail: 'The chrome mascot in 3D on capable devices.', Icon: Box },
   { key: 'reduceMotion', label: 'Reduce motion', detail: 'Calmer transitions and no looping animations, on top of your system setting.', Icon: Accessibility },
+  { key: 'showVale', label: 'Show Vale', detail: 'Your mentor on the desk and during deals.', Icon: Smile },
+  { key: 'holdConfirm', label: 'Hold to confirm', detail: 'Hold to start a Blitz or close an LBO / M&A deal. Off: a single tap.', Icon: Hand },
 ];
 
 const TABS = [

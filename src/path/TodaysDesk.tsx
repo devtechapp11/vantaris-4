@@ -71,7 +71,7 @@ export default function TodaysDesk({ me, board, due, compact = false }: Props) {
     <aside className={`td ${compact ? 'td--compact' : ''}`} aria-label="Today's desk">
       <SpecularCard className="td-card td-vale">
         <div className="td-vale-row">
-          <Vale size={compact ? 56 : 68} />
+          <Vale size={compact ? 56 : 72} avatar />
           <div className="td-vale-copy">
             <MetalPlate tone="platinum" size="sm">{`${careerName(p.level)} desk`.toUpperCase()}</MetalPlate>
             <p className="td-line">{mentorLine(me, due)}</p>

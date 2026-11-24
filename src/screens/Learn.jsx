@@ -177,13 +177,13 @@ function Learn() {
       haptics.fire(HAPTIC.correct);
       fieldBus.pulse(el);
       metalBurst.burst(el, 'correct');
-      valeBus.react('celebrate');
+      valeBus.react('delight');
       setGain({ amount: xp, key: Date.now() });
       if (tier > comboOf(tally.run)) {
         window.setTimeout(() => {
           sfx.comboUp(tier);
           haptics.fire(HAPTIC.combo);
-          valeBus.react('combo');
+          valeBus.react('wow');
           metalBurst.burst(badge.current, tier);
           if (!reduce && scope.current) shake(scope.current, { x: [0, -3, 3, -2, 0] }, { duration: 0.24 });
         }, 260);
@@ -195,7 +195,8 @@ function Learn() {
     } else {
       sfx.wrong();
       haptics.fire(HAPTIC.wrong);
-      valeBus.react('encourage');
+      // Vale looks at the right answer once it is revealed.
+      requestAnimationFrame(() => valeBus.react('concern', { gaze: document.querySelector('.learn-body [data-state="answer"]') }));
       if (!reduce && el) shake(el, { x: [-6, 6, -4, 4, 0] }, { duration: 0.22 });
       // A fresh variant comes back in the « Second look » segment at the end.
       // A fresh variant comes back two or three questions later.
@@ -209,6 +210,12 @@ function Learn() {
       }
     }
   }, [tally.run, tally.bonus, reduce, scope, shake]);
+
+  // Each new question: Vale leans in.
+  const currentKey = queue[at]?.key;
+  useEffect(() => {
+    if (currentKey) valeBus.react('focus');
+  }, [currentKey]);
 
   if ((!chapter && !free) || locked) return <Missing />;
   if (!queue.length) return <Missing review={!mistakes} />;
@@ -294,7 +301,7 @@ function Learn() {
       </header>
 
       <div className="ex-strip">
-        <Vale size={44} label="Vale" />
+        <Vale size={40} label="Vale" />
         <p className="ex-strip-line">
           {inSecondLook ? (
             <MetalPlate tone="steel" size="sm"><Repeat2 size={11} aria-hidden="true" /> Second look</MetalPlate>
@@ -315,6 +322,7 @@ function Learn() {
       <AnimatePresence mode="wait" initial={false}>
         <Step key={current.key} entry={current} chapter={ch} retry={!current.original && !current.warmup} onGraded={onGraded} onNext={next} />
       </AnimatePresence>
+      <div className="vale-dock"><Vale size={56} /></div>
     </main>
   );
 }

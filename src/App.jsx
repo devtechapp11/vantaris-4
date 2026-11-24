@@ -22,6 +22,7 @@ import MetalBurst from './fx/MetalBurst';
 import { useSfxUnlock } from './lib/sfx/useSfx';
 import PromotionCeremony from './exercise/PromotionCeremony';
 import DemoCredit from './exercise/DemoCredit';
+import ValeSplashHook from './components/vale/ValeSplashHook';
 import { LEGAL_ORDER } from './content/legal';
 import { track } from './lib/analytics';
 
@@ -60,10 +61,17 @@ export default function App() {
           <MetalBurst />
           <PromotionCeremony />
           <DemoCredit />
+          <Splash />
         </AppProvider>
       </MotionConfig>
     </Router>
   );
+}
+
+/** Vale's once-per-session splash, only inside the signed-in app. */
+function Splash() {
+  const { session, me } = useApp();
+  return <ValeSplashHook enabled={Boolean(session && me?.profile?.onboarded)} />;
 }
 
 // Screens that show the tab bar on phones (the tabs plus the two desk screens).

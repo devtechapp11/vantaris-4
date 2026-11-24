@@ -29,6 +29,10 @@ import { duration, ease, spring } from '../design/tokens';
 import { useSharedEnter } from '../app/fluid';
 import './Problem.css';
 import { track } from '../lib/analytics';
+import HoldToConfirmButton from '../components/fx/HoldToConfirmButton';
+
+/** LBO and M&A cases are « closed » with a hold, the others locked in with a tap. */
+const isClosing = (kind) => /\bLBO\b|M&A|merger|accretion/i.test(kind ?? '');
 import { useMeta } from '../app/useMeta';
 
 const KEYS = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -166,7 +170,8 @@ export default function Problem() {
       const k = e.key.toUpperCase();
       const idx = KEYS.indexOf(k) >= 0 ? KEYS.indexOf(k) : /^[1-6]$/.test(k) ? Number(k) - 1 : -1;
       if (idx >= 0 && idx < opts.length) pick(opts[idx].id);
-      else if (e.key === 'Enter' && choice) submit();
+      // A closing deal (LBO, M&A) is committed with the hold button, not Enter.
+      else if (e.key === 'Enter' && choice && !isClosing(data.problem.kind)) submit();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -211,6 +216,7 @@ export default function Problem() {
   if (!data) return <ProblemSkeleton />;
 
   const p = data.problem;
+  const closeDeal = isClosing(p.kind);
   const step = answered ? 3 : choice ? 2 : termsSeen ? 1 : 0;
 
   return (
@@ -286,9 +292,15 @@ export default function Problem() {
                     <Lightbulb size={18} aria-hidden="true" /> Hint
                     {!tutorAllowed && <Lock size={12} aria-hidden="true" />}
                   </button>
-                  <button type="button" className="btn btn--primary" disabled={!choice || submitting} onClick={submit}>
-                    {submitting ? <Spinner /> : <>Lock in answer <span className="kbd kbd--dark">↵</span></>}
-                  </button>
+                  {closeDeal ? (
+                    <HoldToConfirmButton disabled={!choice || submitting} onConfirm={submit}>
+                      {submitting ? <Spinner /> : 'Close the deal'}
+                    </HoldToConfirmButton>
+                  ) : (
+                    <button type="button" className="btn btn--primary" disabled={!choice || submitting} onClick={submit}>
+                      {submitting ? <Spinner /> : <>Lock in answer <span className="kbd kbd--dark">↵</span></>}
+                    </button>
+                  )}
                 </div>
               )}
               {!answered && desktop && <p className="t-cap">Desk shortcuts: A–{KEYS[p.options.length - 1]} to pick, Enter to lock it in.</p>}
@@ -307,9 +319,15 @@ export default function Problem() {
             <button type="button" className="btn btn--secondary btn--icon" onClick={askHint} disabled={thinking} aria-label={tutorAllowed ? 'Get a hint from Vale' : 'Hints from Vale come with Pro'}>
               <Lightbulb size={20} aria-hidden="true" />
             </button>
-            <button type="button" className="btn btn--primary" disabled={!choice || submitting} onClick={submit}>
-              {submitting ? <Spinner /> : 'Lock in answer'}
-            </button>
+            {closeDeal ? (
+              <HoldToConfirmButton disabled={!choice || submitting} onConfirm={submit}>
+                {submitting ? <Spinner /> : 'Close the deal'}
+              </HoldToConfirmButton>
+            ) : (
+              <button type="button" className="btn btn--primary" disabled={!choice || submitting} onClick={submit}>
+                {submitting ? <Spinner /> : 'Lock in answer'}
+              </button>
+            )}
           </div>
         </div>
       )}

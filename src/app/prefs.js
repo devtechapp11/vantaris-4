@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from 'react';
 
 const KEY = 'vantaris-prefs-v1';
-const DEFAULTS = { haptics: true, celebrations: true, effects3d: true, reduceMotion: false, sound: true };
+const DEFAULTS = { haptics: true, celebrations: true, effects3d: true, reduceMotion: false, sound: true, showVale: true, holdConfirm: true };
 
 let prefs = { ...DEFAULTS };
 try {

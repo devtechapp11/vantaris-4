@@ -9,6 +9,8 @@ const ROWS = [
   { key: 'haptics', label: 'Haptics' },
   { key: 'celebrations', label: 'Particles' },
   { key: 'reduceMotion', label: 'Reduce motion' },
+  { key: 'showVale', label: 'Show Vale' },
+  { key: 'holdConfirm', label: 'Hold to confirm' },
 ] as const;
 
 /** Sound, haptics, particles and motion, one tap away from any screen with the bar. */
