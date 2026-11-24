@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, Lightformer, MeshTransmissionMaterial, RoundedBox } from '@react-three/drei';
 import { easing } from 'maath';
 import * as THREE from 'three';
 import { ledger } from './ledger';
+import Medallions from './Medallions';
+import TelemetryBadges from './TelemetryBadges';
 
 /*
   Ledger Monolith: three architectural slabs (brushed platinum, liquid chrome,
@@ -60,7 +62,7 @@ function useBrushed() {
   }, []);
 }
 
-function Slabs({ low }: { low: boolean }) {
+function Slabs({ low, children }: { low: boolean; children?: ReactNode }) {
   const group = useRef<THREE.Group>(null);
   const slabs = useRef<(THREE.Mesh | null)[]>([]);
   const brushed = useBrushed();
@@ -115,6 +117,7 @@ function Slabs({ low }: { low: boolean }) {
           <MeshTransmissionMaterial background={SMOKE} color="#E6E9EE" thickness={0.5} roughness={0.12} transmission={0.92} clearcoat={1} clearcoatRoughness={0.04} ior={1.45} chromaticAberration={0.015} anisotropy={0.1} samples={6} resolution={512} backside={false} envMapIntensity={2.2} />
         )}
       </RoundedBox>
+      {children}
     </group>
   );
 }
@@ -166,7 +169,7 @@ function FirstFrame({ onReady }: { onReady: () => void }) {
   return null;
 }
 
-export default function MonolithScene({ low, active, onReady }: { low: boolean; active: boolean; onReady: () => void }) {
+export default function MonolithScene({ low, active, onReady, phone = false, frozen = false }: { low: boolean; active: boolean; onReady: () => void; phone?: boolean; frozen?: boolean }) {
   return (
     <Canvas
       className="mono-canvas"
@@ -177,7 +180,10 @@ export default function MonolithScene({ low, active, onReady }: { low: boolean; 
     >
       <ThirtyFps on={low && active} />
       <Studio />
-      <Slabs low={low} />
+      <Slabs low={low}>
+        <Medallions lowPower={low} frozen={frozen} />
+        <TelemetryBadges isMobile={phone} />
+      </Slabs>
       <FirstFrame onReady={onReady} />
     </Canvas>
   );

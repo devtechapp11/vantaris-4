@@ -3,6 +3,8 @@ import { useReducedMotion } from 'motion/react';
 import { hasWebGL, lowPower, useMedia } from '../../app/useDevice';
 import { usePrefs } from '../../app/prefs';
 import { ledger, measureLedger } from './ledger';
+import { heroStore } from './heroStore';
+import { api } from '../../lib/api';
 import './monolith.css';
 
 // three, fiber, drei and maath only load once the stage is near the screen.
@@ -38,6 +40,14 @@ export default function MonolithStage({ variant }: { variant: 'fixed' | 'inline'
   const low = phone || lowPower();
 
   useEffect(() => ledger.subscribe(() => setLocked(true)), []);
+
+  // The « Deal floor » badge: the real number of published deals, or no figure.
+  useEffect(() => {
+    if (heroStore.get().deals != null) return;
+    (api as { getPublicStats: () => Promise<{ problems?: number }> }).getPublicStats()
+      .then((s) => { if (typeof s?.problems === 'number') heroStore.set({ deals: s.problems }); })
+      .catch(() => {});
+  }, []);
 
   // Never compete with the first paint or the opening: the 3D chunk is parsed
   // once the page is idle (the CSS poster stands in until then).
@@ -100,10 +110,11 @@ export default function MonolithStage({ variant }: { variant: 'fixed' | 'inline'
 
   return (
     <div ref={ref} className={`mono mono--${variant} ${ready ? 'is-ready' : ''} ${locked ? 'is-locked' : ''}`} aria-hidden="true">
+      {variant === 'fixed' && <span className="mono-watermark editorial" aria-hidden="true">Vantaris</span>}
       <Poster />
       {can && near && armed && (
         <Suspense fallback={null}>
-          <MonolithScene low={low} active={visible} onReady={() => setReady(true)} />
+          <MonolithScene low={low} phone={phone} frozen={reduce} active={visible} onReady={() => setReady(true)} />
         </Suspense>
       )}
     </div>

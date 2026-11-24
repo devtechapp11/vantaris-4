@@ -134,7 +134,7 @@ function Film() {
             <div className="chapter-copy">
               <p className="t-eyebrow">{c.eyebrow}</p>
               {i === 0 ? (
-                <h1 id={`ch-${c.id}`} className="t-display hero-title text-chrome text-chrome--live">{c.title}</h1>
+                <HeroTitle c={c} />
               ) : (
                 <h2 id={`ch-${c.id}`} className="chapter-title">{c.title}</h2>
               )}
@@ -323,7 +323,7 @@ function MobileFilm() {
         <MonolithStage variant="inline" />
         <div className="chapter-copy">
           <p className="t-eyebrow">{hero.eyebrow}</p>
-          <h1 id={`ch-${hero.id}`} className="t-display hero-title text-chrome text-chrome--live">{hero.title}</h1>
+          <HeroTitle c={hero} />
           <p className="t-lead">{hero.body}</p>
           <HeroDemo />
         </div>
@@ -368,7 +368,7 @@ function StillFilm() {
         <article key={c.id} className={`still-ch ${i === 0 ? 'still-ch--hero' : ''}`} aria-labelledby={`ch-${c.id}`}>
           <div className="chapter-copy">
             <p className="t-eyebrow">{c.eyebrow}</p>
-            {i === 0 ? <h1 id={`ch-${c.id}`} className="t-display hero-title text-chrome">{c.title}</h1> : <h2 id={`ch-${c.id}`} className="chapter-title">{c.title}</h2>}
+            {i === 0 ? <HeroTitle c={c} still /> : <h2 id={`ch-${c.id}`} className="chapter-title">{c.title}</h2>}
             <p className="t-lead">{c.body}</p>
             {i === 0 && <HeroDemo />}
           </div>
@@ -380,6 +380,15 @@ function StillFilm() {
 }
 
 /* ---------- Three demo deals, playable before any sign-up ---------- */
+/** « Don’t study finance. Command the floor. »: chrome display face, one editorial italic line. */
+function HeroTitle({ c, still = false }) {
+  return (
+    <h1 id={`ch-${c.id}`} className={`t-display hero-title hero-title--dc ${still ? '' : 'text-chrome--live'}`}>
+      {c.title}{c.titleEditorial && <> <span className="editorial">{c.titleEditorial}</span></>}
+    </h1>
+  );
+}
+
 function HeroDemo() {
   return (
     <div className="hero-demo">

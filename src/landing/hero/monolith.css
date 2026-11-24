@@ -1,7 +1,7 @@
 /* ---------- Ledger Monolith stage ---------- */
 .mono { pointer-events: none; }
 .mono--fixed { position: fixed; top: 0; right: 0; z-index: 0; width: 50vw; height: 100lvh; }
-.mono--inline { position: relative; height: 200px; margin: 0 calc(var(--gutter) * -1) calc(var(--sp-2) * -1); }
+.mono--inline { position: relative; height: clamp(220px, 42vh, 380px); margin: 0 calc(var(--gutter) * -1) calc(var(--sp-2) * -1); }
 .mono-canvas { position: absolute !important; inset: 0; opacity: 0; transition: opacity 700ms var(--ease-out); }
 .mono.is-ready .mono-canvas { opacity: 1; }
 
@@ -27,3 +27,26 @@
 /* Locked without WebGL: the poster closes the gaps */
 .mono.is-locked .mono-poster { gap: 0; }
 .mono-poster { transition: opacity 500ms var(--ease-out), gap 420ms var(--ease-out); }
+
+/* ---------- Telemetry badges ---------- */
+.hud-badge {
+  position: relative; display: inline-flex; flex-direction: column; gap: 4px; white-space: nowrap;
+  padding: 8px 12px; font: 500 10px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--steel-300); background: rgba(10, 13, 19, 0.55);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(201, 206, 214, 0.14);
+  transform: translate(8px, -50%);
+}
+.hud-badge--left { transform: translate(calc(-100% - 8px), -50%); }
+.hud-badge::before, .hud-badge::after { content: ''; position: absolute; width: 6px; height: 6px; border-color: var(--platinum); border-style: solid; }
+.hud-badge::before { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
+.hud-badge::after { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
+.hud-badge__value { font-size: 15px; letter-spacing: 0.02em; color: var(--white); }
+
+/* ---------- Watermark behind the sculpture (desktop) ---------- */
+.mono-watermark {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  font-size: 18vw; line-height: 1; white-space: nowrap; color: rgba(201, 206, 214, 0.04);
+  pointer-events: none; user-select: none;
+}
+.mono--inline .mono-watermark { display: none; }

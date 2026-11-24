@@ -16,6 +16,7 @@ import { fieldBus } from '../../fx/field/fieldBus';
 import { ledger } from '../hero/ledger';
 import { DEMO_DEALS, gradeFor, xpFor } from './deals';
 import { saveDemoScore } from './demoScore';
+import { heroStore } from '../hero/heroStore';
 import './demo.css';
 
 type Result = { right: boolean; xp: number; secs: number };
@@ -54,6 +55,7 @@ export default function DemoDeals() {
     setPick(i);
     setResults(next);
     saveDemoScore({ xp: next.reduce((s, r) => s + r.xp, 0), right: next.filter((r) => r.right).length, played: next.length, total: DEMO_DEALS.length });
+    heroStore.set({ played: next.length, right: next.filter((r) => r.right).length, total: DEMO_DEALS.length, grade: next.length === DEMO_DEALS.length ? gradeFor(next.filter((r) => r.right).length) : null });
     track('hero_case', { deal: deal.id, correct: ok });
     if (ok) {
       sound.correct(run + 1);
@@ -95,6 +97,7 @@ export default function DemoDeals() {
     setPick(null);
     setResults([]);
     setDone(false);
+    heroStore.set({ played: 0, right: 0, grade: null });
     shownAt.current = performance.now();
   };
 

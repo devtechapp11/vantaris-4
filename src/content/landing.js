@@ -3,7 +3,7 @@
 // The scroll film: one chapter per screen. `visual` picks what the sticky stage
 // shows while the chapter is in view; `vale` is the mascot's state.
 export const CHAPTERS = [
-  { id: 'hero', visual: 'hero', vale: 'idle', eyebrow: 'The training floor for future dealmakers', title: 'Don’t study finance. Do finance.', body: 'Real DCF, LBO and M&A deals, priced against the clock. An analyst’s reflexes in five minutes a day.' },
+  { id: 'hero', visual: 'hero', vale: 'idle', eyebrow: 'The training floor for future dealmakers', title: 'Don’t study finance.', titleEditorial: 'Command the floor.', body: 'Real DCF, LBO and M&A deals, priced against the clock. An analyst’s reflexes in five minutes a day.' },
   { id: 'deal', visual: 'deal', vale: 'curious', eyebrow: '01 · The term sheet', title: 'Every case is a live deal.', body: 'A company, the numbers that matter and the one question a managing director would put to you. No flashcards. No theory for its own sake.' },
   { id: 'answer', visual: 'answer', vale: 'thinking', eyebrow: '02 · Your call', title: 'Price it before the clock does.', body: 'Tap any figure to run it through the calculator. Commit inside the time and the desk pays up to 50% more points.' },
   { id: 'steps', visual: 'chart', vale: 'success', eyebrow: '03 · The debrief', title: 'See how the senior banker gets there.', body: 'Every deal ends with the full walkthrough: each step, the formula and the judgment behind the number. Open only what you need.' },
