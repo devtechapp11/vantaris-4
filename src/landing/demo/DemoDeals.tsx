@@ -15,7 +15,8 @@ import { feverBurst, originOf } from '../../lib/celebrate';
 import { fieldBus } from '../../fx/field/fieldBus';
 import { ledger } from '../hero/ledger';
 import { DEMO_DEALS, gradeFor, xpFor } from './deals';
-import { saveDemoScore } from './demoScore';
+import { saveDemoScore, saveDemoTickets } from './demoScore';
+import ThermalReceipt from '../../components/receipt/ThermalReceipt';
 import { heroStore } from '../hero/heroStore';
 import './demo.css';
 
@@ -55,6 +56,7 @@ export default function DemoDeals() {
     setPick(i);
     setResults(next);
     saveDemoScore({ xp: next.reduce((s, r) => s + r.xp, 0), right: next.filter((r) => r.right).length, played: next.length, total: DEMO_DEALS.length });
+    saveDemoTickets(next.length);
     heroStore.set({ played: next.length, right: next.filter((r) => r.right).length, total: DEMO_DEALS.length, grade: next.length === DEMO_DEALS.length ? gradeFor(next.filter((r) => r.right).length) : null });
     track('hero_case', { deal: deal.id, correct: ok });
     if (ok) {
@@ -97,6 +99,7 @@ export default function DemoDeals() {
     setPick(null);
     setResults([]);
     setDone(false);
+    saveDemoTickets(0);
     heroStore.set({ played: 0, right: 0, grade: null });
     shownAt.current = performance.now();
   };
@@ -130,7 +133,30 @@ export default function DemoDeals() {
 
   const ok = pick != null && pick === deal.answer;
 
+  const tickets = results.map((r, i) => {
+    const d = DEMO_DEALS[i];
+    const last = i === DEMO_DEALS.length - 1;
+    return (
+      <div key={d.id} style={{ ['--i' as string]: results.length - 1 - i }}>
+        <ThermalReceipt
+          heading="Deal ticket"
+          meta={`Vantaris floor · ${String(i + 1).padStart(2, '0')}/03 · Example`}
+          lines={[
+            { label: 'Method', value: d.kind },
+            ...d.ticket.map(([label, value]) => ({ label, value })),
+            { label: 'Time to close', value: `${r.secs.toFixed(1)}s` },
+            { label: 'Verdict', value: r.right ? 'CORRECT' : 'REVIEWED', strong: true },
+            { label: 'Deals', value: `${i + 1}/3` },
+          ]}
+          stamp={last && done ? `Calibrated · ${gradeFor(right)}` : null}
+          footnote={last && done ? 'Save your desk to keep this ticket.' : undefined}
+        />
+      </div>
+    );
+  });
+
   return (
+    <>
     <SpecularCard className={`dd ${pick == null ? '' : ok ? 'is-right' : 'is-miss'}`} pad={false}>
       <div ref={card} className="dd-inner">
         <header className="dd-head">
@@ -208,5 +234,12 @@ export default function DemoDeals() {
         </AnimatePresence>
       </div>
     </SpecularCard>
+    {tickets.length > 0 && (
+      <section className="dd-tickets" aria-label="Your deal tickets">
+        <p className="ticket-stack__label">{tickets.length} ticket{tickets.length > 1 ? 's' : ''} printed</p>
+        <div className="ticket-stack">{tickets}</div>
+      </section>
+    )}
+    </>
   );
 }

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useApp } from '../app/AppContext';
 import { api } from '../lib/api';
-import { clearDemoScore, readDemoScore } from '../landing/demo/demoScore';
+import { clearDemoScore, readDemoScore, takeDemoTickets } from '../landing/demo/demoScore';
 
 type Credit = { credited: number; reason?: string; me?: unknown } | null;
 
@@ -20,7 +20,10 @@ export default function DemoCredit() {
       if (!res) return; // server not ready: keep it on this device for later
       clearDemoScore();
       if (res.me) setMe(res.me);
-      if (res.credited > 0) showToast(`+${res.credited} XP from your demo deals`, 'success');
+      const tickets = takeDemoTickets();
+      const onDesk = tickets > 0 ? ` · ${tickets} ticket${tickets > 1 ? 's' : ''} on your desk` : '';
+      if (res.credited > 0) showToast(`+${res.credited} XP from your demo deals${onDesk}`, 'success');
+      else if (onDesk) showToast(onDesk.slice(3).replace(/^./, (c) => c.toUpperCase()), 'success');
     }).catch(() => { done.current = false; });
   }, [signedIn, setMe, showToast]);
   return null;

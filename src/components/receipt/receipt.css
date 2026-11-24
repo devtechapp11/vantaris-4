@@ -1,0 +1,38 @@
+/* Thermal ticket: pale paper, mono print, serrated tear edge */
+.receipt-slot { position: relative; overflow: hidden; padding: 0 2px 14px; }
+.receipt {
+  position: relative; margin: 0; padding: 18px 18px 26px;
+  font: 500 12px/1.45 var(--font-mono); font-variant-numeric: tabular-nums slashed-zero; letter-spacing: 0.02em;
+  color: #12161D; background: linear-gradient(180deg, #F8FAFC, #E6E9EE 60%, #C9CED6);
+  box-shadow: 0 18px 36px -20px rgba(0, 0, 0, 0.9);
+  -webkit-mask: linear-gradient(#000 0 0) top / 100% calc(100% - 8px) no-repeat, conic-gradient(from 135deg at top, #000 90deg, transparent 0) bottom / 12px 8px repeat-x;
+  mask: linear-gradient(#000 0 0) top / 100% calc(100% - 8px) no-repeat, conic-gradient(from 135deg at top, #000 90deg, transparent 0) bottom / 12px 8px repeat-x;
+}
+.receipt::before {
+  /* print head grain */
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.5;
+  background: repeating-linear-gradient(180deg, transparent 0 2px, rgba(91, 100, 112, 0.06) 2px 3px);
+}
+.receipt__head { padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px dashed #5B6470; text-align: center; }
+.receipt__heading { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; }
+.receipt__meta { margin: 4px 0 0; font-size: 10px; letter-spacing: 0.14em; color: #5B6470; text-transform: uppercase; }
+.receipt__lines { margin: 0; display: grid; gap: 3px; }
+.receipt__line { display: flex; justify-content: space-between; gap: 12px; }
+.receipt__line dt { color: #2A3039; text-transform: uppercase; font-size: 11px; letter-spacing: 0.08em; }
+.receipt__line dd { margin: 0; text-align: right; }
+.receipt__line.is-strong { margin-top: 6px; padding-top: 6px; border-top: 1px dashed #5B6470; font-weight: 700; }
+.receipt__foot { margin: 12px 0 0; font-size: 10px; letter-spacing: 0.06em; color: #5B6470; text-align: center; }
+.receipt.has-stamp { padding-bottom: 72px; }
+.receipt__stamp {
+  position: absolute; right: 18px; bottom: 26px; margin: 0; padding: 5px 10px;
+  font: 700 12px/1 var(--font-mono); letter-spacing: 0.18em; text-transform: uppercase; white-space: nowrap;
+  color: rgba(42, 48, 57, 0.86); border: 2px solid rgba(42, 48, 57, 0.78); border-radius: 4px;
+  mix-blend-mode: multiply; pointer-events: none;
+}
+
+/* A stack of tickets: older ones peek out behind the newest */
+.ticket-stack { position: relative; display: grid; max-width: 340px; padding-top: 16px; }
+.dd-tickets { margin-top: var(--sp-4); }
+.ticket-stack > * { grid-area: 1 / 1; }
+.ticket-stack > :not(:last-child) { transform: translate(calc(var(--i) * 6px), calc(var(--i) * -7px)) rotate(calc(var(--i) * 1.2deg)); filter: brightness(0.82); }
+.ticket-stack__label { margin: 0 0 8px; font: 500 10px/1 var(--font-mono); letter-spacing: 0.2em; text-transform: uppercase; color: var(--steel-300); }

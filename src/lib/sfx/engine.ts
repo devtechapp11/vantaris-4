@@ -193,6 +193,69 @@ class SfxEngine {
     [0, 7, 12, 16, 19, 24].forEach((s, i) => this.bell(261.63 * Math.pow(2, s / 12), i * 0.11, 0.14, 1.6, 0.6));
     this.tone(55, { glideTo: 40, a: 0.01, d: 1.2, peak: 0.3 });
   }
+
+  /** Thermal printer feed: a dense train of soft clicks over a low motor hum. */
+  printFeed(lines = 8) {
+    if (!this.ready()) return;
+    const n = Math.min(lines, 14);
+    for (let i = 0; i < n * 3; i++) this.click(i * 0.028, 1600 + (i % 3) * 500, 0.07, 0.012);
+    this.tone(110, { type: 'sawtooth', a: 0.02, d: n * 0.084, peak: 0.018 });
+  }
+
+  /** Paper torn off the serrated edge. */
+  tear() {
+    if (!this.ready()) return;
+    for (let i = 0; i < 9; i++) this.click(i * 0.014, 5200 - i * 260, 0.11, 0.02);
+  }
+
+  /** Rubber stamp: a thud and a dry snap. */
+  stamp() {
+    if (!this.ready()) return;
+    this.tone(90, { glideTo: 50, a: 0.002, d: 0.18, peak: 0.42 });
+    this.click(0, 700, 0.3, 0.05);
+    this.click(0.02, 2600, 0.12, 0.02);
+  }
+
+  private holdOsc: { o: OscillatorNode; g: GainNode } | null = null;
+
+  /** Hold to confirm: a pitch rising with the hold (0 → 1 over `ms`). */
+  holdStart(ms = 1200) {
+    if (!this.ready()) return;
+    this.holdStop();
+    const ctx = this.ctx!;
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(220, t);
+    o.frequency.exponentialRampToValueAtTime(660, t + ms / 1000);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.06, t + 0.05);
+    o.connect(g);
+    g.connect(this.master);
+    o.start(t);
+    this.holdOsc = { o, g };
+  }
+
+  /** The hold completed: the rising tone resolves into a bright lock. */
+  holdSet() {
+    this.holdStop();
+    if (!this.ready()) return;
+    this.bell(880, 0, 0.14, 0.6);
+    this.click(0, 3000, 0.2, 0.02);
+  }
+
+  /** Released early (or completed): the tone fades out fast. */
+  holdStop() {
+    const h = this.holdOsc;
+    if (!h || !this.ctx) return;
+    const t = this.ctx.currentTime;
+    h.g.gain.cancelScheduledValues(t);
+    h.g.gain.setValueAtTime(h.g.gain.value, t);
+    h.g.gain.linearRampToValueAtTime(0, t + 0.06);
+    h.o.stop(t + 0.08);
+    this.holdOsc = null;
+  }
 }
 
 export const sfx = new SfxEngine();

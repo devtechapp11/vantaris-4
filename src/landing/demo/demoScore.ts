@@ -33,3 +33,22 @@ export function clearDemoScore() {
     /* ignore */
   }
 }
+
+/** How many demo tickets the visitor printed (shown once after sign-up). */
+const TICKETS = 'vantaris.demo.tickets.v1';
+export function saveDemoTickets(n: number) {
+  try {
+    localStorage.setItem(TICKETS, String(n));
+  } catch {
+    /* storage unavailable */
+  }
+}
+export function takeDemoTickets(): number {
+  try {
+    const n = Number(localStorage.getItem(TICKETS) || 0);
+    localStorage.removeItem(TICKETS);
+    return Number.isFinite(n) ? n : 0;
+  } catch {
+    return 0;
+  }
+}

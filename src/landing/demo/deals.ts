@@ -9,6 +9,8 @@ export type DemoDeal = {
   options: string[];
   answer: number;
   why: string;
+  /** The figures printed on the deal ticket. */
+  ticket: [label: string, value: string][];
 };
 
 export const DEMO_DEALS: DemoDeal[] = [
@@ -20,6 +22,7 @@ export const DEMO_DEALS: DemoDeal[] = [
     answer: 1,
     // 50 × 8.0 = 400
     why: 'Enterprise value = EBITDA × multiple = $50M × 8.0 = $400M.',
+    ticket: [['EBITDA', '$50.0M'], ['Multiple', '8.0x'], ['EV', '$400.0M']],
   },
   {
     id: 'dcf-perpetuity',
@@ -29,6 +32,7 @@ export const DEMO_DEALS: DemoDeal[] = [
     answer: 1,
     // 30 / (0.08 − 0.03) = 600 · traps: 30/0.08 = 375, 30/0.11 = 273, 30/0.03 = 1,000
     why: 'EV = FCF ÷ (WACC − g) = $30M ÷ (8% − 3%) = $600M.',
+    ticket: [['FCF (y+1)', '$30.0M'], ['Growth', '3.0%'], ['WACC', '8.0%'], ['EV', '$600.0M']],
   },
   {
     id: 'lbo-irr',
@@ -38,6 +42,7 @@ export const DEMO_DEALS: DemoDeal[] = [
     answer: 2,
     // MOIC 3.0x; 3^(1/5) − 1 = 24.57% · traps: 2^(1/5) − 1 = 14.9%, 200% ÷ 5 = 40%
     why: 'MOIC = $600M ÷ $200M = 3.0x. IRR = 3.0^(1/5) − 1 ≈ 24.6%, not 200% ÷ 5.',
+    ticket: [['Equity in', '$200.0M'], ['Equity out', '$600.0M'], ['MOIC', '3.0x'], ['IRR', '24.6%']],
   },
 ];
 
