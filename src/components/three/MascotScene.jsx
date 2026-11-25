@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { CanvasTexture, Color, MathUtils, MeshPhysicalMaterial, ShaderMaterial, SphereGeometry, Vector2, Vector3 } from 'three';
+import { CanvasTexture, Color, MathUtils, MeshPhysicalMaterial, ShaderMaterial, Vector2 } from 'three';
+import { makeValeBody } from '../../vale/valeShape';
 import { StudioEnv } from './common';
 import { cssVar } from '../../design/tokens';
 
@@ -21,25 +22,8 @@ import { cssVar } from '../../design/tokens';
 
 const MAX_LEAN = MathUtils.degToRad(8);
 
-/** Unit sphere point → pebble surface. */
-function pebble(v) {
-  const y = v.y;
-  const taper = y < 0 ? 1 - 0.6 * Math.pow(-y, 1.3) : 1 - 0.05 * y * y;
-  return [v.x * taper, y > 0 ? y * 0.9 : y * 1.36, v.z * 0.8 * taper];
-}
-
-function makeBody() {
-  const g = new SphereGeometry(1, 160, 120);
-  const p = g.attributes.position;
-  const v = new Vector3();
-  for (let i = 0; i < p.count; i++) {
-    v.fromBufferAttribute(p, i).normalize();
-    const [x, y, z] = pebble(v);
-    p.setXYZ(i, x, y, z);
-  }
-  g.computeVertexNormals();
-  return g;
-}
+// The body is the shared Vale shape (src/vale/valeShape.ts), so every Vale is the same character.
+const makeBody = () => makeValeBody('high');
 
 /** Chrome body with the visor and eyes painted on by a shader patch. */
 function makeMaterial(colors) {

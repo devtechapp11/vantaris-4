@@ -8,3 +8,17 @@
 .devtype-tag { display: inline-block; width: 6ch; font-size: 11px; font-weight: 400; color: var(--steel-500); font-stretch: 100%; }
 .devtype-rank { margin: 0; font-weight: 800; font-size: clamp(20px, 3.4vw, 40px); letter-spacing: 0.04em; color: var(--chrome-300); }
 .devtype-mono { margin: 0; font-size: 15px; color: var(--chrome-300); }
+
+/* /dev/vale */
+.devvale { position: fixed; inset: 0; background: var(--void); overflow: hidden; }
+.devvale-top { position: absolute; top: calc(var(--safe-top) + 16px); left: var(--gutter); right: var(--gutter-r); display: flex; align-items: center; justify-content: space-between; pointer-events: none; }
+.devvale-top > * { pointer-events: auto; }
+.devvale-cue { position: absolute; left: 0; right: 0; bottom: calc(var(--safe-bottom) + 28px); margin: 0; text-align: center; pointer-events: none; }
+.devvale-panel { position: absolute; right: var(--gutter-r); bottom: calc(var(--safe-bottom) + 64px); display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.devvale-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.devvale-btns button { min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-strong); background: color-mix(in srgb, var(--void-2) 70%, transparent); color: var(--chrome-300); font: 500 10px/1 var(--font-mono); letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; }
+@media (max-width: 600px) { .devvale-panel { left: var(--gutter); right: var(--gutter-r); align-items: center; } .devvale-btns { justify-content: center; } }
+
+/* The sound pill (site-wide component, styled here until the landing adopts it) */
+.sound-pill { min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--chrome-200) 14%, transparent); background: color-mix(in srgb, var(--void-2) 60%, transparent); cursor: pointer; -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.sound-pill[aria-pressed='true'] { color: var(--chrome-200); }

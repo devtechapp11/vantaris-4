@@ -73,6 +73,9 @@ export default defineConfig(({ mode, command }) => {
       rollupOptions: mode === 'demo' ? {} : {
         output: {
           manualChunks(id) {
+            // Transpiler helpers (class fields…) stay in their own tiny chunk, so the
+            // app shell never depends on the lazy three.js chunk through them.
+            if (/node_modules\/(@oxc-project\/runtime|@babel\/runtime)\//.test(id) || id.startsWith('\0')) return 'runtime';
             if (id.includes('node_modules/@supabase')) return 'supabase';
             if (/node_modules\/(react|react-dom|react-router|scheduler)\//.test(id)) return 'react';
             if (id.includes('node_modules/motion') || id.includes('node_modules/framer-motion')) return 'motion';

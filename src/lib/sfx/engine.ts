@@ -13,6 +13,7 @@ class SfxEngine {
   private master!: GainNode;
   private verbSend!: GainNode;
   private noiseBuf?: AudioBuffer;
+  private noiseCache = new Map<number, AudioBuffer>();
 
   get muted() {
     return !getPrefs().sound;
@@ -144,7 +145,50 @@ class SfxEngine {
     src.stop(t + d + 0.02);
   }
 
+  /** White noise, `seconds` long, cached per length. */
+  private noise(seconds: number) {
+    const ctx = this.ctx!;
+    const key = Math.round(seconds * 100);
+    let buf = this.noiseCache.get(key);
+    if (!buf) {
+      const len = Math.max(1, (ctx.sampleRate * seconds) | 0);
+      buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const ch = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) ch[i] = Math.random() * 2 - 1;
+      this.noiseCache.set(key, buf);
+    }
+    return buf;
+  }
+
   // ---------- Public API ----------
+  /** A drop of chrome landing in the pool (Vale's hook, a tap on Vale). */
+  plink() {
+    if (!this.ready()) return;
+    this.bell(1318.5, 0, 0.16, 0.7, 0.5);
+    this.tone(2637, { a: 0.001, d: 0.08, peak: 0.05 });
+  }
+
+  /** Soft air as the camera dives over the pool (act change). */
+  whoosh() {
+    if (!this.ready()) return;
+    const ctx = this.ctx!;
+    const t = ctx.currentTime;
+    const src = ctx.createBufferSource();
+    src.buffer = this.noise(0.6);
+    const f = ctx.createBiquadFilter();
+    f.type = 'bandpass';
+    f.Q.value = 0.8;
+    f.frequency.setValueAtTime(300, t);
+    f.frequency.exponentialRampToValueAtTime(2400, t + 0.5);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.06, t + 0.15);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
+    src.connect(f).connect(g).connect(this.master);
+    src.start(t);
+    src.stop(t + 0.62);
+  }
+
   tick() {
     if (!this.ready()) return;
     this.click(0, 3200, 0.2, 0.018);

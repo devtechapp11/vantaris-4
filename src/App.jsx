@@ -43,6 +43,7 @@ const Legal = lazy(loaders.legal);
 const NotFound = lazy(loaders.notFound);
 // Dev pages (/dev/type, /dev/vale): never linked, noindex, no session needed.
 const DevType = lazy(() => import('./dev/DevType'));
+const DevVale = lazy(() => import('./dev/DevVale'));
 
 // The preview build runs inside a sandboxed frame, so it keeps its route in memory.
 const Router = IS_DEMO ? MemoryRouter : BrowserRouter;
@@ -121,6 +122,7 @@ function Gate() {
       <Suspense fallback={loader}>
         <Routes>
           <Route path="/dev/type" element={<DevType />} />
+          <Route path="/dev/vale" element={<DevVale />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

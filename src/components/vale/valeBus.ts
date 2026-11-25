@@ -11,11 +11,22 @@ const listeners = new Set<Listener>();
 
 const ALIAS: Partial<Record<ValeMood, ValeMood>> = { celebrate: 'delight', combo: 'wow', encourage: 'concern' };
 
-/** Lets any screen make Vale react, and optionally look at an element. */
+/** Lets any screen make Vale react, and optionally look at an element. The 3D
+ *  Vale reads `state` every frame (no React re-render). */
 export const valeBus = {
+  state: { mood: 'idle' as ValeMood, at: 0, gaze: null as Element | null },
   react(mood: ValeMood, opts: { gaze?: Element | null } = {}) {
     const e = { mood: ALIAS[mood] ?? mood, gaze: opts.gaze };
+    this.state = { mood: e.mood, at: typeof performance === 'undefined' ? 0 : performance.now(), gaze: opts.gaze ?? null };
     listeners.forEach((l) => l(e));
+  },
+  /** A right answer (or a tap on Vale): delight, wow from a x3 combo. */
+  correct(tier = 1) {
+    this.react(tier >= 3 ? 'wow' : 'delight');
+  },
+  /** A miss: concern, looking at the right answer when given. */
+  wrong(answer?: Element | null) {
+    this.react('concern', { gaze: answer });
   },
   subscribe(l: Listener) {
     listeners.add(l);
