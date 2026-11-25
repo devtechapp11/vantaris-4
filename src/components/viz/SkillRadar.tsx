@@ -26,7 +26,7 @@ export default function SkillRadar({ skills, trainHref, caption }: Props) {
         <defs>
           <radialGradient id={`${cleanId}-fill`} cx="50%" cy="50%" r="60%">
             <stop offset="0%" stopColor="#F8FAFC" stopOpacity="0.38" />
-            <stop offset="100%" stopColor="#8FA3B8" stopOpacity="0.1" />
+            <stop offset="100%" stopColor="#9AA3AE" stopOpacity="0.1" />
           </radialGradient>
         </defs>
         {[0.25, 0.5, 0.75, 1].map((k) => <polygon key={k} points={poly(() => k)} className="radar__ring" />)}

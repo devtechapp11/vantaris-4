@@ -18,7 +18,7 @@ export async function plaqueImage(desk: string, name: string): Promise<Blob | nu
   g.fillRect(0, 0, S, S);
 
   // Fine corner marks, as on the app's HUD
-  g.strokeStyle = '#3B4A5C';
+  g.strokeStyle = '#2A3039';
   g.lineWidth = 2;
   [[60, 60], [S - 60, 60], [60, S - 60], [S - 60, S - 60]].forEach(([x, y]) => {
     g.beginPath();
@@ -35,7 +35,7 @@ export async function plaqueImage(desk: string, name: string): Promise<Blob | nu
   const x = (S - w) / 2;
   const y = S * 0.36;
   const plate = g.createLinearGradient(x, y, x + w, y + h);
-  ['#B9BFC8', '#E6E9EE', '#A9B0BA', '#D5D9DF', '#8E96A1'].forEach((col, i, a) => plate.addColorStop(i / (a.length - 1), col));
+  ['#C9CED6', '#E6E9EE', '#9AA3AE', '#E6E9EE', '#8A929D'].forEach((col, i, a) => plate.addColorStop(i / (a.length - 1), col));
   g.shadowColor = '#000000';
   g.shadowBlur = 60;
   g.shadowOffsetY = 30;
@@ -63,7 +63,7 @@ export async function plaqueImage(desk: string, name: string): Promise<Blob | nu
   // The largest size that fits the plate with a margin
   let size = 78;
   do {
-    g.font = `600 ${size}px "Space Grotesk Variable", "Inter Variable", system-ui, sans-serif`;
+    g.font = `800 ${size}px "Archivo Variable", system-ui, sans-serif`;
     size -= 2;
   } while (g.measureText(label).width > w - 120 && size > 30);
   g.fillStyle = '#F8FAFC';
@@ -71,11 +71,11 @@ export async function plaqueImage(desk: string, name: string): Promise<Blob | nu
   g.fillStyle = '#2A3039';
   g.fillText(label, S / 2, y + h / 2);
 
-  g.font = '500 44px "Inter Variable", system-ui, sans-serif';
+  g.font = '500 44px "Archivo Variable", system-ui, sans-serif';
   if ('letterSpacing' in g) (g as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = '0px';
   g.fillStyle = '#E6E9EE';
   g.fillText(name, S / 2, y + h + 110);
-  g.font = '400 28px "JetBrains Mono Variable", ui-monospace, monospace';
+  g.font = '400 28px "Martian Mono Variable", ui-monospace, monospace';
   g.fillStyle = '#9AA3AE';
   if ('letterSpacing' in g) (g as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = '8px';
   g.fillText('VANTARIS', S / 2, S - 120);

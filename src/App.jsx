@@ -41,15 +41,19 @@ const Profile = lazy(loaders.profile);
 const Plans = lazy(loaders.plans);
 const Legal = lazy(loaders.legal);
 const NotFound = lazy(loaders.notFound);
+// Dev pages (/dev/type, /dev/vale): never linked, noindex, no session needed.
+const DevType = lazy(() => import('./dev/DevType'));
 
 // The preview build runs inside a sandboxed frame, so it keeps its route in memory.
 const Router = IS_DEMO ? MemoryRouter : BrowserRouter;
+// The preview build keeps its route in memory; a /dev/* address still opens there.
+const routerProps = IS_DEMO && typeof location !== 'undefined' && location.pathname.startsWith('/dev/') ? { initialEntries: [location.pathname] } : {};
 
 export default function App() {
   const prefs = usePrefs();
   useSfxUnlock();
   return (
-    <Router>
+    <Router {...routerProps}>
       <MotionConfig reducedMotion={prefs.reduceMotion ? 'always' : 'user'}>
         <AppProvider>
           <ObsidianField key={prefs.reduceMotion ? 'still' : 'live'} still={prefs.reduceMotion} />
@@ -111,6 +115,17 @@ function Gate() {
   const prerendered = document.documentElement.hasAttribute('data-prerender') && /^\/(welcome)?$/.test(location.pathname);
   const loader = prerendered ? <HeroShell /> : <LogoLoader />;
   if (session === undefined) return loader;
+
+  if (location.pathname.startsWith('/dev/')) {
+    return (
+      <Suspense fallback={loader}>
+        <Routes>
+          <Route path="/dev/type" element={<DevType />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+    );
+  }
 
   let routes;
   if (location.pathname === '/reset-password') {

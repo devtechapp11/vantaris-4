@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { getPrefs } from '../app/prefs';
 
 // Polished metal, from white highlight to dark steel (all on palette).
-const SHADES = ['#F8FAFC', '#E6E9EE', '#D5D9DF', '#C9CED6', '#B9BFC8', '#A9B0BA', '#9AA3AE', '#8E96A1', '#7C848F', '#5B6470'];
+const SHADES = ['#F8FAFC', '#E6E9EE', '#E6E9EE', '#C9CED6', '#C9CED6', '#9AA3AE', '#9AA3AE', '#8A929D', '#7C848F', '#5B6470'];
 const MAX = 140;
 
 type Shard = { x: number; y: number; vx: number; vy: number; r: number; vr: number; s: number; life: number; age: number; quad: boolean };

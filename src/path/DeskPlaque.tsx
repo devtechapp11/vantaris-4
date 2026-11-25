@@ -9,7 +9,7 @@ export default function DeskPlaque({ desk, reached, elite = false, tierLabel = n
   return (
     <div className={`plaque ${reached ? 'is-reached' : ''} ${elite ? 'plaque--elite' : ''}`}>
       <span className="plaque-rule" aria-hidden="true" />
-      <MetalPlate tone={tone} size="md" className="plaque-plate">
+      <MetalPlate tone={tone} size="md" className="plaque-plate" rank={desk}>
         {!reached && (elite || tierLabel) && <Lock size={11} strokeWidth={2} aria-hidden="true" />}
         {`${desk} desk`.toUpperCase()}
       </MetalPlate>

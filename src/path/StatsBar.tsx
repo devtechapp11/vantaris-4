@@ -31,7 +31,7 @@ export default function StatsBar({ level, streak, lit, stars, board }: Props) {
   return (
     <header className="sbar" aria-label="Your standing">
       <SpecularBorder />
-      <MetalPlate tone="platinum" size="sm" className="sbar-desk">{careerName(level)}</MetalPlate>
+      <MetalPlate tone="platinum" size="sm" className="sbar-desk" rank={level}>{careerName(level)}</MetalPlate>
       <Link to="/ranking" className="sbar-stat sbar-rank" aria-describedby={tip}>
         {rank ? <><b className="fig-mono">#<AnimatedNumber value={rank} /></b><span className="sbar-unit">in league</span></> : <span className="sbar-unit">Unranked</span>}
         <span role="tooltip" id={tip} className="sbar-tip">

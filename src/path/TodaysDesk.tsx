@@ -72,7 +72,7 @@ export default function TodaysDesk({ me, board, due, compact = false }: Props) {
   return (
     <aside className={`td ${compact ? 'td--compact' : ''}`} aria-label="Today's desk">
       <SpecularCard className="td-card td-deskcard">
-        <MetalPlate tone="platinum" size="sm">{`${careerName(p.level)} desk`.toUpperCase()}</MetalPlate>
+        <MetalPlate tone="platinum" size="sm" rank={p.level}>{`${careerName(p.level)} desk`.toUpperCase()}</MetalPlate>
         {toNext != null && p.next_level && (
           <p className="td-next fig-mono">{toNext} XP → {careerName(p.next_level).toUpperCase()}</p>
         )}

@@ -17,9 +17,9 @@ function dropConsole() {
   };
 }
 
-// Preload the two font files every screen needs, so text paints in the right
+// Preload the two font files every screen needs (Archivo, Martian Mono), so text paints in the right
 // face on first render (fontsource hashes the names, so this runs after bundling).
-const CRITICAL_FONTS = /(inter-latin-opsz-normal|space-grotesk-latin-wght-normal|instrument-serif-latin-400-italic)-[\w-]+\.woff2$/;
+const CRITICAL_FONTS = /(archivo-latin-wdth-normal|martian-mono-latin-wdth-normal)-[\w-]+\.woff2$/;
 function preloadFonts(base) {
   return {
     name: 'vantaris-preload-fonts',

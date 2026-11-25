@@ -124,11 +124,11 @@ export default function PromotionCeremony() {
               animate={{ rotateX: 0, y: 0, opacity: 1 }}
               transition={springs.heavy}
             >
-              <span className="promo-text" aria-hidden="true">
+              <span className="promo-text" aria-hidden="true" data-rank={desk ?? undefined}>
                 {label.split('').map((ch, i) => (
                   <span key={i} className={i < letters ? 'is-cut' : ''}>{ch === ' ' ? ' ' : ch}</span>
                 ))}
-                {' '}<span className={`editorial promo-desk ${letters >= label.length ? 'is-cut' : ''}`}>Desk</span>
+                {' '}<span className={`promo-desk ${letters >= label.length ? 'is-cut' : ''}`}>Desk</span>
               </span>
               <span className="sr-only">{label} desk</span>
             </motion.div>

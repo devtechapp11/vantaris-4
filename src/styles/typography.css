@@ -1,38 +1,34 @@
-/* Three voices: Space Grotesk (everything), JetBrains Mono (every figure,
-   ticker, HUD label, receipt), Instrument Serif italic (one expression per
-   screen: the hero line, landing section titles, the promotion title). */
-@import '@fontsource/instrument-serif/latin-400-italic.css';
-
-:root {
-  --font-editorial: 'Instrument Serif', 'Times New Roman', serif;
-}
+/* Two families, two width axes. Archivo (62 → 125%) for every word: landing
+   titles in wide engraved capitals, like a bank card or a watch dial. Martian
+   Mono (75 → 112.5%) for figures, labels, tickets and the HUD, always with
+   tabular, slashed-zero figures. No serif anywhere. */
+@import '@fontsource-variable/archivo/wdth.css';
+@import '@fontsource-variable/martian-mono/wdth.css';
 
 .num, [data-num] { font-family: var(--font-mono); font-variant-numeric: tabular-nums slashed-zero; }
 
-.editorial {
-  font-family: var(--font-editorial);
-  font-style: italic;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+/* Wide engraved capitals: landing titles and the big display lines */
+.t-wide, .t-display {
+  font-family: var(--font-sans);
+  font-stretch: 125%;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.012em;
+  line-height: 0.94;
 }
 
-.hero-title.hero-title--dc {
-  font-family: var(--font-display);
-  font-weight: 600;
-  line-height: 0.92;
-  letter-spacing: -0.045em;
-  /* #F8FAFC → #C9CED6 → #5B6470 on the obsidian ground, drawn as an opacity
-     mask over opaque text (a transparent text fill would keep the title out
-     of LCP and push it to hydration). */
-  color: #F8FAFC;
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.81) 55%, rgba(0, 0, 0, 0.37) 100%);
-  mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.81) 55%, rgba(0, 0, 0, 0.37) 100%);
-}
-.hero-title .editorial {
-  display: inline-block;
-  padding-right: 0.06em; /* italic overhang */
-  font-size: 1.08em;
-  letter-spacing: -0.02em;
+.kicker {
+  font: 500 10px/1.2 var(--font-mono);
+  font-stretch: 87.5%;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--steel-300);
 }
 
-.kicker { font: 500 11px/1 var(--font-mono); letter-spacing: 0.22em; text-transform: uppercase; color: var(--steel-300); }
+/* Width is rank: a desk's name widens as you climb. Desk plaques, the rank
+   badge and the promotion ceremony read it from data-rank. */
+[data-rank] { font-family: var(--font-sans); font-variation-settings: normal; }
+[data-rank='Analyst'] { font-stretch: 62%; }
+[data-rank='Associate'] { font-stretch: 85%; }
+[data-rank='VP'] { font-stretch: 105%; }
+[data-rank='MD'], [data-rank='Elite'] { font-stretch: 125%; }

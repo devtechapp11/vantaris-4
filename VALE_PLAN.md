@@ -68,5 +68,12 @@ Le chunk `Landing` importe aussi `SpecularCard`, `PlanCard`, `BillingSwitch`, `T
   - Prérendu (`index.html`, `HeroShell`) : plus de titre Instrument Serif, seulement le repère du hook.
   - App : `AppHud` supprimé (labels verticaux + croix). Rail : 5 → 3 cartes (bureau + XP vers le suivant + phrase de série · objectif du jour + Blitz · ligue/ghost run). « XP TODAY », la série en dot-matrix et le graphique 7 j disparaissent du rail (Rank a déjà le graphique 30 j, qui contient les 7 derniers jours). Deal Brief du jour → Vault. Vale n'apparaît plus qu'une fois, à côté du nœud actif, avec une bulle (sa phrase ne répète plus l'XP ni la série). Règle numérotée `01 02 03` retirée.
   - Les polices sont remplacées en Phase 2.
-- [ ] Phase 2 — identité Prism Chrome
+- [x] Phase 2 — identité Prism Chrome
+  - `tokens.css` : palette void / steel / chrome / prism / gain-loss du plan, `--prism-edge`, `--chrome-text`, `--chrome-button`. Les dégradés métal sont recalculés sur les nouveaux tokens. Alias en fin de `:root` : `--obsidian`, `--obsidian-2`, `--platinum`, `--chrome-hi`, `--white`, `--glacier` (→ `--prism-ice`), `--slate`. `--glacier` n'est utilisé que dans deux liserés métal à 12 % (bords, conforme à la règle prism).
+  - `check-palette.mjs` : nouvelle allowlist ; les 4 hex prism (et leurs `rgb()`) échouent hors de `src/styles/tokens.css`. 9 fichiers migrés des anciens hex (`#B9BFC8`, `#8E96A1`, `#D5D9DF`, `#A9B0BA`, `#4A515B`, `#8FA3B8`, `#3B4A5C`, `rgba(143,163,184)`) vers les tokens les plus proches.
+  - Polices : Archivo et Martian Mono, fichiers `wdth.css` (axes 62–125 % et 75–112,5 % vérifiés dans le paquet). Inter, Space Grotesk, JetBrains Mono et Instrument Serif désinstallés ; aucune référence restante (`.editorial` supprimé ; splash Vale, cérémonie, plaque image, atlas de glyphes et script OG migrés). Préchargement : `archivo-latin-wdth` (90 KB) + `martian-mono-latin-wdth` (38 KB), soit +11 KB par rapport aux trois polices précédentes.
+  - « La largeur = le rang » : `data-rank` (Analyst 62 %, Associate 85 %, VP 105 %, MD/Elite 125 %) via la prop `rank` de `MetalPlate` (plaques de bureau du Path, badge de la barre de stats, carte bureau du rail) et sur le titre de la cérémonie de promotion.
+  - Titres de la landing : Archivo 125 %, 800, capitales ; « DO IT. » souligné de `--prism-edge` (2 px).
+  - Page de test : `/dev/type` (noindex, hors session ; ouvre aussi dans le build preview).
+  - Mouvement : `springs.ts` inchangé ; les courbes GSAP arrivent avec GSAP en Phase 4.
 - [ ] Phase 3 — Vale 3D (`/dev/vale`) → **arrêt pour validation**

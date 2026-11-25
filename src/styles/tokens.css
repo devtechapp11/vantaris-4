@@ -1,41 +1,55 @@
 /*
-  Vantaris design tokens « Obsidian Platinum »: the only place raw colours live.
-  scripts/check-palette.mjs fails the build on any colour outside this file's
-  palette.
+  Vantaris design tokens « Prism Chrome »: the only place raw colours live.
+  scripts/check-palette.mjs fails the build on any colour outside this palette,
+  and on any prism hue written outside this file.
 
-  Identity: obsidian surfaces, steel structure, brushed platinum and liquid
-  chrome, pure white text. Glacier and slate are cold reflections only (never
-  a flat fill, never above 12% opacity). Gain and loss are desaturated and only
-  mark a right or wrong answer, always next to an icon.
+  Identity: a void, steel structure and monochrome chrome. The one colour on
+  the site is light itself: the prism hues are the dispersion of the chrome,
+  used only on a 1px glass edge, Vale's outline, the 3D iridescence and the
+  « DO IT. » underline. Never a fill, never text, never a background, under 2%
+  of a screen. Gain and loss only mark a right or wrong answer, next to an icon.
 
-  Type: Space Grotesk for display and headings, Inter for reading, JetBrains
-  Mono with tabular, slashed-zero figures for every number.
+  Type: Archivo (width 62 → 125%) for every word, Martian Mono (width 75 →
+  112.5%) with tabular, slashed-zero figures for every number. Width is rank.
 
-  The legacy names (--black, --carbon, --silver…) are aliases kept so every
-  screen reads the new palette without a rewrite.
+  The Obsidian Platinum names (--obsidian, --platinum, --glacier…) are aliases
+  at the end of :root, so every existing screen reads the new palette.
 */
 :root {
   color-scheme: dark;
 
-  /* ---------- Palette (locked) ---------- */
-  --obsidian: #05070B;
-  --obsidian-2: #0A0D13;
+  /* ---------- Void ---------- */
+  --void: #05070B;
+  --void-2: #0A0D13;
   --graphite: #12161D;
   --steel-800: #1C222B;
   --steel-700: #2A3039;
   --steel-500: #5B6470;
   --steel-300: #9AA3AE;
-  --platinum: #C9CED6;
-  --chrome-hi: #E6E9EE;
-  --white: #F8FAFC;
-  --glacier: #8FA3B8;
-  --slate: #3B4A5C;
+  /* ---------- Chrome ---------- */
+  --chrome-100: #FFFFFF;
+  --chrome-200: #F8FAFC;
+  --chrome-300: #E6E9EE;
+  --chrome-400: #C9CED6;
+  --chrome-600: #8A929D;
+  --chrome-700: #7C848F;
+  /* ---------- Prism: the dispersion of light. Edges and reflections only. ---------- */
+  --prism-ice: #A8E6F0;
+  --prism-lilac: #C7BEFF;
+  --prism-peach: #FFD8C7;
+  --prism-mint: #D9F7E0;
+  --prism-edge: linear-gradient(90deg, transparent, var(--prism-ice), var(--prism-lilac), var(--prism-peach), transparent);
+  /* ---------- Functional (always with an icon) ---------- */
   --gain: #7FB89A;
   --loss: #C98A8A;
-  --engraved: #4A515B;
+
+  --chrome-text: linear-gradient(180deg, #FFFFFF 0%, #E6E9EE 34%, #8A929D 56%, #F8FAFC 76%, #9AA3AE 100%);
+  --chrome-button: linear-gradient(180deg, #FFFFFF 0%, #C9CED6 55%, #9AA3AE 100%);
+
+  --engraved: var(--steel-500);
   --metal-brushed: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 3px),
-                   linear-gradient(180deg, #E6E9EE 0%, #B9BFC8 45%, #8E96A1 100%);
-  --metal-chrome: linear-gradient(180deg, #FFFFFF 0%, #D5D9DF 30%, #7C848F 52%, #E6E9EE 70%, #A9B0BA 100%);
+                   linear-gradient(180deg, #E6E9EE 0%, #C9CED6 45%, #8A929D 100%);
+  --metal-chrome: linear-gradient(180deg, #FFFFFF 0%, #E6E9EE 30%, #7C848F 52%, #E6E9EE 70%, #9AA3AE 100%);
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 24px;
@@ -74,7 +88,7 @@
 
   /* ---------- Metal: brushed edges, platinum fills, specular light ---------- */
   --white-metal: var(--white);
-  --platinum-shade: #B9BFC8;
+  --platinum-shade: var(--chrome-400);
   /* 1px card edge: light catches the top-left corner, fades along the sides */
   --metal-edge: linear-gradient(calc(95deg + var(--spec, 0.45) * 90deg),
     color-mix(in srgb, var(--platinum) 58%, transparent) 0%,
@@ -93,8 +107,8 @@
     var(--carbon) 38%,
     color-mix(in srgb, var(--carbon) 70%, var(--black)) 100%);
   /* Brushed platinum fill (primary button, progress bars) */
-  --metal-fill: linear-gradient(180deg, #E6E9EE 0%, #B9BFC8 45%, #8E96A1 100%);
-  --metal-fill-press: linear-gradient(180deg, #B9BFC8 0%, #8E96A1 60%, #7C848F 100%);
+  --metal-fill: var(--chrome-button);
+  --metal-fill-press: linear-gradient(180deg, #C9CED6 0%, #8A929D 60%, #7C848F 100%);
   --metal-bar: linear-gradient(90deg, var(--aluminium) 0%, var(--silver) 42%, var(--platinum) 78%, var(--white-metal) 100%);
   /* Hairline brushing, barely visible: gives fills a grain instead of plastic */
   --brush: repeating-linear-gradient(180deg, color-mix(in srgb, var(--black) 3.5%, transparent) 0 1px, transparent 1px 2px);
@@ -129,9 +143,10 @@
   --glass-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
 
   /* ---------- Type ---------- */
-  --font-ui: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-display: 'Space Grotesk Variable', 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --font-sans: 'Archivo Variable', 'Archivo', system-ui, sans-serif;
+  --font-mono: 'Martian Mono Variable', 'Martian Mono', ui-monospace, monospace;
+  --font-ui: var(--font-sans);
+  --font-display: var(--font-sans);
   --font-figure: var(--font-mono);
   /* Phones: reading text never below 16px. Desktop steps up (see below). */
   --fs-2xs: 11px;
@@ -146,8 +161,8 @@
   --fs-4xl: 44px;
   --fs-5xl: 60px;
   --fs-display: clamp(44px, 11vw, 104px);
-  --fw-display: 560;
-  --fw-heading: 560;
+  --fw-display: 800;
+  --fw-heading: 700;
   --fw-regular: 400;
   --fw-medium: 500;
   --fw-semibold: 600;
@@ -155,7 +170,7 @@
   --lh-tight: 1.04;
   --lh-snug: 1.25;
   --lh-body: 1.6;
-  --tracking-tight: -0.03em;
+  --tracking-tight: -0.02em;
   --tracking-wide: 0.08em;
   --tracking-wider: 0.18em;
 
@@ -232,6 +247,15 @@
   --z-sheet: 60;
   --z-overlay: 80;
   --z-toast: 90;
+
+  /* ---------- Obsidian Platinum names, kept as aliases ---------- */
+  --obsidian: var(--void);
+  --obsidian-2: var(--void-2);
+  --platinum: var(--chrome-400);
+  --chrome-hi: var(--chrome-300);
+  --white: var(--chrome-200);
+  --glacier: var(--prism-ice);
+  --slate: var(--steel-700);
 }
 
 /* Phones: every control at least 48px tall, comfortable under a thumb */

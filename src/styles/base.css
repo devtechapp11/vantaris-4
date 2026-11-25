@@ -46,7 +46,7 @@ main:focus { outline: none; }
 svg.lucide { stroke-width: 1.5px; }
 
 /* ---------- Type ---------- */
-/* Headlines: Space Grotesk, set tight (-0.03em) like an engraved plate. */
+/* Headlines: Archivo. .t-display is set in wide engraved capitals (typography.css). */
 .t-display {
   font-family: var(--font-display);
   font-size: var(--fs-display);

@@ -26,13 +26,15 @@ html.lenis, html.lenis body { height: auto; }
   text-align: center;
 }
 .act-title {
-  margin: 0; max-width: 16ch;
-  font-family: var(--font-display); font-weight: var(--fw-display);
-  font-size: clamp(44px, 9vw, 104px); line-height: 0.96; letter-spacing: var(--tracking-tight);
+  margin: 0; max-width: 18ch;
+  font-family: var(--font-sans); font-stretch: 125%; font-weight: 800; text-transform: uppercase;
+  font-size: clamp(34px, 7vw, 92px); line-height: 0.94; letter-spacing: -0.012em;
   text-wrap: balance;
 }
-.act-title--sm { font-size: clamp(34px, 5.6vw, 64px); }
-.act-title-strong { display: block; }
+.act-title--sm { font-size: clamp(28px, 4.6vw, 56px); }
+/* « DO IT. »: the one word with a prism underline (1px of dispersed light) */
+.act-title-strong { display: inline-block; position: relative; padding-bottom: 0.08em; }
+.act-title-strong::after { content: ''; position: absolute; left: 4%; right: 4%; bottom: 0; height: 2px; background: var(--prism-edge); opacity: 0.9; }
 .act-line { margin: 0; max-width: 44ch; font-size: var(--fs-lg); line-height: var(--lh-body); color: var(--fg-2); text-wrap: pretty; }
 
 /* Act 1 · Hook: Vale alone, a cue at the bottom */

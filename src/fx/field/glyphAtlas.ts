@@ -5,7 +5,7 @@ const GLYPHS = [' ', '.', '·', ':', '-', '+', '×', '=', '÷', '%', '$', '€',
   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
 export async function buildGlyphAtlas(cell = 64): Promise<{ canvas: HTMLCanvasElement; count: number }> {
-  const font = `500 ${Math.round(cell * 0.7)}px "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace`;
+  const font = `500 ${Math.round(cell * 0.7)}px "Martian Mono Variable", "Martian Mono", ui-monospace, monospace`;
   try {
     await document.fonts.load(font);
   } catch {

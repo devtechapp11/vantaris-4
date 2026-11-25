@@ -1,0 +1,10 @@
+/* Dev pages (/dev/*): never linked, noindex. */
+.devpage { min-height: 100dvh; padding: calc(var(--safe-top) + 48px) var(--gutter-r) 96px var(--gutter); max-width: var(--col-wide); margin: 0 auto; display: flex; flex-direction: column; gap: 40px; background: var(--void); }
+.devsec { display: flex; flex-direction: column; gap: 10px; padding-top: 24px; border-top: 1px solid var(--line); }
+.devtype-hero { font-size: clamp(34px, 7vw, 92px); margin: 0; }
+.devtype-doit { display: inline-block; position: relative; padding-bottom: 0.08em; }
+.devtype-doit::after { content: ''; position: absolute; left: 4%; right: 4%; bottom: 0; height: 2px; background: var(--prism-edge); }
+.devtype-row { margin: 0; font-family: var(--font-sans); font-weight: 800; font-size: clamp(22px, 4vw, 44px); line-height: 1.05; color: var(--chrome-200); }
+.devtype-tag { display: inline-block; width: 6ch; font-size: 11px; font-weight: 400; color: var(--steel-500); font-stretch: 100%; }
+.devtype-rank { margin: 0; font-weight: 800; font-size: clamp(20px, 3.4vw, 40px); letter-spacing: 0.04em; color: var(--chrome-300); }
+.devtype-mono { margin: 0; font-size: 15px; color: var(--chrome-300); }

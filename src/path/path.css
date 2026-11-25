@@ -93,7 +93,7 @@
   -webkit-tap-highlight-color: transparent; cursor: pointer;
 }
 .pn-edge, .pn-face { position: absolute; left: 0; width: 80px; height: 80px; border-radius: 50%; }
-.pn-edge { top: 7px; background: linear-gradient(180deg, #8E96A1, #4A515B); box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.9); }
+.pn-edge { top: 7px; background: linear-gradient(180deg, #8A929D, #5B6470); box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.9); }
 .pn-face {
   top: 0; display: grid; place-items: center; overflow: hidden;
   background: radial-gradient(circle at 34% 24%, color-mix(in srgb, var(--white) 85%, transparent), transparent 40%), var(--metal-brushed);

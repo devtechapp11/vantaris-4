@@ -55,7 +55,7 @@ void main(){
   vec3 obsidian = vec3(0.0196, 0.0275, 0.0431); // #05070B
   vec3 steel    = vec3(0.165, 0.188, 0.224);    // #2A3039
   vec3 platinum = vec3(0.788, 0.808, 0.839);    // #C9CED6
-  vec3 glacier  = vec3(0.561, 0.639, 0.722);    // #8FA3B8
+  vec3 glacier  = vec3(0.604, 0.639, 0.682);    // #9AA3AE (steel-300)
 
   // 1. Liquid mercury: domain-warped fbm, very slow
   float t = uTime * 0.03;
