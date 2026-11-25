@@ -69,11 +69,6 @@
 .path-wrap { position: relative; width: 100%; display: flex; justify-content: center; margin-top: var(--sp-2); }
 .path2 { position: relative; }
 .path2-svg { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
-.gauge-base { stroke: var(--steel-800); stroke-width: 1; }
-.gauge-lit { stroke: var(--platinum); stroke-width: 1; opacity: 0.8; }
-.gauge-tick { stroke: var(--steel-700); stroke-width: 1; }
-.gauge-tick.is-on { stroke: var(--chrome-hi); }
-.gauge-num { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em; fill: var(--steel-500); font-variant-numeric: tabular-nums slashed-zero; }
 
 .seg-lit { fill: none; stroke: url(#seg-chrome); stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 0 5px color-mix(in srgb, var(--platinum) 45%, transparent)); }
 .seg-glint { fill: none; stroke: var(--white); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 8 92; animation: seg-glint 3.2s linear infinite; opacity: 0.9; }
@@ -170,7 +165,22 @@
 .pp.is-locked .relic { opacity: 0.4; filter: grayscale(0.4); }
 .relic-canvas { z-index: 1; }
 
-.path-vale { position: absolute; z-index: 2; pointer-events: none; }
+.path-vale { position: absolute; z-index: 2; }
+/* Vale's one line, in a speech bubble above him (the only Vale on the screen) */
+.vale-say {
+  position: absolute; bottom: calc(100% + 8px); width: max-content; max-width: 240px; margin: 0;
+  padding: 10px 12px; border-radius: 14px;
+  font-size: var(--fs-sm); line-height: 1.4; color: var(--fg-2); text-align: left;
+  background: var(--surface-glass); -webkit-backdrop-filter: blur(var(--blur-xl)); backdrop-filter: blur(var(--blur-xl));
+  box-shadow: var(--glass-edge), 0 18px 30px -20px rgba(0, 0, 0, 0.9);
+}
+.vale-say--l, .vale-say--r { bottom: auto; top: 118px; max-width: 220px; }
+.vale-say--l { left: 0; }
+.vale-say--r { right: 0; }
+.vale-say--l::before, .vale-say--r::before { content: ''; position: absolute; top: -5px; width: 10px; height: 10px; rotate: 45deg; background: inherit; box-shadow: inset 1px 1px 0 color-mix(in srgb, var(--chrome-hi) 14%, transparent); }
+.vale-say--l::before { left: 28px; }
+.vale-say--r::before { right: 28px; }
+.vale-say--inline { position: static; max-width: none; width: auto; margin-top: 8px; }
 
 /* ---------- Vault Cache capsule ---------- */
 .vc { position: absolute; width: 80px; display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 2; }
@@ -198,8 +208,8 @@
 /* ---------- Today's Desk ---------- */
 .td { display: flex; flex-direction: column; gap: var(--sp-3); }
 .td-card { background: var(--surface-glass); -webkit-backdrop-filter: blur(var(--blur-xl)) saturate(120%); backdrop-filter: blur(var(--blur-xl)) saturate(120%); }
-.td-vale-row { display: flex; align-items: center; gap: 14px; }
-.td-vale-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-width: 0; }
+.td-deskcard { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.td-next { margin: 0; font-size: 11px; letter-spacing: 0.16em; color: var(--chrome-hi); }
 .td-line { margin: 0; font-size: var(--fs-sm); line-height: 1.45; color: var(--fg-2); }
 .td-meta { margin: 12px 0 0; font-size: 10px; letter-spacing: 0.16em; color: var(--steel-300); }
 .td-goal { display: flex; align-items: center; gap: 16px; }
@@ -209,7 +219,6 @@
 .td-ring circle { fill: none; stroke-width: 5; }
 .td-ring-track { stroke: var(--steel-800); }
 .td-ring-fill { stroke: var(--chrome-hi); stroke-linecap: round; transition: stroke-dasharray 900ms var(--ease-out); filter: drop-shadow(0 0 4px color-mix(in srgb, var(--chrome-hi) 60%, transparent)); }
-.td-goal-num { position: relative; font-size: var(--fs-lg); color: var(--fg); }
 .td-goal-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; }
 .td-goal-text { font-size: var(--fs-sm); color: var(--fg-2); }
 .td-goal-text b { color: var(--fg); }
@@ -226,9 +235,6 @@
 
 .td--compact { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); }
 .td--compact .td-card { padding: 14px 16px; }
-@media (min-width: 768px) { .td--compact { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 768px) { .td--compact { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 767px) { .td--compact .td-league { display: none; } }
 
-/* Today's desk: streak + 7-day dot chart in a glass card */
-.td-pulse .glass__figure { margin-top: 8px; }
-.td-streak { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }

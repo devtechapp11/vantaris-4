@@ -6,18 +6,16 @@ import SpecularCard from '../../components/fx/SpecularCard';
 import AnimatedNumber from '../../components/fx/AnimatedNumber';
 import MetalPlate from '../../components/fx/MetalPlate';
 import { SoundToggle } from '../../components/Momentum';
-import SoundBars from '../hud/SoundBars';
+import SoundBars from '../../components/sound/SoundBars';
 import { springs } from '../../motion/springs';
 import { sound } from '../../lib/sound';
 import { haptic } from '../../app/prefs';
 import { track } from '../../lib/analytics';
 import { feverBurst, originOf } from '../../lib/celebrate';
 import { fieldBus } from '../../fx/field/fieldBus';
-import { ledger } from '../hero/ledger';
 import { DEMO_DEALS, gradeFor, xpFor } from './deals';
 import { saveDemoScore, saveDemoTickets } from './demoScore';
 import ThermalReceipt from '../../components/receipt/ThermalReceipt';
-import { heroStore } from '../hero/heroStore';
 import './demo.css';
 
 type Result = { right: boolean; xp: number; secs: number };
@@ -57,16 +55,11 @@ export default function DemoDeals() {
     setResults(next);
     saveDemoScore({ xp: next.reduce((s, r) => s + r.xp, 0), right: next.filter((r) => r.right).length, played: next.length, total: DEMO_DEALS.length });
     saveDemoTickets(next.length);
-    heroStore.set({ played: next.length, right: next.filter((r) => r.right).length, total: DEMO_DEALS.length, grade: next.length === DEMO_DEALS.length ? gradeFor(next.filter((r) => r.right).length) : null });
     track('hero_case', { deal: deal.id, correct: ok });
     if (ok) {
       sound.correct(run + 1);
       haptic([12, 40, 18]);
       fieldBus.pulse(card.current);
-      if (!ledger.locked) {
-        ledger.lock();
-        sound.impact(0.7);
-      }
       window.setTimeout(() => feverBurst(2 + next.filter((r) => r.right).length, originOf(card.current?.querySelector('.dd-xp')) ?? undefined), 40);
     } else {
       sound.wrong();
@@ -83,7 +76,6 @@ export default function DemoDeals() {
       shownAt.current = performance.now();
     } else {
       setDone(true);
-      ledger.lock();
       // Bring the calibration into view if the card's top has scrolled under the bar.
       requestAnimationFrame(() => {
         const r = card.current?.getBoundingClientRect();
@@ -100,7 +92,6 @@ export default function DemoDeals() {
     setResults([]);
     setDone(false);
     saveDemoTickets(0);
-    heroStore.set({ played: 0, right: 0, grade: null });
     shownAt.current = performance.now();
   };
 
@@ -133,27 +124,27 @@ export default function DemoDeals() {
 
   const ok = pick != null && pick === deal.answer;
 
-  const tickets = results.map((r, i) => {
-    const d = DEMO_DEALS[i];
-    const last = i === DEMO_DEALS.length - 1;
+  // One ticket only: the last deal closed.
+  const lastAt = results.length - 1;
+  const lastResult = results[lastAt];
+  const ticket = lastResult ? (() => {
+    const d = DEMO_DEALS[lastAt];
     return (
-      <div key={d.id} style={{ ['--i' as string]: results.length - 1 - i }}>
-        <ThermalReceipt
-          heading="Deal ticket"
-          meta={`Vantaris floor · ${String(i + 1).padStart(2, '0')}/03 · Example`}
-          lines={[
-            { label: 'Method', value: d.kind },
-            ...d.ticket.map(([label, value]) => ({ label, value })),
-            { label: 'Time to close', value: `${r.secs.toFixed(1)}s` },
-            { label: 'Verdict', value: r.right ? 'CORRECT' : 'REVIEWED', strong: true },
-            { label: 'Deals', value: `${i + 1}/3` },
-          ]}
-          stamp={last && done ? `Calibrated · ${gradeFor(right)}` : null}
-          footnote={last && done ? 'Save your desk to keep this ticket.' : undefined}
-        />
-      </div>
+      <ThermalReceipt
+        key={d.id}
+        heading="Deal ticket"
+        meta={`Vantaris floor · ${String(lastAt + 1).padStart(2, '0')}/03 · Example`}
+        lines={[
+          { label: 'Method', value: d.kind },
+          ...d.ticket.map(([label, value]) => ({ label, value })),
+          { label: 'Time to close', value: `${lastResult.secs.toFixed(1)}s` },
+          { label: 'Verdict', value: lastResult.right ? 'CORRECT' : 'REVIEWED', strong: true },
+        ]}
+        stamp={done ? `Calibrated · ${gradeFor(right)}` : null}
+        footnote={done ? 'Save your desk to keep this ticket.' : undefined}
+      />
     );
-  });
+  })() : null;
 
   return (
     <>
@@ -182,11 +173,6 @@ export default function DemoDeals() {
                 </p>
                 <MetalPlate tone={right === 3 ? 'platinum' : 'steel'} size="lg">{gradeFor(right)}</MetalPlate>
               </div>
-              <dl className="dd-cal-stats">
-                <div><dt>XP earned</dt><dd className="fig-mono"><AnimatedNumber value={xp} /></dd></div>
-                <div><dt>Avg. time</dt><dd className="fig-mono">{(results.reduce((s, r) => s + r.secs, 0) / Math.max(1, results.length)).toFixed(1)}s</dd></div>
-                <div><dt>Desk</dt><dd>Analyst</dd></div>
-              </dl>
               <p className="t-callout">{right === 3 ? 'Three for three. Your desk is ready: keep your score and start the path.' : 'You have the reflex. Save your desk and the path takes it from here.'}</p>
               <Link to="/signup" className="btn btn--primary btn--lg dd-cta" onClick={() => track('upgrade_click', { source: 'landing-calibration' })}>
                 Save your desk — Start free <ArrowRight size={18} aria-hidden="true" />
@@ -234,12 +220,7 @@ export default function DemoDeals() {
         </AnimatePresence>
       </div>
     </SpecularCard>
-    {tickets.length > 0 && (
-      <section className="dd-tickets" aria-label="Your deal tickets">
-        <p className="ticket-stack__label">{tickets.length} ticket{tickets.length > 1 ? 's' : ''} printed</p>
-        <div className="ticket-stack">{tickets}</div>
-      </section>
-    )}
+    {ticket && <section className="dd-tickets" aria-label="Your deal ticket">{ticket}</section>}
     </>
   );
 }

@@ -6,4 +6,7 @@
   display: block; pointer-events: none;
   background: radial-gradient(ellipse at 30% 20%, var(--graphite), var(--obsidian) 70%);
 }
+/* Off on the landing (Vale's stage is the background) */
+.field.is-off { opacity: 0; }
+.field { transition: opacity 400ms ease; }
 @media print { .field { display: none; } }

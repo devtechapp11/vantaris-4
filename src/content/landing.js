@@ -1,29 +1,14 @@
-// Landing page copy. Edit freely; the layout adapts to the number of items.
+// Landing page copy: a pitch, one idea per screen. Titles ≤ 7 words, lines ≤ 20.
 
-// The scroll film: one chapter per screen. `visual` picks what the sticky stage
-// shows while the chapter is in view; `vale` is the mascot's state.
-export const CHAPTERS = [
-  { id: 'hero', visual: 'hero', vale: 'idle', eyebrow: 'The training floor for future dealmakers', title: 'Don’t study finance.', titleEditorial: 'Command the floor.', body: 'Real DCF, LBO and M&A deals, priced against the clock. An analyst’s reflexes in five minutes a day.' },
-  { id: 'deal', visual: 'deal', vale: 'curious', eyebrow: '01 · The term sheet', title: 'Every case is a live deal.', body: 'A company, the numbers that matter and the one question a managing director would put to you. No flashcards. No theory for its own sake.' },
-  { id: 'answer', visual: 'answer', vale: 'thinking', eyebrow: '02 · Your call', title: 'Price it before the clock does.', body: 'Tap any figure to run it through the calculator. Commit inside the time and the desk pays up to 50% more points.' },
-  { id: 'steps', visual: 'chart', vale: 'success', eyebrow: '03 · The debrief', title: 'See how the senior banker gets there.', body: 'Every deal ends with the full walkthrough: each step, the formula and the judgment behind the number. Open only what you need.' },
-  { id: 'ladder', visual: 'ladder', vale: 'celebrate', eyebrow: '04 · The ladder', title: 'Analyst to Managing Director.', body: 'Points are earned on first-time closes, never bought. Four titles, each one opening harder desks, up to structuring the deal yourself.' },
-  { id: 'tutor', visual: 'tutor', vale: 'idle', eyebrow: '05 · Your coach', title: 'Stuck? Ask Vale.', body: 'Hints, formulas and the logic behind a step, on demand. Vale coaches like a sharp associate: it never hands you the answer before you commit.' },
-];
-
-// Set to true after `npm run mascot` has produced public/mascot/hero-loop.*
-// (see docs/higgsfield-prompts.md). Desktop browsers without WebGL then show the
-// video in the hero; phones keep the light SVG.
-export const HERO_LOOP = false;
-
-export const FEATURES = [
-  { icon: 'briefcase', title: 'Live deal simulations', body: 'DCF, LBO, comps and M&A cases built like the deals interviewers actually put on the table.' },
-  { icon: 'trending', title: 'Analyst to MD', body: 'Earn points on every first-time solve, climb four tiers and unlock harder modules as you go.' },
-  { icon: 'sparkles', title: 'Vale, your AI tutor', body: 'Ask for a hint, the formula or the idea behind a step. Vale never spoils the answer before you submit.' },
-  { icon: 'timer', title: 'Beat the clock', body: 'Answer inside the time and earn up to a 50% speed bonus. Daily streaks keep you sharp.' },
-  { icon: 'trophy', title: 'Leaderboard', body: 'See where you rank this week, this month and all time against other future dealmakers.' },
-  { icon: 'steps', title: 'Every step, explained', body: 'After each deal, a step-by-step walkthrough shows how a banker gets to the number.' },
-];
+export const PITCH = {
+  hook: 'Move · Vale is awake',
+  hookTouch: 'Tap Vale',
+  promise: ['Don’t study finance.', 'Do it.'],
+  promiseLine: 'Real DCF, LBO and M&A deals, priced against the clock. Five minutes a day.',
+  deal: { title: 'Close a live deal.', line: 'Three deals, no sign-up. Save your desk and the XP comes with you.' },
+  membership: { title: 'Start free. Go Pro.', line: 'Three deals a week, free for as long as you like.' },
+  final: { title: 'Your desk is open.', cta: 'Start free' },
+};
 
 // Points thresholds mirror level_for_points() in supabase/sql/schema.core.sql.
 export const LADDER = [
@@ -31,39 +16,4 @@ export const LADDER = [
   { level: 'Associate', points: 251, line: 'Comps, precedents and your first LBO.' },
   { level: 'VP', points: 501, line: 'Accretion, dilution and distressed capital.' },
   { level: 'MD', points: 751, line: 'Structure the deal. Own the room.' },
-];
-
-export const TICKER = [
-  ['EV / EBITDA', '9.0x'], ['IRR', '23.0%'], ['WACC', '8.4%'], ['MOIC', '2.8x'], ['Premium', '25%'],
-  ['TV growth', '3.0%'], ['Accretion', '+4.2%'], ['Net debt', '$110M'], ['FCF yield', '6.1%'], ['P/E', '18.5x'],
-];
-
-// A made-up deal for the product preview (not one of the real problems).
-// Exit EV 8.0x × $70M = $560M; exit equity $560M − $110M = $450M;
-// MOIC 450 / 160 = 2.81x; IRR = 2.8125^(1/5) − 1 = 23.0%.
-export const SAMPLE_DEAL = {
-  title: 'Northwind Logistics',
-  kind: 'LBO returns',
-  terms: [
-    ['Entry EV', '$400M · 8.0x'],
-    ['Sponsor equity', '$160M'],
-    ['EBITDA, year 5', '$70M'],
-    ['Exit multiple', '8.0x'],
-    ['Net debt at exit', '$110M'],
-  ],
-  question: 'What IRR does the sponsor earn over five years?',
-  options: ['18.6%', '23.0%', '26.4%', '29.9%'],
-  pick: 1,
-  hint: 'Start with exit equity, then compound back over five years.',
-};
-
-// SAMPLE quotes for the preview build only. The live build hides this section
-// while any entry is still marked `sample: true`. Replace them with real quotes
-// you have permission to publish (first name + school is plenty), and remove
-// the `sample` flag.
-export const TESTIMONIALS = [
-  { quote: 'The speed bonus turned LBO math into a habit. I do one deal on the train every morning.', name: 'Sample student', role: 'Finance, year 2', sample: true },
-  { quote: 'Vale explains the “why” behind each step without giving the answer away. That is exactly how I wanted to learn.', name: 'Sample student', role: 'Economics, year 3', sample: true },
-  { quote: 'Watching my rank climb from Analyst to VP kept me practicing through recruiting season.', name: 'Sample student', role: 'Commerce, year 1', sample: true },
-  { quote: 'The walkthroughs read like an associate marking up my model. Short, precise, no fluff.', name: 'Sample student', role: 'MBA candidate', sample: true },
 ];

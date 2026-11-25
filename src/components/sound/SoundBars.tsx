@@ -1,5 +1,5 @@
 import { usePrefs } from '../../app/prefs';
-import './hud.css';
+import './soundbars.css';
 
 /** Three platinum bars beside the mute button: moving while sound is on, flat when muted. */
 export default function SoundBars() {

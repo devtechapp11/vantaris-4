@@ -61,6 +61,12 @@ Le chunk `Landing` importe aussi `SpecularCard`, `PlanCard`, `BillingSwitch`, `T
 
 ## Suivi des phases
 - [x] Phase 0 — audit
-- [ ] Phase 1 — soustraction
+- [x] Phase 1 — soustraction
+  - Landing : `MonolithScene`/`MonolithStage`/`Medallions`/`TelemetryBadges`/`heroStore`/`ledger`, `Shutter`, `HudOverlay` (croix + labels verticaux), `Ladder`, le film à chapitres et ses 5 visuels data-viz **supprimés**. Reste : nav, hook (Vale 2D en attendant la 3D), promesse, deal, membership, appel final, pied de page.
+  - `ObsidianField` : scène `landing` → canvas éteint (`fieldBus.visible = false`, plus aucun dessin GPU). Nouvel uniform `uGrid`. Scènes `app` / `exercise` = glyphes 0, trame 0, grille 0 : il ne reste que le mercure lent. La cérémonie de promotion garde ses glyphes.
+  - Démo : calibrage = score + note + action (stats XP/temps/desk retirées), un seul ticket (le dernier deal). Logique et `localStorage` intacts.
+  - Prérendu (`index.html`, `HeroShell`) : plus de titre Instrument Serif, seulement le repère du hook.
+  - App : `AppHud` supprimé (labels verticaux + croix). Rail : 5 → 3 cartes (bureau + XP vers le suivant + phrase de série · objectif du jour + Blitz · ligue/ghost run). « XP TODAY », la série en dot-matrix et le graphique 7 j disparaissent du rail (Rank a déjà le graphique 30 j, qui contient les 7 derniers jours). Deal Brief du jour → Vault. Vale n'apparaît plus qu'une fois, à côté du nœud actif, avec une bulle (sa phrase ne répète plus l'XP ni la série). Règle numérotée `01 02 03` retirée.
+  - Les polices sont remplacées en Phase 2.
 - [ ] Phase 2 — identité Prism Chrome
 - [ ] Phase 3 — Vale 3D (`/dev/vale`) → **arrêt pour validation**

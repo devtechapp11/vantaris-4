@@ -38,10 +38,6 @@
 .dd-cal-top { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); flex-wrap: wrap; }
 .dd-cal-score { margin: 0; font-size: 64px; line-height: 0.9; letter-spacing: -0.05em; color: var(--white); }
 .dd-cal-score small { font-size: 22px; color: var(--steel-500); letter-spacing: 0; margin-left: 2px; }
-.dd-cal-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-2); margin: 0; padding: var(--sp-3) 0; border-block: var(--hairline) solid var(--line); }
-.dd-cal-stats div { display: flex; flex-direction: column; gap: 4px; }
-.dd-cal-stats dt { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--steel-300); }
-.dd-cal-stats dd { margin: 0; font-size: var(--fs-lg); color: var(--white); }
 .dd-cta { width: 100%; }
 .dd-replay { align-self: center; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 var(--sp-3); border: 0; background: none; color: var(--steel-300); font: inherit; font-size: var(--fs-sm); cursor: pointer; }
 @media (hover: hover) { .dd-replay:hover { color: var(--fg); } }

@@ -1,0 +1,10 @@
+/* ---------- Sound visualiser ---------- */
+.sbars { display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; }
+.sbars i { display: block; width: 2px; height: 3px; border-radius: 1px; background: var(--platinum); opacity: 0.55; transform-origin: bottom; }
+.sbars.is-on i { height: 12px; opacity: 0.9; animation: sbar 900ms var(--ease-in-out) infinite alternate; }
+.sbars.is-on i:nth-child(2) { animation-duration: 640ms; animation-delay: -200ms; }
+.sbars.is-on i:nth-child(3) { animation-duration: 1100ms; animation-delay: -420ms; }
+@keyframes sbar { 0% { transform: scaleY(0.25); } 100% { transform: scaleY(1); } }
+@media (prefers-reduced-motion: reduce) { .sbars.is-on i { animation: none; transform: scaleY(0.6); } }
+[data-motion='reduce'] .sbars.is-on i { animation: none; transform: scaleY(0.6); }
+

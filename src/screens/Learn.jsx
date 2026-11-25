@@ -15,7 +15,7 @@ import { finQuestion } from '../lib/finance/toQuestion';
 import { templatesFor } from '../lib/finance/templates';
 import DealBriefCard from '../pedagogy/DealBriefCard';
 import { SoundToggle } from '../components/Momentum';
-import SoundBars from '../landing/hud/SoundBars';
+import SoundBars from '../components/sound/SoundBars';
 import MetalPlate from '../components/fx/MetalPlate';
 import Vale from '../components/vale/Vale';
 import { valeBus } from '../components/vale/valeBus';

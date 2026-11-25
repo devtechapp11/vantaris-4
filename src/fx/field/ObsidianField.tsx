@@ -85,7 +85,7 @@ function start(canvas: HTMLCanvasElement, stillPref: boolean): (() => void) | un
   const uPulse = u('uPulse');
   const uG = {
     atlas: u('uGlyphs'), count: u('uGlyphCount'), cell: u('uCell'),
-    amount: u('uGlyphAmount'), flash: u('uGlyphFlash'), tcell: u('uTrameCell'), trame: u('uTrame'),
+    amount: u('uGlyphAmount'), flash: u('uGlyphFlash'), tcell: u('uTrameCell'), trame: u('uTrame'), grid: u('uGrid'),
   };
 
   // Glyph atlas: a 1-pixel black placeholder until the real one is drawn.
@@ -133,6 +133,7 @@ function start(canvas: HTMLCanvasElement, stillPref: boolean): (() => void) | un
     gl.uniform1f(uG.amount, glyphs);
     gl.uniform1f(uG.flash, fa < 1 ? Math.sin(Math.PI * fa) : 0);
     gl.uniform1f(uG.trame, fieldBus.trame * (phone ? 0.6 : 1));
+    gl.uniform1f(uG.grid, fieldBus.grid);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     if (!shown) {
       shown = true;
@@ -143,6 +144,9 @@ function start(canvas: HTMLCanvasElement, stillPref: boolean): (() => void) | un
     raf = requestAnimationFrame(loop);
     if (now - last < minDt) return;
     last = now;
+    // Hidden (the landing): skip the GPU work, keep the loop cheap.
+    canvas.classList.toggle('is-off', !fieldBus.visible);
+    if (!fieldBus.visible) return;
     if (!phone && !fieldBus.trameOff && prevNow && probeFrames < 150) {
       probeFrames += 1;
       if (probeFrames > 30) probeSum += now - prevNow; // skip warm-up frames
@@ -198,6 +202,7 @@ function start(canvas: HTMLCanvasElement, stillPref: boolean): (() => void) | un
 
   // While motion is reduced the still frame follows scene changes.
   const sceneWatch = reduced ? window.setInterval(() => {
+    canvas.classList.toggle('is-off', !fieldBus.visible);
     if (Math.abs(glyphs - fieldBus.glyphAmount) > 0.01) draw(performance.now());
   }, 500) : 0;
 

@@ -2,16 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import { Ghost, Repeat2, Zap } from 'lucide-react';
 import SpecularCard from '../components/fx/SpecularCard';
 import MagneticButton from '../components/fx/MagneticButton';
-import AnimatedNumber from '../components/fx/AnimatedNumber';
 import MetalPlate from '../components/fx/MetalPlate';
-import Vale from '../components/vale/Vale';
-import GlassStat from '../components/fx/GlassStat';
-import DotMatrixNumber from '../components/viz/DotMatrixNumber';
-import DotMatrixChart from '../components/viz/DotMatrixChart';
 import { careerName } from '../lib/career';
 import { prefetchProps } from '../app/routes';
-import DealBriefCard from '../pedagogy/DealBriefCard';
-import { briefOfTheDay } from '../content/briefs';
 import { seen } from './store';
 
 type Row = { rank: number; name: string; points: number; is_me?: boolean };
@@ -25,15 +18,13 @@ type Me = {
 
 export const DAILY_XP = 50;
 
-/** What Vale says on arrival: one line, the most useful thing first. */
+/** What Vale says on arrival: one line, the most useful thing first. The XP
+ *  to the next desk and the streak live in the rail, so Vale never repeats them. */
 export function mentorLine(me: Me, due: number) {
-  const p = me.profile;
   const best = me.blitz_best ?? 0;
-  if (best > 0 && best > (seen().blitz ?? 0)) return `New Blitz record: ${best.toLocaleString('en-US')}. The floor noticed. Now do it on a harder desk.`;
-  if (due > 0) return `${due} ${due === 1 ? 'notion is' : 'notions are'} going soft. Ten minutes of review now saves an hour before the interview.`;
-  if (p.streak > 0 && !p.active_today) return `${p.streak}-day streak on the line. One session before midnight keeps the desk warm.`;
-  if (p.streak >= 3) return `${p.streak} days straight. That is how analysts become associates: quietly, every day.`;
-  if (p.next_level && p.next_level_at != null) return `${Math.max(0, p.next_level_at - p.points)} XP to the ${careerName(p.next_level)} desk. Clean answers, fast: the multiplier does the rest.`;
+  if (best > 0 && best > (seen().blitz ?? 0)) return `New Blitz record: ${best.toLocaleString('en-US')}. Now do it on a harder desk.`;
+  if (due > 0) return `${due} ${due === 1 ? 'notion is' : 'notions are'} going soft. Ten minutes of review saves an hour later.`;
+  if (me.profile.streak >= 3 && me.profile.active_today) return 'That is how analysts become associates: quietly, every day.';
   return 'Every chapter is a deal you will see again. Learn it once, properly.';
 }
 
@@ -49,16 +40,23 @@ function Ring({ value, goal }: { value: number; goal: number }) {
   );
 }
 
+/** The streak, in one sentence (the number lives in the stats bar). */
+export function streakLine(p: Me['profile']) {
+  if (p.streak <= 0) return 'Close one deal today to start a streak.';
+  if (p.active_today) return `${p.streak}-day streak, kept today.`;
+  return `${p.streak}-day streak. One session today keeps it.`;
+}
+
 type Props = { me: Me; board: Board; due: number; compact?: boolean };
 
 /**
- * « Today's Desk »: Vale and the desk status, the daily XP goal, the next
- * action, the league around you and the Deal Brief of the day. A sticky right
- * rail on desktop; compact cards above the path below 1280 px.
+ * « Today's Desk »: three cards, nothing repeated. The desk and the next rank,
+ * the daily goal with one action, the league. Vale is not here: he stands by
+ * the active node on the path. A sticky right rail on desktop; compact cards
+ * above the path below 1280 px.
  */
 export default function TodaysDesk({ me, board, due, compact = false }: Props) {
   const navigate = useNavigate();
-  const week = me.week ?? [];
   const today = me.week?.[me.week.length - 1]?.points ?? 0;
   const bestDay = Math.max(0, ...(me.week ?? []).slice(0, -1).map((d) => d.points));
   const rows = board?.rows ?? [];
@@ -73,23 +71,17 @@ export default function TodaysDesk({ me, board, due, compact = false }: Props) {
 
   return (
     <aside className={`td ${compact ? 'td--compact' : ''}`} aria-label="Today's desk">
-      <SpecularCard className="td-card td-vale">
-        <div className="td-vale-row">
-          <Vale size={compact ? 56 : 72} avatar />
-          <div className="td-vale-copy">
-            <MetalPlate tone="platinum" size="sm">{`${careerName(p.level)} desk`.toUpperCase()}</MetalPlate>
-            <p className="td-line">{mentorLine(me, due)}</p>
-          </div>
-        </div>
+      <SpecularCard className="td-card td-deskcard">
+        <MetalPlate tone="platinum" size="sm">{`${careerName(p.level)} desk`.toUpperCase()}</MetalPlate>
         {toNext != null && p.next_level && (
-          <p className="td-meta fig-mono">{toNext} XP → {careerName(p.next_level).toUpperCase()}</p>
+          <p className="td-next fig-mono">{toNext} XP → {careerName(p.next_level).toUpperCase()}</p>
         )}
+        <p className="td-line">{streakLine(p)}</p>
       </SpecularCard>
 
       <SpecularCard className="td-card td-goal">
         <div className="td-goal-ring">
           <Ring value={today} goal={DAILY_XP} />
-          <span className="td-goal-num fig-mono"><AnimatedNumber value={today} /></span>
         </div>
         <div className="td-goal-copy">
           <span className="t-eyebrow">Today's goal</span>
@@ -100,22 +92,7 @@ export default function TodaysDesk({ me, board, due, compact = false }: Props) {
         </div>
       </SpecularCard>
 
-      <GlassStat eyebrow="XP today" value={today} unit="XP" size="sm" className="td-card td-pulse">
-        <div className="td-streak">
-          <DotMatrixNumber value={p.streak} label={`${p.streak}-day streak`} dot={compact ? 4 : 5} />
-          <span className="t-eyebrow">Day streak</span>
-        </div>
-        {week.length > 0 && (
-          <DotMatrixChart
-            values={week.map((d) => d.points)}
-            labels={week.map((d) => new Date(`${d.date}T12:00:00`).toLocaleDateString('en-US', { weekday: 'narrow' }))}
-            rows={6}
-            ariaLabel={`XP over the last 7 days: ${week.map((d) => d.points).join(', ')}`}
-          />
-        )}
-      </GlassStat>
-
-      {!compact || around.length ? (
+      {!compact || around.length || ghost ? (
         <SpecularCard className="td-card td-league">
           <div className="td-head">
             <span className="t-eyebrow">League · all time</span>
@@ -145,8 +122,6 @@ export default function TodaysDesk({ me, board, due, compact = false }: Props) {
           )}
         </SpecularCard>
       ) : null}
-
-      <DealBriefCard brief={briefOfTheDay(me.path?.stars ?? {})} title="Deal Brief · today" className="td-card" collapsible={compact} defaultOpen={!compact} />
     </aside>
   );
 }

@@ -22,7 +22,7 @@ import { metalBurst } from '../fx/MetalBurst';
 import { fieldBus } from '../fx/field/fieldBus';
 import { api } from '../lib/api';
 import StatsBar from '../path/StatsBar';
-import TodaysDesk from '../path/TodaysDesk';
+import TodaysDesk, { mentorLine } from '../path/TodaysDesk';
 import PathNode, { NODE } from '../path/PathNode';
 import VaultCache from '../path/VaultCache';
 import DeskPlaque from '../path/DeskPlaque';
@@ -182,7 +182,7 @@ export default function Path() {
   const due = me.review?.due?.length ?? 0;
   const deskIdx = DESKS.indexOf(me.profile.level);
   const allMastered = nodes.every((n) => n.stars >= 3);
-  const reachedTo = layout.pts.reduce((last, p, k) => (p.reached ? k : last), 0);
+  const say = mentorLine(me, due);
 
   const open = (n) => {
     if (n.tierLocked) return openPaywall('level', { level: n.level });
@@ -221,15 +221,6 @@ export default function Path() {
                     <stop offset="1" stopColor="var(--chrome-hi)" />
                   </linearGradient>
                 </defs>
-                {/* Elevation gauge: graduated, chrome up to where you stand */}
-                <line x1={6} y1={0} x2={6} y2={layout.H} className="gauge-base" />
-                <line x1={6} y1={0} x2={6} y2={layout.pts[reachedTo].y} className="gauge-lit" />
-                {layout.pts.filter((p) => p.node).map((p, k) => (
-                  <g key={`t${k}`}>
-                    <line x1={2} x2={12} y1={p.y} y2={p.y} className={p.reached ? 'gauge-tick is-on' : 'gauge-tick'} />
-                    {!phone && <text x={16} y={p.y + 3} className="gauge-num">{String(k + 1).padStart(2, '0')}</text>}
-                  </g>
-                ))}
                 {layout.pts.slice(1).map((p, k) => {
                   const seg = curve([[layout.pts[k].x, layout.pts[k].y], [p.x, p.y]]);
                   return p.reached ? (
@@ -282,7 +273,8 @@ export default function Path() {
                     />
                     {isActive && valeOut && (
                       <div className="path-vale" style={left ? { left: cx - NODE / 2 - 84, top: y + 10 } : { left: cx + NODE / 2 + 10, top: y + 10 }}>
-                        <Vale size={66} label="Vale, your mentor" />
+                        <p className={`vale-say ${left ? 'vale-say--l' : 'vale-say--r'}`}>{say}</p>
+                        <Vale size={66} label="Vale, your mentor" avatar />
                       </div>
                     )}
                     <div className={`pp ${left ? '' : 'pp--r'} ${phone ? 'pp--col' : ''} is-${n.state}`} style={{ ...panel, top: y + (phone ? 0 : 6) }}>
@@ -297,8 +289,11 @@ export default function Path() {
                             <MagneticButton className="btn btn--primary btn--sm pp-start" onClick={() => open(n)} {...prefetchProps(`/learn/${n.id}`)}>
                               <Play size={14} aria-hidden="true" /> {n.state === 'progress' ? 'Resume' : 'Start'}
                             </MagneticButton>
-                            {isActive && !valeOut && <Vale size={50} />}
+                            {isActive && !valeOut && <Vale size={50} avatar />}
                           </span>
+                        )}
+                        {isActive && !valeOut && (
+                          <span className="vale-say vale-say--inline">{say}</span>
                         )}
                       </span>
                     </div>

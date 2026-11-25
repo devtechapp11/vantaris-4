@@ -13,6 +13,8 @@ import './Vault.css';
  * hook and a banker's tip on the back.
  */
 import VaultBriefs from '../pedagogy/VaultBriefs';
+import DealBriefCard from '../pedagogy/DealBriefCard';
+import { briefOfTheDay } from '../content/briefs';
 import SkillRadar from './viz/SkillRadar';
 import GlassStat from './fx/GlassStat';
 
@@ -37,6 +39,7 @@ export default function Vault({ stars = {}, review }) {
         />
         <GlassStat eyebrow="To review" value={due} unit={due === 1 ? 'NOTION' : 'NOTIONS'} size="sm" delta={fragile ? `${fragile} fragile in rotation` : 'Nothing fragile right now'} />
       </div>
+      <DealBriefCard brief={briefOfTheDay(stars)} title="Deal Brief · today" collapsible defaultOpen={false} />
       <div className="vault-review">
         <Repeat2 size={20} aria-hidden="true" />
         <span className="grow stack-4">

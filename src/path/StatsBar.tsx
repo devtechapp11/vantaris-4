@@ -5,7 +5,7 @@ import MetalPlate from '../components/fx/MetalPlate';
 import SpecularBorder from '../components/fx/SpecularBorder';
 import AnimatedNumber from '../components/fx/AnimatedNumber';
 import { SoundToggle } from '../components/Momentum';
-import SoundBars from '../landing/hud/SoundBars';
+import SoundBars from '../components/sound/SoundBars';
 import { careerName } from '../lib/career';
 import FeelMenu from './FeelMenu';
 

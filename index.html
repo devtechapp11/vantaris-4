@@ -36,17 +36,13 @@
     <!-- First paint is black, never white, before the stylesheet arrives -->
     <style>html,body{background:#05070B;color:#E4E8EE;margin:0}
       .prerender{display:none}
-      html[data-prerender] .prerender{display:flex;min-height:100svh;box-sizing:border-box;align-items:flex-end;padding:0 16px calc(env(safe-area-inset-bottom,0px) + 8svh)}
-      .prerender-copy{max-width:520px;width:100%;display:flex;flex-direction:column;gap:16px}.prerender-cta{margin-top:8px}
-      .prerender .prerender-title{font-size:clamp(46px,12.5vw,96px);margin:0}
-      @media (min-width:768px){html[data-prerender] .prerender{padding-left:32px}}
-      @media (min-width:900px){html[data-prerender] .prerender{align-items:center;padding-bottom:0}.prerender-copy{max-width:min(640px,50vw)}.prerender .prerender-title{font-size:clamp(64px,6.6vw,96px)}}
-      @media (min-width:1100px){html[data-prerender] .prerender{padding-left:max(48px,calc((100vw - 1160px)/2 + 48px))}}
+      html[data-prerender] .prerender{display:flex;min-height:100svh;box-sizing:border-box;align-items:flex-end;justify-content:center;padding:0 16px calc(env(safe-area-inset-bottom,0px) + 32px)}
+      .prerender-cue{margin:0}
     </style>
     <script src="/boot.js"></script>
   </head>
   <body>
-    <div id="root"><div class="prerender" aria-hidden="true"><div class="prerender-copy"><p class="t-eyebrow">The training floor for future dealmakers</p><p class="t-display hero-title hero-title--dc prerender-title">Don’t study finance. <span class="editorial">Command the floor.</span></p><p class="t-lead">Real DCF, LBO and M&amp;A deals, priced against the clock. An analyst’s reflexes in five minutes a day.</p><div class="prerender-cta"><span class="btn btn--primary btn--lg btn--auto">Start free</span></div></div></div></div>
+    <div id="root"><div class="prerender" aria-hidden="true"><p class="kicker prerender-cue">Move · Vale is awake</p></div></div>
     <noscript>Vantaris needs JavaScript turned on.</noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>

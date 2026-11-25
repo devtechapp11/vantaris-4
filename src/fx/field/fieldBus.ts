@@ -1,12 +1,13 @@
 export type FieldScene = 'landing' | 'app' | 'exercise' | 'ceremony';
 
-/** Resting glyph matrix and vector trame per scene. Exercises switch the
- *  glyphs off: the background never competes with a DCF. */
-const SCENES: Record<FieldScene, [glyphs: number, trame: number]> = {
-  landing: [0.6, 1],
-  app: [0.35, 0.8],
-  exercise: [0, 0.35],
-  ceremony: [0.8, 1],
+/** Resting glyph matrix, vector trame and perspective grid per scene. The app
+ *  keeps only the slow mercury; the landing switches the field off (Vale's 3D
+ *  stage is its background). Glyphs come back only for a promotion. */
+const SCENES: Record<FieldScene, [glyphs: number, trame: number, grid: number]> = {
+  landing: [0, 0, 0],
+  app: [0, 0, 0],
+  exercise: [0, 0, 0],
+  ceremony: [0.8, 0.6, 0],
 };
 
 /**
@@ -19,8 +20,11 @@ export const fieldBus = {
   pulseX: 0.5,
   pulseY: 0.5,
   pulseAt: -1,
-  glyphAmount: 0.35,
-  trame: 1,
+  glyphAmount: 0,
+  trame: 0,
+  grid: 0,
+  /** False on the landing: the canvas stops drawing and fades out. */
+  visible: true,
   /** Set when the frame-time guard switched the trame off for this session. */
   trameOff: false,
   flashAt: -1,
@@ -49,7 +53,8 @@ export const fieldBus = {
   },
   setScene(scene: FieldScene) {
     this.scene = scene;
-    [this.glyphAmount, this.trame] = SCENES[scene];
+    [this.glyphAmount, this.trame, this.grid] = SCENES[scene];
+    this.visible = scene !== 'landing';
     if (this.trameOff) this.trame = 0;
   },
 };

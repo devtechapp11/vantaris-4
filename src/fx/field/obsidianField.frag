@@ -14,6 +14,7 @@ uniform float uGlyphAmount;// 0..1, the scene's resting level
 uniform float uGlyphFlash; // 0..1, the promotion rain
 uniform float uTrameCell;  // vector trame cell, in pixels
 uniform float uTrame;      // 0..1
+uniform float uGrid;       // 0..1, perspective floor grid
 
 out vec4 fragColor;
 
@@ -70,7 +71,7 @@ void main(){
   vec2 g = vec2(p.x * depth, depth + uTime * 0.04);
   vec2 gv = abs(fract(g) - 0.5) / max(fwidth(g), vec2(1e-4));
   float line = 1.0 - min(min(gv.x, gv.y), 1.0);
-  float grid = below * line * (1.0 - smoothstep(1.0, 8.0, depth)) * 0.35;
+  float grid = below * line * (1.0 - smoothstep(1.0, 8.0, depth)) * 0.35 * uGrid;
 
   // 3. Diagonal specular beam
   float beamPos = sin(uTime * 0.07) * 0.8;
