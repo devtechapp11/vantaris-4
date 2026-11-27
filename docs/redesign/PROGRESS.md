@@ -180,6 +180,18 @@ production deploy.
   `demoScore.ts` stays because the app's `DemoCredit` still reads it.
 - QA: all 8 acts and the hand-off were walked through in Playwright at 1440 and 375, with motion, reduced motion and no WebGL: 0 errors.
 
+## Phase 9 — Liquid Glass (exactly 3 surfaces) ✅
+
+- `src/components/glass/LiquidGlass.tsx` (the brief's A12), mounted once at the root. It sets `has-liquid` on Chromium only; Safari and Firefox keep the plain blur.
+- `.glass--liquid` (the brief's CSS, in `components.css`) is on three surfaces only:
+  - the landing's nav pill, once you scroll;
+  - the plan cards (landing and `/plans`, through `PlanCard`);
+  - the app's mobile tab bar.
+
+  The older frosted `.glass` stays on the app's other floating layers (sheets, toasts…); it has no refraction. Under reduced transparency, both are solid.
+- Shots: `design/qa/p9` (`/`, `/start`, `/app`, `/dev/vale`, `/plans`). The refraction was checked on the landing's plan cards, with Vale bent behind them.
+- Lighthouse mobile (targets: landing ≥ 75, app ≥ 85): not run here. Launching Lighthouse through `npx` was refused by the session's safety mode. It is listed for Dev.
+
 ## Decisions to confirm (defaults applied)
 
 - [DÉCISION DEV] Guest progress is not merged into an existing account when Google or the email already has one; the screen says so clearly.
@@ -202,4 +214,5 @@ production deploy.
   ```
   The client already blocks it.
 - Lessons credited by `credit_lesson_xp` (the local mode, before `VITE_LESSON_SERVER=1`) have no guest cap: add `if public._is_anonymous() and (lessons today) >= 3 then return 0`.
+- Run Lighthouse mobile on the branch preview (targets: landing ≥ 75 performance, app ≥ 85): `npx lighthouse <preview-url> --form-factor=mobile`.
 - The existing problem combo (`combo_multiplier`: ×5 from 10 in a row) differs from V4 lessons (×5 from 8). It was left unchanged.

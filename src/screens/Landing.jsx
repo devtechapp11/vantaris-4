@@ -112,7 +112,7 @@ function LandingNav() {
     <header className={`lnav ${solid ? 'is-solid' : ''}`}>
       <div className="lnav-inner">
         <Link to="/" className="lnav-brand" aria-label={`${BRAND.name}, home`}><Logo size={26} /></Link>
-        <nav className="lnav-links" aria-label="Website">
+        <nav className={`lnav-links ${solid ? 'glass--liquid' : ''}`} aria-label="Website">
           <a href="#membership">Membership</a>
           <Link to="/signin">Sign in</Link>
           <SoundPill className="lnav-sound" />

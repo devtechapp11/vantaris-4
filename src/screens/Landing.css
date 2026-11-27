@@ -21,8 +21,7 @@ html.lenis, html.lenis body { height: auto; }
 .lnav-inner { max-width: var(--col-wide); margin: 0 auto; height: 64px; padding: 0 var(--gutter-r) 0 var(--gutter); display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
 .lnav-inner > * { pointer-events: auto; }
 .lnav-brand { text-decoration: none; color: var(--fg); min-height: var(--tap); display: flex; align-items: center; }
-.lnav-links { display: flex; align-items: center; gap: var(--sp-1); padding: 4px; border-radius: 999px; transition: background-color var(--dur-base), box-shadow var(--dur-base); }
-.lnav.is-solid .lnav-links { background: color-mix(in srgb, var(--void-2) 70%, transparent); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: inset 0 0 0 1px var(--line); }
+.lnav-links { display: flex; align-items: center; gap: var(--sp-1); padding: 4px; border-radius: 999px; border: 1px solid transparent; transition: background-color var(--dur-base), box-shadow var(--dur-base); }
 .lnav-links a { min-height: var(--tap); display: inline-flex; align-items: center; padding: 0 var(--sp-3); color: var(--fg-2); text-decoration: none; font-size: var(--fs-sm); font-weight: var(--fw-medium); border-radius: 999px; transition: color var(--dur-fast); }
 .lnav-links a:hover { color: var(--fg); }
 .lnav-sound { margin-left: var(--sp-1); }
@@ -92,7 +91,6 @@ html.lenis, html.lenis body { height: auto; }
 .act--membership { min-height: auto; padding-top: var(--sp-24); scroll-margin-top: 64px; }
 .billing-row { display: flex; justify-content: center; }
 .act--membership .plans-grid { width: 100%; max-width: var(--col-wide); text-align: left; }
-.landing .plan-inner.metal { background: var(--surface-glass); -webkit-backdrop-filter: blur(var(--blur-xl)); backdrop-filter: blur(var(--blur-xl)); border-radius: var(--radius-md); }
 
 /* Act 7 · the call, over the opening shot */
 .act--final { min-height: 90svh; justify-content: flex-end; padding-bottom: calc(var(--safe-bottom) + var(--sp-16)); }

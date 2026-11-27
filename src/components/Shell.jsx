@@ -29,7 +29,7 @@ const isOn = (tab, path) => (tab.match ? tab.match(path) : path === tab.to || pa
 export function TabBar() {
   const { pathname } = useLocation();
   return (
-    <nav className="tabbar glass" aria-label="Main">
+    <nav className="tabbar glass--liquid" aria-label="Main">
       <div className="tabbar-inner">
         {TABS.map((tab) => {
           const { to, label, Icon } = tab;

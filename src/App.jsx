@@ -11,6 +11,7 @@ import { comboOf } from './lib/momentum';
 import Paywall from './components/Paywall';
 import { LogoLoader } from './components/Logo';
 import HeroShell from './components/HeroShell';
+import { LiquidGlassFilter } from './components/glass/LiquidGlass';
 import Mascot from './components/Mascot';
 import { IS_DEMO } from './lib/config';
 import { loaders } from './app/routes';
@@ -61,6 +62,7 @@ export default function App() {
     <Router {...routerProps}>
       <MotionConfig reducedMotion={prefs.reduceMotion ? 'always' : 'user'}>
         <AppProvider>
+          <LiquidGlassFilter />
           <ObsidianField key={prefs.reduceMotion ? 'still' : 'live'} still={prefs.reduceMotion} />
           {IS_DEMO && <div className="preview-band" role="note">Preview: nothing you enter leaves this page</div>}
           <Gate />

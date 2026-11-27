@@ -19,6 +19,24 @@
   .glass { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
 
+/* V4 Liquid Glass: exactly three surfaces carry it — the landing's nav pill,
+   the plan cards and the app's tab bar. Refraction (#vt-liquid) renders in
+   Chromium only (.has-liquid); elsewhere the plain blur is enough. */
+.glass--liquid {
+  background: color-mix(in oklab, var(--graphite) 55%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid color-mix(in oklab, var(--chrome-300) 22%, transparent);
+}
+.has-liquid .glass--liquid {
+  backdrop-filter: url(#vt-liquid) blur(6px) saturate(150%);
+}
+/* The plan cards keep their own spotlight and metal sheen: the glass is their ground. */
+.plan .plan-inner.glass--liquid { background: color-mix(in oklab, var(--graphite) 55%, transparent); }
+@media (prefers-reduced-transparency: reduce) {
+  .glass--liquid, .has-liquid .glass--liquid { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+
 /* =========================================================
    Buttons. One primary (platinum) per screen; everything else is quiet.
    Hover is a tonal step, press is 0.98.
