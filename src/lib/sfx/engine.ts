@@ -286,6 +286,29 @@ class SfxEngine {
     for (let i = 0; i < 9; i++) this.click(i * 0.014, 5200 - i * 260, 0.11, 0.02);
   }
 
+  /** Opening Bell: a small brass hand bell, three strikes (1.2 s). */
+  openingBell() {
+    if (!this.ready()) return;
+    [0, 0.38, 0.76].forEach((w) => {
+      this.bell(1318.5, w, 0.16, 0.9, 0.4);
+      this.bell(1975.5, w + 0.004, 0.05, 0.6, 0.4);
+    });
+  }
+
+  /** Elevator « ding »: one soft two-tone chime. */
+  ding() {
+    if (!this.ready()) return;
+    this.bell(987.8, 0, 0.18, 1.4, 0.5);
+    this.bell(783.99, 0.32, 0.16, 1.6, 0.5);
+  }
+
+  /** Split-flap: one short mechanical flap. */
+  flap(when = 0) {
+    if (!this.ready()) return;
+    this.click(when, 3200, 0.09, 0.012);
+    this.click(when + 0.018, 1400, 0.06, 0.02);
+  }
+
   /** Rubber stamp: a thud and a dry snap. */
   stamp() {
     if (!this.ready()) return;

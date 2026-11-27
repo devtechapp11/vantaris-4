@@ -15,6 +15,7 @@ import McqCard from './McqCard';
 import FormulaBuilder from './FormulaBuilder';
 import PairMatch from './PairMatch';
 import ValuationSlider from './ValuationSlider';
+import OpeningBell, { bellDue } from '../../rituals/OpeningBell';
 import './engine.css';
 
 type Props = {
@@ -62,6 +63,8 @@ export default function LessonShell({ skill, title, onExit, onDone, difficulty }
   const lastPointer = useRef<{ x: number; y: number } | null>(null);
   const attempt = useRef(newAttemptId());
   const startedAt = useRef(0);
+  const [bell, setBell] = useState(bellDue);
+  const endBell = useCallback(() => setBell(false), []);
 
   useEffect(() => {
     let live = true;
@@ -229,6 +232,8 @@ export default function LessonShell({ skill, title, onExit, onDone, difficulty }
 
   const busy = phase === 'locking' || phase === 'waiting';
   return (
+    <>
+    {bell && <OpeningBell reduced={Boolean(reduce)} onDone={endBell} />}
     <main className="xl" id="main" onPointerDown={(e) => (lastPointer.current = { x: e.clientX, y: e.clientY })}>
       <header className="xl-top">
         <button type="button" className="xl-close" onClick={onExit} aria-label="Leave the lesson"><X size={20} aria-hidden="true" /></button>
@@ -288,5 +293,6 @@ export default function LessonShell({ skill, title, onExit, onDone, difficulty }
         </AnimatePresence>
       </footer>
     </main>
+    </>
   );
 }

@@ -1,0 +1,17 @@
+/* The rituals (V4 Phase 10). Tokens only. */
+
+/* Opening Bell */
+.bell {
+  position: fixed; inset: 0; z-index: calc(var(--z-overlay, 100) + 10);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-4);
+  border: 0; padding: 0; width: 100%; cursor: pointer; color: var(--fg);
+  background: color-mix(in srgb, var(--void) 92%, transparent);
+  animation: bell-in 200ms ease both; transition: opacity 200ms ease;
+}
+.bell.is-out { opacity: 0; }
+.bell-icon { fill: var(--chrome-200); transform-origin: 50% 12%; animation: bell-swing 380ms ease-in-out 3; }
+.bell.is-still .bell-icon { animation: none; }
+.bell-line { font: 700 clamp(26px, 6vw, 40px)/1 var(--font-sans); font-stretch: 112%; letter-spacing: -0.01em; }
+@keyframes bell-in { from { opacity: 0; } }
+@keyframes bell-swing { 25% { rotate: 14deg; } 75% { rotate: -14deg; } }
+@media (prefers-reduced-motion: reduce) { .bell, .bell-icon { animation: none; } }
