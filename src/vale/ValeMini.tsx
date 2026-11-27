@@ -26,7 +26,7 @@ function MiniStage() {
 
 /**
  * frameloop="demand": frames are drawn only while something happens — a
- * reaction (2.2 s), the pointer moving (0.6 s), a blink every 4–7 s.
+ * reaction (2.6 s, a Gold Standard included), the pointer moving (0.6 s), a blink every 4–7 s.
  */
 function Pulse() {
   const invalidate = useThree((s) => s.invalidate);
@@ -40,7 +40,7 @@ function Pulse() {
       invalidate();
     };
     run(1200);
-    const off = valeBus.subscribe(() => run(2200));
+    const off = valeBus.subscribe(() => run(2600));
     const move = () => run(600);
     addEventListener('pointermove', move, { passive: true });
     let id = 0;
@@ -65,9 +65,9 @@ function Pulse() {
  */
 export default function ValeMini({ desk, reduced, onReady }: { desk: Desk | null; reduced: boolean; onReady?: () => void }) {
   const [ready, setReady] = useState(false);
+  // One store for every Vale on screen: set, never cleared here (the Path's Vale keeps the desk outfit).
   useEffect(() => {
     valeOutfit.set(desk);
-    return () => valeOutfit.set(null);
   }, [desk]);
   return (
     <Canvas

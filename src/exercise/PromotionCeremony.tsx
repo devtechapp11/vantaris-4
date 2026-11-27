@@ -7,10 +7,14 @@ import { sfx } from '../lib/sfx/engine';
 import { haptics, HAPTIC } from '../lib/haptics';
 import { fieldBus } from '../fx/field/fieldBus';
 import { shower } from '../lib/celebrate';
-import { springs } from '../motion/springs';
 import { careerName } from '../lib/career';
 import { markSeen, seen } from '../path/store';
 import { plaqueImage } from './plaqueImage';
+import ValeSeat from '../path/ValeSeat';
+import SplitFlap from '../rituals/SplitFlap';
+import ThermalReceipt from '../components/receipt/ThermalReceipt';
+import { valeMidas } from '../vale/valeMidas';
+import { deskOf } from '../vale/outfits/outfitRegistry';
 import './exercise.css';
 
 const ORDER = ['Analyst', 'Associate', 'VP', 'MD'];
@@ -21,9 +25,11 @@ const LINE: Record<string, string> = {
 };
 
 /**
- * The desk promotion (Analyst → Associate → VP → MD): a full-screen ceremony,
- * skippable after 1.5 s. The plate swings up in 3D, is engraved letter by
- * letter, and can be shared as a square image.
+ * The desk promotion (Analyst → Associate → VP → MD), the one moment of the
+ * app that stacks everything: an elevator climbs (the floor number on
+ * split-flap), « ding », the doors open on Vale in the new desk's outfit, he
+ * turns to gold (Gold Standard), and a thermal receipt prints the new desk.
+ * Skippable after 1.5 s; shareable as a square image.
  */
 export default function PromotionCeremony() {
   const { me } = useApp() as { me: { profile: { level: string; display_name: string } } | null };
@@ -37,7 +43,9 @@ export default function PromotionCeremony() {
 
   // A new desk since the last time this device saw the player: celebrate once.
   // Never over a session or its results: the ceremony waits for the way out.
-  const inSession = useLocation().pathname.startsWith('/learn');
+  const path = useLocation().pathname;
+  const inSession = path.startsWith('/learn') || path.startsWith('/lesson') || path === '/start';
+  const [open, setOpen] = useState(false);
   useEffect(() => {
     if (!level || inSession) return;
     const prev = seen().level;
@@ -59,6 +67,11 @@ export default function PromotionCeremony() {
     fieldBus.pulse(null);
     shower();
     const skip = window.setTimeout(() => setSkippable(true), 1500);
+    // The climb, the ding, the doors, then gold.
+    setOpen(reduce ?? false);
+    const ding = window.setTimeout(() => sfx.ding(), reduce ? 0 : 1100);
+    const doors = window.setTimeout(() => setOpen(true), reduce ? 0 : 1350);
+    const gold = window.setTimeout(() => valeMidas.gold('gold'), reduce ? 200 : 1900);
     let i = 0;
     const engrave = reduce ? 0 : window.setInterval(() => {
       i += 1;
@@ -69,6 +82,9 @@ export default function PromotionCeremony() {
     // Starts once the plate has swung up
     return () => {
       window.clearTimeout(skip);
+      window.clearTimeout(ding);
+      window.clearTimeout(doors);
+      window.clearTimeout(gold);
       window.clearInterval(engrave);
       fieldBus.setMultiplier(1);
       fieldBus.setScene('app');
@@ -117,23 +133,39 @@ export default function PromotionCeremony() {
             </button>
           )}
           <p className="promo-eyebrow fig-mono">PROMOTION · {ORDER.indexOf(desk) + 1}/4</p>
-          <div className="promo-stage">
-            <motion.div
-              className="promo-plate"
-              initial={reduce ? { opacity: 0 } : { rotateX: 70, y: 60, opacity: 0 }}
-              animate={{ rotateX: 0, y: 0, opacity: 1 }}
-              transition={springs.heavy}
-            >
-              <span className="promo-text" aria-hidden="true" data-rank={desk ?? undefined}>
-                {label.split('').map((ch, i) => (
-                  <span key={i} className={i < letters ? 'is-cut' : ''}>{ch === ' ' ? ' ' : ch}</span>
-                ))}
-                {' '}<span className={`promo-desk ${letters >= label.length ? 'is-cut' : ''}`}>Desk</span>
-              </span>
-              <span className="sr-only">{label} desk</span>
-            </motion.div>
+          <div className="lift" aria-hidden="true">
+            <div className="lift-floor fig-mono">
+              FL <SplitFlap value={String(ORDER.indexOf(desk) + 1).padStart(2, '0')} sound={!reduce} />
+            </div>
+            <div className={`lift-car ${open ? 'is-open' : ''}`}>
+              <div className="lift-inside">
+                <ValeSeat outfit={deskOf(desk)} reduced={Boolean(reduce)} size={200} />
+              </div>
+              <span className="lift-door lift-door--l" />
+              <span className="lift-door lift-door--r" />
+            </div>
           </div>
-          <motion.p className="promo-line" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springs.soft, delay: reduce ? 0 : 0.9 }}>
+          <span className="promo-text" aria-hidden="true" data-rank={desk ?? undefined}>
+            {label.split('').map((ch, i) => (
+              <span key={i} className={i < letters ? 'is-cut' : ''}>{ch === ' ' ? ' ' : ch}</span>
+            ))}
+            {' '}<span className={`promo-desk ${letters >= label.length ? 'is-cut' : ''}`}>Desk</span>
+          </span>
+          <span className="sr-only">{label} desk</span>
+          {open && (
+            <ThermalReceipt
+              heading="PROMOTION"
+              meta={new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+              lines={[
+                { label: 'New desk', value: label },
+                { label: 'Floor', value: `${ORDER.indexOf(desk) + 1} of 4`, strong: true },
+              ]}
+              stamp="PROMOTED"
+              onPrinted={() => sfx.stamp()}
+              className="lift-receipt"
+            />
+          )}
+          <motion.p className="promo-line" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: reduce ? 0 : 2.2 }}>
             {LINE[desk] ?? 'A new seat at the table.'}
           </motion.p>
           <motion.div className="promo-actions" initial={{ opacity: 0 }} animate={{ opacity: skippable ? 1 : 0 }} transition={{ duration: 0.3 }}>

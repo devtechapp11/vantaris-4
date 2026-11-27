@@ -98,3 +98,17 @@
 .promo-actions { display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: center; }
 .promo-note { margin: 0; font-size: var(--fs-xs); color: var(--steel-300); }
 .promo-text .promo-desk { font-stretch: 100%; font-weight: 500; }
+
+/* Promotion: the elevator */
+.lift { display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); }
+.lift-floor { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; letter-spacing: 0.12em; color: var(--fg-2); }
+.lift-floor .flap { font-size: 22px; }
+.lift-car { position: relative; width: 220px; height: 240px; overflow: hidden; border-radius: 6px 6px 0 0; background: var(--void-2); box-shadow: inset 0 0 0 2px var(--steel-700), 0 0 0 6px var(--steel-800); }
+.lift-inside { position: absolute; inset: 0; display: grid; place-items: end center; padding-bottom: 8px; background: radial-gradient(60% 50% at 50% 30%, color-mix(in srgb, var(--chrome-100) 16%, transparent), transparent); }
+.lift-door { position: absolute; top: 0; bottom: 0; width: 50%; background: var(--metal-brushed); box-shadow: inset 0 0 0 1px var(--line-strong); transition: transform 900ms cubic-bezier(.65, 0, .35, 1); }
+.lift-door--l { left: 0; }
+.lift-door--r { right: 0; }
+.lift-car.is-open .lift-door--l { transform: translateX(-100%); }
+.lift-car.is-open .lift-door--r { transform: translateX(100%); }
+.lift-receipt { margin-top: var(--sp-2); }
+@media (prefers-reduced-motion: reduce) { .lift-door { transition: none; } }
