@@ -15,3 +15,19 @@
 @keyframes bell-in { from { opacity: 0; } }
 @keyframes bell-swing { 25% { rotate: 14deg; } 75% { rotate: -14deg; } }
 @media (prefers-reduced-motion: reduce) { .bell, .bell-icon { animation: none; } }
+
+/* Closing Signature */
+.sig { position: relative; height: 64px; margin: calc(var(--sp-1) * -1) 0 var(--sp-1); }
+.sig-line { width: 100%; height: 100%; overflow: visible; }
+.sig-line path { fill: none; stroke: var(--chrome-200); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: sig-draw 560ms cubic-bezier(.6, .1, .3, 1) forwards; }
+.sig-line .sig-rule { stroke: var(--line-strong); stroke-width: 1; animation-duration: 300ms; }
+.sig-stamp {
+  position: absolute; right: 8%; top: 4px; rotate: -9deg; padding: 6px 12px; border: 2px solid var(--chrome-300); border-radius: 8px;
+  font: 600 14px/1 var(--font-mono); letter-spacing: 0.16em; color: var(--chrome-100);
+  opacity: 0; animation: sig-stamp 260ms cubic-bezier(.2, 1.4, .4, 1) 600ms forwards;
+}
+.sig.is-still .sig-line path { animation: none; stroke-dashoffset: 0; }
+.sig.is-still .sig-stamp { animation: none; opacity: 1; }
+@keyframes sig-draw { to { stroke-dashoffset: 0; } }
+@keyframes sig-stamp { from { opacity: 0; scale: 1.9; } to { opacity: 1; scale: 1; } }
+@media (prefers-reduced-motion: reduce) { .sig-line path { animation: none; stroke-dashoffset: 0; } .sig-stamp { animation: none; opacity: 1; } }

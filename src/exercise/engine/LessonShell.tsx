@@ -16,6 +16,7 @@ import FormulaBuilder from './FormulaBuilder';
 import PairMatch from './PairMatch';
 import ValuationSlider from './ValuationSlider';
 import OpeningBell, { bellDue } from '../../rituals/OpeningBell';
+import Signature from '../../rituals/Signature';
 import './engine.css';
 
 type Props = {
@@ -268,6 +269,7 @@ export default function LessonShell({ skill, title, onExit, onDone, difficulty }
                 {res.xpAwarded > 0 && <span className="xl-xp">+{res.xpAwarded} XP</span>}
               </p>
               <p className="xl-brief"><strong>{res.dealBrief.title}</strong> · {res.dealBrief.takeaway}</p>
+              {last && <Signature reduced={Boolean(reduce)} />}
               <button type="button" className="btn btn--primary btn--lg xl-cta" onClick={() => void next()} autoFocus>Continue</button>
             </motion.div>
           ) : last && phase === 'answer' ? (
