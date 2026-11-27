@@ -19,6 +19,7 @@ import OpeningBell, { bellDue } from '../../rituals/OpeningBell';
 import Signature from '../../rituals/Signature';
 import Redline, { type Miss } from '../../rituals/Redline';
 import Seal from '../../rituals/Seal';
+import { recordTicket } from '../../rituals/vault';
 import './engine.css';
 
 type Props = {
@@ -151,7 +152,8 @@ export default function LessonShell({ skill, title, onExit, onDone, difficulty }
     const total = start.items.length;
     const xp = await finish(start, skill, starsFor(results.right, total), results.right, results.xp);
     setCredited(xp);
-  }, [start, phase, last, i, skill, results, misses.length]);
+    recordTicket({ at: new Date().toISOString(), skill, title, xp, right: results.right, total });
+  }, [start, phase, last, i, skill, title, results, misses.length]);
 
   // Keyboard: 1–4, Enter, Escape.
   useEffect(() => {

@@ -19,6 +19,7 @@ import { useRank } from '../app/useRank';
 import { BRAND, IS_DEMO } from '../lib/config';
 import { longDate, money, number, relative } from '../lib/format';
 import './Profile.css';
+import VaultShelves from '../rituals/VaultShelves';
 import { useMeta } from '../app/useMeta';
 
 const SETTINGS = [
@@ -105,6 +106,7 @@ export default function Profile() {
           <Item as="section" className="stack-12" aria-labelledby="vault">
             <div className="section-head"><h2 id="vault">Wall Street Vault</h2><span className="t-foot fig-mono">{me.path?.total ?? 0}★</span></div>
             <Vault stars={me.path?.stars} review={me.review} />
+            <VaultShelves stars={me.path?.stars} />
           </Item>
         </>
       ) : tab === 'progress' ? (
