@@ -10,7 +10,6 @@ import { Page } from '../components/chrome';
 import PathSwitch from '../components/PathSwitch';
 import { Skeleton, TIER_LABEL } from '../components/bits';
 import MagneticButton from '../components/fx/MagneticButton';
-import Vale from '../components/vale/Vale';
 import { valeBus } from '../components/vale/valeBus';
 import { LEVEL_TIER } from '../app/usePlans';
 import { isLocked } from '../lib/modules';
@@ -26,6 +25,8 @@ import TodaysDesk, { mentorLine } from '../path/TodaysDesk';
 import PathNode, { NODE } from '../path/PathNode';
 import VaultCache from '../path/VaultCache';
 import DeskPlaque from '../path/DeskPlaque';
+import ValeSeat from '../path/ValeSeat';
+import ActiveCta, { ContinuePill } from '../path/ActiveCta';
 import { buildPath, DESKS } from '../path/model';
 import { recordCache } from '../path/store';
 import { RELIC_OF, posterUrl } from '../path/relics/kinds';
@@ -62,16 +63,18 @@ const curve = (list) => list.reduce((d, [x, y], k) => {
 }, '');
 
 /**
- * The Deal Path. Desktop (≥ 1280 px): sidebar, the path (560 px) and the
- * « Today's Desk » rail. Tablet: the rail's cards sit above the path. Phone:
- * compact cards, the path and the tab bar.
+ * The Deal Path. One dominant action: the active node's CTA, focused and
+ * centred on arrival (Enter starts). Desktop (≥ 1024 px): sidebar, the path
+ * and the « Today's Desk » rail (3 cards). Below: a 3-item header (streak,
+ * goal, desk), the path, the tab bar, and a « Continue » pill when the active
+ * node scrolls away.
  */
 export default function Path() {
   useMeta({ title: 'Deal Path' });
   const { me, setMe, openPaywall, showToast } = useApp();
   const navigate = useNavigate();
   const board = useBoard(me?.profile?.points);
-  const rail = useMedia('(min-width: 1280px)');
+  const rail = useMedia('(min-width: 1024px)');
   const prefs = usePrefs();
   const reduce = useReducedMotion() || prefs.reduceMotion;
   const fine = useMedia('(hover: hover) and (pointer: fine)');
@@ -97,13 +100,16 @@ export default function Path() {
   }, [showToast]);
   const model = useMemo(() => (me ? buildPath({ ...me, desk }) : null), [me, desk]);
 
-  // Bring the next chapter into view on arrival.
+  // The « Continue » pill shows while the active node is off screen.
+  const [activeGone, setActiveGone] = useState(false);
   useEffect(() => {
-    const el = activeRef.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    if (r.top > window.innerHeight * 0.75) el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
-  }, [reduce, Boolean(model)]); // eslint-disable-line react-hooks/exhaustive-deps
+    // The wrapper has no box of its own (its children are positioned): watch the node itself.
+    const el = activeRef.current?.querySelector('.pn');
+    if (!el || typeof IntersectionObserver === 'undefined') return undefined;
+    const io = new IntersectionObserver(([e]) => setActiveGone(!e.isIntersecting), { rootMargin: '-64px 0px -96px 0px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [Boolean(model)]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // The relics' 3D chunk waits for an idle moment after the first paint.
   useEffect(() => {
@@ -188,7 +194,7 @@ export default function Path() {
     if (n.tierLocked) return openPaywall('level', { level: n.level });
     if (!n.reachable) return showToast(`Earn a star on “${nodes[n.index - 1]?.title}” to open this chapter.`);
     sfx.press();
-    navigate(`/learn/${n.id}`);
+    navigate(`/lesson/${n.id}`);
     return undefined;
   };
 
@@ -207,8 +213,7 @@ export default function Path() {
     <Page wide className="screen path-screen">
       <div className="desk">
         <div className="desk-main">
-          <StatsBar level={me.profile.level} streak={me.profile.streak} lit={me.profile.active_today} stars={me.path?.total ?? 0} board={board} />
-          {!rail && <TodaysDesk me={me} board={board} due={due} compact />}
+          <StatsBar level={me.profile.level} streak={me.profile.streak} lit={me.profile.active_today} stars={me.path?.total ?? 0} board={board} today={me.week?.[me.week.length - 1]?.points ?? 0} />
           <PathSwitch value="guided" />
 
           <div ref={wrap} className={`path-wrap ${relicsReady ? 'relics-live' : ''}`}>
@@ -259,7 +264,10 @@ export default function Path() {
                 const left = cx < W / 2 + (phone ? 6 : GAUGE / 2);
                 const panel = left ? { left: cx + NODE / 2 + 14, right: 0 } : { left: phone ? 16 : GAUGE + 8, right: W - (cx - NODE / 2 - 14) };
                 const room = left ? cx - NODE / 2 - (phone ? 12 : GAUGE + 8) : W - (cx + NODE / 2);
-                const valeOut = room >= 84;
+                // Phones: Vale sits inline by the CTA (no room beside the node for him and his line).
+                const seat = phone ? 0 : room >= 140 ? 140 : room >= 100 ? 100 : 0;
+                const valeOut = seat > 0;
+                const cta = n.state === 'progress' ? 'continue' : n.state === 'completed' || n.state === 'mastered' ? 'review' : 'start';
                 const cap = caption(n, i);
                 const hot = hover ? hover === n.id : isActive;
                 return (
@@ -269,12 +277,12 @@ export default function Path() {
                       active={isActive}
                       style={{ left: cx - NODE / 2, top: y + 14 }}
                       onOpen={open}
-                      prefetch={n.state === 'locked' ? undefined : prefetchProps(`/learn/${n.id}`)}
+                      prefetch={n.state === 'locked' ? undefined : prefetchProps(`/lesson/${n.id}`)}
                     />
                     {isActive && valeOut && (
-                      <div className="path-vale" style={left ? { left: cx - NODE / 2 - 84, top: y + 10 } : { left: cx + NODE / 2 + 10, top: y + 10 }}>
-                        <p className={`vale-say ${left ? 'vale-say--l' : 'vale-say--r'}`}>{say}</p>
-                        <Vale size={66} label="Vale, your mentor" avatar />
+                      <div className="path-vale" style={left ? { left: cx - NODE / 2 - seat - 4, top: y + 14 + NODE / 2 - seat / 2 } : { left: cx + NODE / 2 + 4, top: y + 14 + NODE / 2 - seat / 2 }}>
+                        <ValeSeat level={me.profile.level} reduced={reduce} size={seat} />
+                        <p className={`vale-say ${left ? 'vale-say--l' : 'vale-say--r'}`} style={{ top: seat - 6 }}>{say}</p>
                       </div>
                     )}
                     <div className={`pp ${left ? '' : 'pp--r'} ${phone ? 'pp--col' : ''} is-${n.state}`} style={{ ...panel, top: y + (phone ? 0 : 6) }}>
@@ -284,15 +292,20 @@ export default function Path() {
                       <span className="pp-text">
                         <span className="pp-title">{n.title}</span>
                         {cap && <span className="pp-cap">{cap}</span>}
-                        {(isActive || n.state === 'progress') && (
+                        {isActive && (
                           <span className="pp-go">
-                            <MagneticButton className="btn btn--primary btn--sm pp-start" onClick={() => open(n)} {...prefetchProps(`/learn/${n.id}`)}>
-                              <Play size={14} aria-hidden="true" /> {n.state === 'progress' ? 'Resume' : 'Start'}
-                            </MagneticButton>
-                            {isActive && !valeOut && <Vale size={50} avatar />}
+                            <ActiveCta kind={cta} title={n.title} onStart={() => open(n)} prefetch={prefetchProps(`/lesson/${n.id}`)} />
+                            {!valeOut && <ValeSeat level={me.profile.level} reduced={reduce} size={phone ? 56 : 88} />}
                           </span>
                         )}
-                        {isActive && !valeOut && (
+                        {!isActive && n.state === 'progress' && (
+                          <span className="pp-go">
+                            <MagneticButton className="btn btn--secondary btn--sm pp-start" onClick={() => open(n)} {...prefetchProps(`/lesson/${n.id}`)}>
+                              <Play size={14} aria-hidden="true" /> Resume
+                            </MagneticButton>
+                          </span>
+                        )}
+                        {isActive && !valeOut && !phone && (
                           <span className="vale-say vale-say--inline">{say}</span>
                         )}
                       </span>
@@ -309,6 +322,9 @@ export default function Path() {
           </div>
         )}
       </div>
+      {!rail && activeGone && nodes[active] && (
+        <ContinuePill title={nodes[active].title} onStart={() => open(nodes[active])} />
+      )}
       {can3d && armed && slots.length > 0 && (
         <Suspense fallback={null}>
           <RelicLayer slots={slots} hot={hover ?? nodes[active]?.id ?? null} onReady={() => setRelicsReady(true)} />

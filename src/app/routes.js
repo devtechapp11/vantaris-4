@@ -18,7 +18,7 @@ export const loaders = {
 };
 
 const BY_PATH = [
-  [/^\/$/, 'home'],
+  [/^\/(app)?$/, 'home'],
   [/^\/learn\/[^/]+$/, 'learn'],
   [/^\/lesson\/[^/]+$/, 'lesson'],
   [/^\/blitz$/, 'blitz'],

@@ -16,7 +16,24 @@ type Props = {
   lit: boolean;
   stars: number;
   board: Board;
+  /** XP earned today, for the goal ring (phones and tablets: the rail is hidden). */
+  today?: number;
 };
+
+const GOAL = 50;
+function GoalRing({ value }: { value: number }) {
+  const r = 9;
+  const c = 2 * Math.PI * r;
+  const pct = Math.min(1, value / GOAL);
+  return (
+    <span className="sbar-stat sbar-goal" aria-label={`Today's goal: ${Math.min(value, GOAL)} of ${GOAL} XP`}>
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <circle cx="12" cy="12" r={r} className="sbar-goal-track" />
+        <circle cx="12" cy="12" r={r} className="sbar-goal-fill" strokeDasharray={`${c * pct} ${c}`} transform="rotate(-90 12 12)" />
+      </svg>
+    </span>
+  );
+}
 
 const ordinal = (n: number) => {
   const s = ['th', 'st', 'nd', 'rd'];
@@ -24,8 +41,12 @@ const ordinal = (n: number) => {
   return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
 };
 
-/** The standing bar: desk plate, league place, streak and stars, plus sound. Sticky, frosted, never clipped. */
-export default function StatsBar({ level, streak, lit, stars, board }: Props) {
+/**
+ * The standing bar. Phones and tablets: three items only (streak, today's
+ * goal, desk). Desktop: desk, league place, streak, stars and sound (the goal
+ * and the league live in the rail there).
+ */
+export default function StatsBar({ level, streak, lit, stars, board, today = 0 }: Props) {
   const tip = useId();
   const rank = board?.rank ?? null;
   return (
@@ -41,7 +62,8 @@ export default function StatsBar({ level, streak, lit, stars, board }: Props) {
       <span className={`sbar-stat ${lit ? 'is-lit' : ''}`} aria-label={`${streak}-day streak${lit ? ', kept today' : ''}`}>
         <Flame size={17} aria-hidden="true" /> <b className="fig-mono"><AnimatedNumber value={streak} /></b>
       </span>
-      <span className="sbar-stat" aria-label={`${stars} stars`}>
+      <GoalRing value={today} />
+      <span className="sbar-stat sbar-stars" aria-label={`${stars} stars`}>
         <Star size={17} aria-hidden="true" className="sbar-star" /> <b className="fig-mono"><AnimatedNumber value={stars} /></b>
       </span>
       <span className="sbar-sound">

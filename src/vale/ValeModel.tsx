@@ -27,6 +27,12 @@ export const valeRig = {
   turn: 0,
 };
 
+let blinkRequested = false;
+/** Ask for a blink on the next frame (on-demand canvases draw only now and then). */
+export function requestBlink() {
+  blinkRequested = true;
+}
+
 /** How long a mood holds before Vale settles back to idle (ms). */
 const HOLD: Partial<Record<ValeMood, number>> = { delight: 1600, wow: 1500, concern: 1800 };
 
@@ -180,6 +186,10 @@ export default function ValeModel({ reduced = false, lowPower = false, interacti
 
     // Blink every 2.8–6.4 s (reduced motion: a single blink).
     let open = 1;
+    if (blinkRequested) {
+      blinkRequested = false;
+      s.blinkAt = t;
+    }
     const since = t - s.blinkAt;
     if (since > 0 && since < 0.16) open = Math.abs(Math.cos((since / 0.16) * Math.PI)) * 0.92 + 0.08;
     if (since >= 0.16) {

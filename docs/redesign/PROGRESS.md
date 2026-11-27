@@ -100,6 +100,31 @@ production deploy.
 - **Route `/lesson/:node`** (focus screen). The existing `/learn/:node` keeps its content and gains the Midas edge on its options.
 - **Tests**: 22 unit tests (multipliers, stars, every lesson valid with a non-MCQ, deterministic rebuild, grading, an off-centre slider) and 18 Deno tests (a lesson keeps the engine wording when the writer fails twice). `submit-answer`'s idempotency is enforced in SQL (`attempt_id` primary key); the repo has no harness that runs plpgsql here, so it is listed for Dev's `npm run test:sql`.
 
+## Phase 6 — Path « action directe » ✅
+
+- **One dominant action**
+  - The active node grows to 96 px.
+  - `ActiveCta` shows START, CONTINUE or REVIEW. It is in the first render and is centred on arrival only when off screen, with no motion under reduced motion. It takes focus, so Enter starts it.
+  - It opens `/lesson/:node`, the V4 lesson, directly on question 1: one click, checked in Playwright (Enter → `.xq-prompt` visible, 0 errors).
+  - A locked Pro node still opens membership (`openPaywall('level')`).
+- **Desktop (≥ 1024 px)**: sidebar, path (≤ 560 px), a 320 px rail of 3 cards with nothing repeated:
+  - Next unlock (XP to the next desk);
+  - today's goal and one action;
+  - the league.
+
+  The stats bar keeps desk, league place, streak, stars and sound.
+- **Phones and tablets**
+  - The header has 3 items: streak, today's goal ring, desk. The rail's cards are gone.
+  - The tab bar is unchanged (4 tabs).
+  - A « Continue · <chapter> » pill appears only while the active node is off screen, using an IntersectionObserver on the node itself.
+- **ValeMini** (`src/vale/ValeMini.tsx`)
+  - One 140 px canvas beside the active node (100 px when the gap is narrow; 56 px inline next to the CTA on phones, where his line is dropped so the CTA stays the only thing that stands out).
+  - `frameloop="demand"`. It is invalidated on a `valeBus` reaction (2.2 s), pointer movement (0.6 s) and a blink every 4–7 s; `requestBlink()` was added to `ValeModel`.
+  - DPR ≤ 1.5, the low-detail body, the outfit for the player's desk.
+  - `ValeSeat` paints `public/vale/poster-<desk>.webp` first (four posters, about 11 KB each, rendered from `/dev/vale`). The 3D loads when the browser is idle, only with WebGL and not on weak devices (≤ 4 cores and ≤ 4 GB).
+- **`/app`** is an alias of the Path (Path tab active).
+- QA shots: `design/qa/p6` (375, 768, 1440 × motion and reduced motion). Playwright's full-page capture resizes the viewport, so it can show the Continue pill where a real viewport doesn't; that was checked separately.
+
 ## Decisions to confirm (defaults applied)
 
 - [DÉCISION DEV] Outfits are procedural. Plan B, if they read as toys: Blender, then GLB with Draco, under 300 KB per outfit, loaded lazily.

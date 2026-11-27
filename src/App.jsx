@@ -84,7 +84,7 @@ function Splash() {
 }
 
 // Screens that show the tab bar on phones (the tabs plus the two desk screens).
-const TAB_PATHS = new Set([...TABS.map((t) => t.to), '/practice']);
+const TAB_PATHS = new Set([...TABS.map((t) => t.to), '/app', '/practice']);
 // Focus screens: no sidebar, no tabs, nothing between the player and the question.
 const isFocus = (path) => path.startsWith('/learn/') || path.startsWith('/lesson/');
 // Sign in, sign up and forgot password are one screen: switching between them
@@ -92,7 +92,7 @@ const isFocus = (path) => path.startsWith('/learn/') || path.startsWith('/lesson
 const AUTH_PATHS = new Set(['/signin', '/signup', '/forgot']);
 const routeKey = (path) => (AUTH_PATHS.has(path) ? 'auth' : path === '/welcome' ? '/' : path);
 // App screens that need an account: signed-out visitors go to sign in, not to a 404.
-const APP_PATHS = ['/learn/:node', '/lesson/:node', '/blitz', '/practice', '/practice/:id', '/ranking', '/profile', '/plans', '/onboarding'];
+const APP_PATHS = ['/app', '/learn/:node', '/lesson/:node', '/blitz', '/practice', '/practice/:id', '/ranking', '/profile', '/plans', '/onboarding'];
 const legalRoutes = LEGAL_ORDER.map((slug) => <Route key={slug} path={`/${slug}`} element={<Legal />} />);
 
 function Gate() {
@@ -164,6 +164,7 @@ function Gate() {
     routes = (
       <>
         <Route path="/" element={<Path />} />
+        <Route path="/app" element={<Path />} />
         <Route path="/learn/:node" element={<Learn />} />
         <Route path="/lesson/:node" element={<Lesson />} />
         <Route path="/blitz" element={<Blitz />} />

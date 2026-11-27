@@ -13,7 +13,7 @@ import { Avatar, TierBadge } from './bits';
 // Four pillars, the same on the phone tab bar and the desktop rail. Path holds
 // both the guided route and free training (the deal library) behind one switch.
 export const TABS = [
-  { to: '/', label: 'Path', Icon: Route, match: (p) => p === '/' || p.startsWith('/practice') },
+  { to: '/', label: 'Path', Icon: Route, match: (p) => p === '/' || p === '/app' || p.startsWith('/practice') },
   { to: '/blitz', label: 'Blitz', Icon: Zap },
   { to: '/profile', label: 'Vault', Icon: Vault },
   { to: '/ranking', label: 'Rank', Icon: Trophy },

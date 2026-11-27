@@ -6,3 +6,11 @@
 @media (max-aspect-ratio: 3/4) { .vale-poster img { object-fit: cover; } }
 .vale-poster { transition: opacity 600ms ease; }
 .vale-poster.is-gone { opacity: 0; pointer-events: none; }
+
+/* ValeMini: Vale's seat beside the active node */
+.vale-seat { position: relative; display: inline-block; flex: none; }
+.vale-seat-poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; transition: opacity 400ms ease; }
+.vale-seat-poster.is-gone { opacity: 0; }
+.vale-mini-canvas { position: absolute !important; inset: 0; opacity: 0; transition: opacity 400ms ease; }
+.vale-mini-canvas.is-ready { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .vale-seat-poster, .vale-mini-canvas { transition: none; } }

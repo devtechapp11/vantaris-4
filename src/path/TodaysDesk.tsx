@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom';
 import { Ghost, Repeat2, Zap } from 'lucide-react';
 import SpecularCard from '../components/fx/SpecularCard';
 import MagneticButton from '../components/fx/MagneticButton';
-import MetalPlate from '../components/fx/MetalPlate';
 import { careerName } from '../lib/career';
 import { prefetchProps } from '../app/routes';
 import { seen } from './store';
@@ -43,8 +42,8 @@ function Ring({ value, goal }: { value: number; goal: number }) {
 /** The streak, in one sentence (the number lives in the stats bar). */
 export function streakLine(p: Me['profile']) {
   if (p.streak <= 0) return 'Close one deal today to start a streak.';
-  if (p.active_today) return `${p.streak}-day streak, kept today.`;
-  return `${p.streak}-day streak. One session today keeps it.`;
+  if (p.active_today) return 'Streak kept today.';
+  return 'One lesson today keeps your streak.';
 }
 
 type Props = { me: Me; board: Board; due: number; compact?: boolean };
@@ -72,9 +71,11 @@ export default function TodaysDesk({ me, board, due, compact = false }: Props) {
   return (
     <aside className={`td ${compact ? 'td--compact' : ''}`} aria-label="Today's desk">
       <SpecularCard className="td-card td-deskcard">
-        <MetalPlate tone="platinum" size="sm" rank={p.level}>{`${careerName(p.level)} desk`.toUpperCase()}</MetalPlate>
-        {toNext != null && p.next_level && (
-          <p className="td-next fig-mono">{toNext} XP → {careerName(p.next_level).toUpperCase()}</p>
+        <span className="t-eyebrow">Next unlock</span>
+        {toNext != null && p.next_level ? (
+          <p className="td-next fig-mono">{toNext} XP · <span data-rank={p.next_level}>{careerName(p.next_level).toUpperCase()}</span> desk</p>
+        ) : (
+          <p className="td-next fig-mono">Top desk reached</p>
         )}
         <p className="td-line">{streakLine(p)}</p>
       </SpecularCard>
