@@ -42,13 +42,17 @@ const Plans = lazy(loaders.plans);
 const Legal = lazy(loaders.legal);
 const NotFound = lazy(loaders.notFound);
 // Dev pages (/dev/type, /dev/vale): never linked, noindex, no session needed.
-const DevType = lazy(() => import('./dev/DevType'));
-const DevVale = lazy(() => import('./dev/DevVale'));
+// eslint-disable-next-line no-undef
+const DEV_PAGES = __DEV_PAGES__;
+const DevType = DEV_PAGES ? lazy(() => import('./dev/DevType')) : null;
+const DevVale = DEV_PAGES ? lazy(() => import('./dev/DevVale')) : null;
 
 // The preview build runs inside a sandboxed frame, so it keeps its route in memory.
 const Router = IS_DEMO ? MemoryRouter : BrowserRouter;
-// The preview build keeps its route in memory; a /dev/* address still opens there.
-const routerProps = IS_DEMO && typeof location !== 'undefined' && location.pathname.startsWith('/dev/') ? { initialEntries: [location.pathname] } : {};
+// The preview build keeps its route in memory; a direct address to a known
+// screen (QA captures, /dev/*) still opens there.
+const DIRECT = /^\/(dev\/|start$|app$|learn\/|blitz$|practice|ranking$|profile$|plans$|signin$|signup$)/;
+const routerProps = IS_DEMO && typeof location !== 'undefined' && DIRECT.test(location.pathname) ? { initialEntries: [location.pathname] } : {};
 
 export default function App() {
   const prefs = usePrefs();
@@ -117,7 +121,7 @@ function Gate() {
   const loader = prerendered ? <HeroShell /> : <LogoLoader />;
   if (session === undefined) return loader;
 
-  if (location.pathname.startsWith('/dev/')) {
+  if (DEV_PAGES && location.pathname.startsWith('/dev/')) {
     return (
       <Suspense fallback={loader}>
         <Routes>

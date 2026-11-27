@@ -1,0 +1,40 @@
+/* Midas: the Prism Chrome edge revealed from the touched point. Tokens only. */
+@property --midas-r { syntax: '<length>'; inherits: true; initial-value: 0px; }
+@property --midas-o { syntax: '<number>'; inherits: true; initial-value: 0; }
+
+.midas-surface { position: relative; isolation: isolate; }
+
+.midas-surface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  padding: 1.5px;
+  pointer-events: none;
+  color: var(--chrome-100);
+  background: var(--prism-ring);
+  background-size: 300% 300%;
+  opacity: var(--midas-o);
+  -webkit-mask:
+    radial-gradient(circle at var(--mx, 50%) var(--my, 50%), currentColor var(--midas-r), transparent calc(var(--midas-r) + 28px)),
+    linear-gradient(currentColor 0 0) content-box,
+    linear-gradient(currentColor 0 0);
+  -webkit-mask-composite: source-in, xor, source-over;
+  mask:
+    radial-gradient(circle at var(--mx, 50%) var(--my, 50%), currentColor var(--midas-r), transparent calc(var(--midas-r) + 28px)),
+    linear-gradient(currentColor 0 0) content-box,
+    linear-gradient(currentColor 0 0);
+  mask-composite: intersect, exclude, add;
+}
+
+/* Midas State: every edge on, a slow drift of the prism */
+.is-midas-state .midas-surface::after {
+  --midas-r: 200vmax;
+  opacity: 1;
+  animation: vt-midas-drift 6s linear infinite;
+}
+@keyframes vt-midas-drift { to { background-position: 300% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .is-midas-state .midas-surface::after { animation: none; }
+}

@@ -67,6 +67,16 @@ for (const file of walk(ROOT)) {
   });
 }
 
+// Gold exists only as a linear vec3 in src/vale/midas.ts (promotions and the
+// landing demo): never in CSS, never anywhere else.
+const GOLD = '0.766, 0.336';
+for (const file of walk(ROOT)) {
+  if (relative(ROOT, file).split('\\').join('/') === 'vale/midas.ts') continue;
+  readFileSync(file, 'utf8').split('\n').forEach((line, i) => {
+    if (line.includes(GOLD)) problems.push(`${relative(process.cwd(), file)}:${i + 1}  gold outside src/vale/midas.ts`);
+  });
+}
+
 if (problems.length) {
   console.error(`check-palette: ${problems.length} colour(s) outside the Prism Chrome palette:\n  ${problems.join('\n  ')}`);
   process.exit(1);

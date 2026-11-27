@@ -51,11 +51,15 @@ function preloadFonts(base) {
 // The alias swaps the whole backend module, so the real build never contains
 // the preview code or the answer key.
 export default defineConfig(({ mode, command }) => {
-  const base = mode === 'demo' ? './' : '/';
+  // QA_BASE=/ serves the preview build at the root so deep links work (scripts/shots.mjs).
+  const base = process.env.QA_BASE ?? (mode === 'demo' ? './' : '/');
   const production = command === 'build' && mode === 'production';
   return {
     plugins: [react(), preloadFonts(base), ...(production ? [dropConsole()] : [])],
     base,
+    // /dev/* sign-off pages: in dev, local builds and Vercel previews, never in
+    // a Vercel production deployment (the routes and their chunks drop out).
+    define: { __DEV_PAGES__: JSON.stringify(process.env.VERCEL_ENV !== 'production') },
     resolve: {
       alias: {
         '@api-impl': fileURLToPath(new URL(mode === 'demo' ? './src/lib/api/demo.js' : './src/lib/api/real.js', import.meta.url)),

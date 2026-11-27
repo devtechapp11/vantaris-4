@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { Suspense, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import { easing } from 'maath';
 import { MathUtils, Vector3, type BufferGeometry, type Group, type Mesh } from 'three';
@@ -7,6 +7,10 @@ import { makeValeBody, makeValeMaterial, type ValeUniforms } from './valeShape';
 import { rippleBus } from './rippleBus';
 import { siteSound } from './siteSound';
 import { POOL_Y } from './ValeStage';
+import { applyMidas, setMidasReach } from './midas';
+import { valeMidas } from './valeMidas';
+import { OUTFITS, useOutfit } from './outfits/outfitRegistry';
+import Sparkles from './Sparkles';
 
 /**
  * What the page can drive (the intro, the scroll): plain numbers read every
@@ -33,6 +37,8 @@ type Props = {
   lowPower?: boolean;
   /** Tap reaction (off when Vale is only a decor). */
   interactive?: boolean;
+  /** What a tap does besides the hop: the landing's Midas Touch, or nothing. */
+  tapMidas?: boolean;
   onReady?: () => void;
   /** A sculpted body (public/vale.glb), instead of the procedural pebble. */
   bodyGeometry?: BufferGeometry;
@@ -45,10 +51,13 @@ type Props = {
  * seconds, reacts to valeBus (delight hop, wow spin, concern looks at the
  * right answer), and a tap makes him jump, rings the pool and plinks.
  */
-export default function ValeModel({ reduced = false, lowPower = false, interactive = true, onReady, bodyGeometry, children }: Props) {
+export default function ValeModel({ reduced = false, lowPower = false, interactive = true, tapMidas = true, onReady, bodyGeometry, children }: Props) {
   const procedural = useMemo(() => (bodyGeometry ? null : makeValeBody(lowPower ? 'low' : 'high')), [lowPower, bodyGeometry]);
   const geometry = bodyGeometry ?? procedural!;
-  const material = useMemo(() => makeValeMaterial(), []);
+  // The visor and the eyes never turn: they must stay readable.
+  const material = useMemo(() => applyMidas(makeValeMaterial(), { mask: '(1.0 - visorMask())' }), []);
+  const desk = useOutfit();
+  const Outfit = desk ? OUTFITS[desk] : null;
   const root = useRef<Group>(null);
   const spin = useRef<Group>(null);
   const body = useRef<Mesh>(null);
@@ -81,9 +90,17 @@ export default function ValeModel({ reduced = false, lowPower = false, interacti
     k.current.gaze = r ? { x: ((r.left + r.width / 2) / innerWidth) * 2 - 1, y: -(((r.top + r.height / 2) / innerHeight) * 2 - 1) } : null;
   }), []);
 
+  useEffect(() => {
+    valeMidas.reduced = reduced;
+  }, [reduced]);
+  useEffect(() => {
+    if (root.current) setMidasReach(root.current);
+  }, [desk]);
+
   const onTap = (e: ThreeEvent<PointerEvent>) => {
     if (!interactive) return;
     e.stopPropagation();
+    if (tapMidas) valeMidas.touch(e.point.clone());
     k.current.tap = performance.now();
     valeBus.correct(2);
     rippleBus.emit(root.current?.position.x ?? 0, 0, 0.8);
@@ -174,9 +191,12 @@ export default function ValeModel({ reduced = false, lowPower = false, interacti
     u.uEyeGlow.value = MathUtils.damp(u.uEyeGlow.value, valeRig.eyes * (live === 'concern' ? 0.8 : 1), 8, dt);
 
     // Mercury: still in reduced motion, a little alive at rest, more when moved.
-    const target = reduced ? 0 : (live === 'wow' ? 0.22 : live === 'delight' ? 0.14 : 0.06) + valeRig.distort;
+    // Dressed, the chrome ripples less: the cloth shell sits just 3% above the skin.
+    const target = reduced ? 0 : ((live === 'wow' ? 0.22 : live === 'delight' ? 0.14 : 0.06) + valeRig.distort) * (desk ? 0.35 : 1);
     u.uDistort.value = MathUtils.damp(u.uDistort.value, target, 4, dt);
     u.uTime.value = reduced ? 0 : t;
+
+    valeMidas.center.set(g.position.x, g.position.y + 0.1 * g.scale.y, g.position.z + 0.4);
 
     if (!s.ready) {
       s.ready = true;
@@ -185,6 +205,7 @@ export default function ValeModel({ reduced = false, lowPower = false, interacti
   });
 
   return (
+    <>
     <group ref={root}>
       <group ref={spin}>
         <mesh
@@ -195,9 +216,17 @@ export default function ValeModel({ reduced = false, lowPower = false, interacti
           onPointerOver={() => { if (interactive) gl.domElement.style.cursor = 'pointer'; }}
           onPointerOut={() => { gl.domElement.style.cursor = ''; }}
         />
+        {Outfit && (
+          <Suspense fallback={null}>
+            <Outfit key={desk} />
+          </Suspense>
+        )}
         {children}
       </group>
     </group>
+    {/* world space: outside Vale's transforms */}
+    <Sparkles body={body} reduced={reduced} />
+    </>
   );
 }
 

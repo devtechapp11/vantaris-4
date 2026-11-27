@@ -38,6 +38,8 @@
   --prism-lilac: #C7BEFF;
   --prism-peach: #FFD8C7;
   --prism-mint: #D9F7E0;
+  /* A closed ring of dispersed light (Midas edges): no transparent ends. */
+  --prism-ring: linear-gradient(115deg, var(--prism-ice), var(--prism-lilac), var(--prism-peach), var(--prism-mint), var(--prism-ice));
   --prism-edge: linear-gradient(90deg, transparent, var(--prism-ice), var(--prism-lilac), var(--prism-peach), transparent);
   /* ---------- Functional (always with an icon) ---------- */
   --gain: #7FB89A;

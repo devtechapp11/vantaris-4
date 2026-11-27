@@ -38,3 +38,7 @@ mascot-src/
 
 # local QA captures
 qa/
+
+# Visual QA captures (scripts/shots.mjs)
+design/qa/
+dist-qa

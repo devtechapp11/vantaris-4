@@ -1,4 +1,5 @@
 import { getPrefs, setPref } from '../../app/prefs';
+import { comboChord, midasShimmer, type Multiplier } from './combo';
 
 export type Combo = 1 | 2 | 3 | 5;
 
@@ -161,6 +162,39 @@ class SfxEngine {
   }
 
   // ---------- Public API ----------
+  /** The combo chord: root and richness climb with the multiplier. */
+  combo(mult: Multiplier) {
+    if (!this.ready()) return;
+    comboChord(this.ctx!, this.master, mult);
+  }
+
+  /** Midas State pad; returns its stop (a no-op when muted). */
+  midasShimmer(): () => void {
+    if (!this.ready()) return () => {};
+    return midasShimmer(this.ctx!, this.master);
+  }
+
+  /**
+   * Spatial version of a sound for the landing: everything played inside `fn`
+   * goes through a stereo panner (pan -1..1), then back to the master.
+   */
+  panned(pan: number, fn: (s: this) => void) {
+    if (!this.ready()) return;
+    const ctx = this.ctx!;
+    const p = ctx.createStereoPanner?.();
+    if (!p) return fn(this);
+    p.pan.value = Math.max(-1, Math.min(1, pan));
+    p.connect(this.master);
+    const prev = this.master;
+    this.master = p as unknown as GainNode;
+    try {
+      fn(this);
+    } finally {
+      this.master = prev;
+    }
+    setTimeout(() => p.disconnect(), 2500);
+  }
+
   /** A drop of chrome landing in the pool (Vale's hook, a tap on Vale). */
   plink() {
     if (!this.ready()) return;
