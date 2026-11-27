@@ -192,10 +192,71 @@ production deploy.
 - Shots: `design/qa/p9` (`/`, `/start`, `/app`, `/dev/vale`, `/plans`). The refraction was checked on the landing's plan cards, with Vale bent behind them.
 - Lighthouse mobile (targets: landing ≥ 75, app ≥ 85): not run here. Launching Lighthouse through `npx` was refused by the session's safety mode. It is listed for Dev.
 
+## Phase 10 — Rituals (one commit each) ✅
+
+1. **Opening Bell** (`rituals/OpeningBell.tsx`): the first lesson of the local day starts with three strikes of a small bell (1.2 s, a tap skips it): « Market's open. »
+2. **Closing Signature** (`rituals/Signature.tsx`): « Hold to close the deal » (700 ms) on the last exercise, then a signature line traces itself and the CLOSED stamp lands.
+3. **Redline** (`rituals/Redline.tsx`):
+   - the lesson's misses come back as a marked-up document, with a margin note in the loss red taken from the Deal Brief;
+   - correcting a line strikes it through: « Cleared »;
+   - it can be skipped; no XP, nothing is graded twice.
+4. **The Seal** (`rituals/Seal.tsx`): a lesson at 3★ stamps the chapter's chrome seal (DCF, LBO, M&A…).
+5. **The Vault's shelves** (`rituals/VaultShelves.tsx`, `rituals/vault.ts`):
+   - Deal Tickets: the XP the server really credited, kept on the device because there is no per-lesson history endpoint yet;
+   - Deal Toys: mastered chapters, with their accuracy;
+   - Seals: from the server's stars.
+
+   Real data only.
+6. **Promotion elevator** (`exercise/PromotionCeremony.tsx`):
+   - the floor number on split-flap, « ding », then the doors open on Vale in the new outfit;
+   - Gold Standard, then a PROMOTED thermal receipt;
+   - it waits outside `/lesson` and `/start`.
+7. **Split-flap** (`rituals/SplitFlap.tsx`): the rank on Ranking and the XP credited at the end of a lesson (400 ms, a mechanical click).
+8. **Pitch-deck card** (`rituals/pitchDeck.ts`, `PitchDeckShare.tsx`):
+   - a 1080 × 1350 canvas drawn on the device: PROJECT VALE — CONFIDENTIAL, Vale in his outfit, the desk, streak, accuracy and XP;
+   - the first name only when the player ticks it.
+9. **Vale yawns** (`rituals/BreakNudge.tsx`):
+   - after 45 minutes of continuous play (more than 10 minutes away starts the count over), a small card shows: « 45 minutes in. A short break helps it stick. »;
+   - it never blocks, and shows once per session.
+
+New sounds: `sfx.openingBell`, `sfx.ding`, `sfx.flap`. Shots: `design/qa/p10`.
+
+## Phase 11 — Membership and retention ✅
+
+- « Recommended » on Pro (our recommendation, said as such) replaces « Most popular ».
+- The yearly badge is computed from the plans (`yearlySaving`); the old written « 2 months free » is gone.
+- Triggers:
+  - the closable plans card after a finished lesson (free tier, at most once a week);
+  - the existing sheet on a locked Pro node.
+
+  Never inside a lesson. `REVERSE_TRIAL_ENABLED = false` in `src/lib/config.js`.
+- PAID receipt: still printed only after `confirmPayment` (signature verified by the server). Prices, plan ids, checkout and webhook were not touched.
+- Streak and freezes stay server-side (`finish_lesson`, in the migration not yet applied):
+  - local date (IANA), one lesson = one day;
+  - +1 freeze per 7 days, 2 in reserve at most, spent by itself.
+- Milestones narrowed to 7, 30, 100, then every 100. The day's first lesson runs in Midas State, and the results stamp a streak seal (« 30D »).
+- In-app reminder (`path/StreakNote.tsx`), in a neutral tone: « Your streak is at 6. One lesson keeps it. » Freezes in reserve are stated plainly.
+
+## Phase 12 — Final QA ✅
+
+- Gate: lint 0 errors (old warnings remain), typecheck, build with check-palette and check-dist (129 files clean), tests 22/22.
+- `node scripts/shots.mjs final` on 15 routes × 3 widths × 2 motion modes: 90 captures in `design/qa/final` (git-ignored), 0 page or console errors. `/start` was re-checked with a longer wait (`design/qa/start-check`), since the first shot caught a step transition.
+- Passes with Chromium `--disable-webgl` and reduced motion:
+  - keyboard only: the landing tab order is logical (skip link → nav → sound → CTA → deal → billing → plans), and `/start` answers the deal with the `1`–`4` keys;
+  - sound is off by default, with no audio context before an action;
+  - 0 errors.
+- `grep -rn "499\|999\|1999\|1,999" src`: no amounts outside `src/lib/api/demo.js` (the demo backend). The other hits are radii (`999px`) and shader constants. Real prices come from `public.plans`.
+- The « Join 2,341 future dealmakers » on the auth screens is the demo backend's figure. In production it is the server's count, shown only above `SOCIAL_PROOF_MIN`.
+
 ## Decisions to confirm (defaults applied)
 
 - [DÉCISION DEV] Guest progress is not merged into an existing account when Google or the email already has one; the screen says so clearly.
 - [DÉCISION DEV] DPDP (minors, India): nothing beyond the existing; Dev decides with a lawyer before the public launch (obligations from 14 May 2027). No birth date, phone or school is collected.
+- [DÉCISION DEV] Streak freezes: earned only (+1 per 7 days, 2 max), not for sale.
+- [DÉCISION DEV] Reminders: in-app only. An opt-in email reminder needs a `profiles.email_reminders` column (default false), a toggle in Settings and a daily sender (cron and email provider). None of it was built, so nothing promises an email.
+- [DÉCISION DEV] Streak milestones: 7, 30, 100, then every 100. Freezes still come every 7 days.
+- [DÉCISION DEV] The plans card after a lesson: at most once a week, free tier only.
+- [DÉCISION DEV] Deal Tickets live on the device (localStorage, 120 at most) until a server history exists.
 - [DÉCISION DEV] Outfits are procedural. Plan B, if they read as toys: Blender, then GLB with Draco, under 300 KB per outfit, loaded lazily.
 
 ## Manual actions for Dev
@@ -215,4 +276,9 @@ production deploy.
   The client already blocks it.
 - Lessons credited by `credit_lesson_xp` (the local mode, before `VITE_LESSON_SERVER=1`) have no guest cap: add `if public._is_anonymous() and (lessons today) >= 3 then return 0`.
 - Run Lighthouse mobile on the branch preview (targets: landing ≥ 75 performance, app ≥ 85): `npx lighthouse <preview-url> --form-factor=mobile`.
+- Plan perks text: check each tier's wording in `public.tiers` (tagline and features) before launch.
+- DPDP: the note above; nothing was collected beyond what already existed.
+- Leftovers from this session:
+  - a stale preview server still listens on port 4173 (stopping it was refused by the session's safety mode);
+  - the QA server is on 4180.
 - The existing problem combo (`combo_multiplier`: ×5 from 10 in a row) differs from V4 lessons (×5 from 8). It was left unchanged.
