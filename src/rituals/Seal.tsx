@@ -11,13 +11,13 @@ export const MONOGRAM: Record<string, string> = {
  * Le Sceau: a chapter closed at 3★ is sealed — a metal disc engraved with its
  * monogram, a stamp's thud. The Vault keeps every seal (from the server's stars).
  */
-export default function Seal({ skill, size = 112, stamp = false, label }: { skill: string; size?: number; stamp?: boolean; label?: string }) {
+export default function Seal({ skill, size = 112, stamp = false, label, mono: forced }: { skill: string; size?: number; stamp?: boolean; label?: string; mono?: string }) {
   useEffect(() => {
     if (!stamp) return undefined;
     const t = window.setTimeout(() => sfx.stamp(), 380);
     return () => clearTimeout(t);
   }, [stamp]);
-  const mono = MONOGRAM[skill] ?? skill.slice(0, 3).toUpperCase();
+  const mono = forced ?? MONOGRAM[skill] ?? skill.slice(0, 3).toUpperCase();
   return (
     <figure className={`seal ${stamp ? 'is-stamping' : ''}`} style={{ width: size, height: size }} aria-label={label ?? `${mono} seal: chapter mastered`}>
       <svg viewBox="0 0 100 100" aria-hidden="true">

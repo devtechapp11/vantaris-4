@@ -31,9 +31,9 @@ export function DrawCheck({ size = 18 }) {
 
 /**
  * One plan, as a flat column. `featured` (Pro) carries the page's one primary
- * button and a small "Most popular" label. Feature checks tick in one after another.
+ * button. Pro carries « Recommended »: our own recommendation, said as such. Feature checks tick in one after another.
  */
-export default function PlanCard({ tier, plan, monthly, featured = false, current = false, busy = false, disabled = false, busyLabel, onSelect, cta, note, glass = false }) {
+export default function PlanCard({ tier, plan, monthly, featured = false, recommended = tier.id === 'pro', current = false, busy = false, disabled = false, busyLabel, onSelect, cta, note, glass = false }) {
   const elite = tier.id === 'elite';
   const yearly = plan.interval === 'yearly';
   const saving = yearly && monthly ? monthly.amount * 12 - plan.amount : 0;
@@ -48,7 +48,7 @@ export default function PlanCard({ tier, plan, monthly, featured = false, curren
     >
       <Spotlight className={`plan-inner glass--liquid ${glass ? 'glass-stat' : 'metal metal--live'} ${featured ? 'is-active' : ''}`}>
       {featured && (glass ? <SpecularBorder strong /> : <BorderBeam duration={6} />)}
-      {featured && <span className="plan-flag">Most popular</span>}
+      {recommended && !current && <span className="plan-flag" title="Our recommendation">Recommended</span>}
       {current && <span className="plan-flag plan-flag--current">Current plan</span>}
       <header className="stack-4">
         <h3 id={`plan-${tier.id}`} className="plan-name">{tier.name}</h3>
@@ -118,8 +118,21 @@ export default function PlanCard({ tier, plan, monthly, featured = false, curren
   );
 }
 
-/** Monthly / yearly switch; the "2 months free" badge bounces in on yearly. */
-export function BillingToggle({ cycle, onChange }) {
+/** What yearly saves, from the plans themselves: whole months free if every tier agrees, else « Save up to N% ». */
+export function yearlySaving(plans) {
+  const rows = (plans ?? []).filter((p) => p.interval === 'yearly').map((y) => {
+    const m = plans.find((p) => p.tier === y.tier && p.interval === 'monthly');
+    return m && m.amount > 0 ? { months: (m.amount * 12 - y.amount) / m.amount, pct: (m.amount * 12 - y.amount) / (m.amount * 12) } : null;
+  }).filter(Boolean);
+  if (!rows.length) return null;
+  const months = Math.min(...rows.map((r) => Math.floor(r.months + 1e-6)));
+  if (months >= 1 && rows.every((r) => Math.floor(r.months + 1e-6) === months)) return `${months} ${months === 1 ? 'month' : 'months'} free`;
+  const pct = Math.max(...rows.map((r) => Math.floor(r.pct * 100)));
+  return pct > 0 ? `Save up to ${pct}%` : null;
+}
+
+/** Monthly / yearly switch; the saving badge (computed from the plans) bounces in on yearly. */
+export function BillingToggle({ cycle, onChange, saving = null }) {
   const yearly = cycle === 'yearly';
   return (
     <div className="billing">
@@ -132,7 +145,7 @@ export function BillingToggle({ cycle, onChange }) {
         ))}
       </div>
       <AnimatePresence>
-        {yearly && (
+        {yearly && saving && (
           <motion.span
             className="chip chip--strong billing-badge"
             initial={{ opacity: 0, scale: 0.3, rotate: -8 }}
@@ -140,7 +153,7 @@ export function BillingToggle({ cycle, onChange }) {
             exit={{ opacity: 0, scale: 0.5 }}
             transition={spring.bouncy}
           >
-            2 months free
+            {saving}
           </motion.span>
         )}
       </AnimatePresence>

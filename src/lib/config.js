@@ -14,3 +14,6 @@ export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
 
 // Brand colour passed to Razorpay Checkout so the payment sheet matches the app.
 export const CHECKOUT_THEME = '#12161D'; // Razorpay modal accent: carbon, to match the monochrome UI
+
+// A reverse trial (Pro for a few days, then back to free) stays off until Dev decides.
+export const REVERSE_TRIAL_ENABLED = false;

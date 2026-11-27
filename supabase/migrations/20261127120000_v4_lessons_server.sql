@@ -57,10 +57,10 @@ drop policy if exists lesson_answers_own on public.lesson_answers;
 create policy lesson_answers_own on public.lesson_answers for select to authenticated
   using (user_id = (select auth.uid()));
 
--- Streak milestones (7, 14, 30, 50, 100…): the day's first lesson starts in Midas State.
+-- Streak milestones (7, 30, 100, then every 100): the day's first lesson starts in Midas State.
 create or replace function public._is_milestone(p_streak integer)
 returns boolean language sql immutable set search_path = '' as $$
-  select p_streak in (7, 14, 30, 50, 100, 150, 200, 365) or (p_streak > 365 and p_streak % 100 = 0);
+  select p_streak in (7, 30) or (p_streak >= 100 and p_streak % 100 = 0);
 $$;
 
 -- Opens a session. Anonymous players (onboarding) get at most 3 lessons a day.

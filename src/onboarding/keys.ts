@@ -1,5 +1,5 @@
 /** Kept after onboarding: the daily goal (in-app reminders), the profile (difficulty) and the one-time plans card. */
-export const START_KEYS = { goal: 'vt.goal.minutes', profile: 'vt.profile', plansCard: 'vt.plansCard' } as const;
+export const START_KEYS = { goal: 'vt.goal.minutes', profile: 'vt.profile', plansCard: 'vt.plansCard', plansNudge: 'vt.plansNudge' } as const;
 
 export const put = (k: string, v: string) => {
   try {

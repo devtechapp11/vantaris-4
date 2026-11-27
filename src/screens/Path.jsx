@@ -27,6 +27,7 @@ import VaultCache from '../path/VaultCache';
 import DeskPlaque from '../path/DeskPlaque';
 import ValeSeat from '../path/ValeSeat';
 import PlansCard from '../path/PlansCard';
+import StreakNote from '../path/StreakNote';
 import ActiveCta, { ContinuePill } from '../path/ActiveCta';
 import { buildPath, DESKS } from '../path/model';
 import { recordCache } from '../path/store';
@@ -215,6 +216,7 @@ export default function Path() {
       <div className="desk">
         <div className="desk-main">
           <StatsBar level={me.profile.level} streak={me.profile.streak} lit={me.profile.active_today} stars={me.path?.total ?? 0} board={board} today={me.week?.[me.week.length - 1]?.points ?? 0} />
+          <StreakNote streak={me.profile.streak} activeToday={Boolean(me.profile.active_today)} freezes={desk?.freezes ?? null} />
           <PlansCard free={(me.tier?.id ?? 'free') === 'free'} />
           <PathSwitch value="guided" />
 

@@ -19,6 +19,7 @@ import OpeningBell, { bellDue } from '../../rituals/OpeningBell';
 import Signature from '../../rituals/Signature';
 import Redline, { type Miss } from '../../rituals/Redline';
 import Seal from '../../rituals/Seal';
+import { useApp } from '../../app/AppContext';
 import { recordTicket } from '../../rituals/vault';
 import SplitFlap from '../../rituals/SplitFlap';
 import './engine.css';
@@ -70,6 +71,9 @@ export default function LessonShell({ skill, title, onExit, onDone, difficulty }
   const attempt = useRef(newAttemptId());
   const startedAt = useRef(0);
   const [bell, setBell] = useState(bellDue);
+  // Read once at the start: a milestone day's lesson extends yesterday's streak by one.
+  const appMe = (useApp() as unknown as { me: { profile: { streak: number } } | null }).me;
+  const [streakAtStart] = useState(() => appMe?.profile.streak ?? 0);
   const endBell = useCallback(() => setBell(false), []);
 
   useEffect(() => {
@@ -237,6 +241,12 @@ export default function LessonShell({ skill, title, onExit, onDone, difficulty }
           onPrinted={() => credited != null && sfx.stamp()}
         />
         {stars === 3 && credited != null && <Seal skill={skill} stamp />}
+        {start.midasDay && credited != null && (
+          <div className="xl-milestone">
+            <Seal skill="streak" mono={`${streakAtStart + 1}D`} label={`${streakAtStart + 1}-day streak seal`} stamp size={96} />
+            <p className="xl-note">{streakAtStart + 1} days in a row. Sealed.</p>
+          </div>
+        )}
         <button type="button" className="btn btn--primary btn--lg" disabled={credited == null} onClick={() => onDone(credited ?? 0)} autoFocus>Continue</button>
       </main>
     );

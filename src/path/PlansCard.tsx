@@ -4,8 +4,8 @@ import { X } from 'lucide-react';
 import { START_KEYS, get, put } from '../onboarding/keys';
 
 /**
- * Right after onboarding, once: the plans, on one closable card. Nothing
- * else is pitched on the first day.
+ * The plans, on one closable card: right after onboarding, then at most once
+ * a week after a finished lesson (free tier). Never inside a lesson.
  */
 export default function PlansCard({ free }: { free: boolean }) {
   const navigate = useNavigate();

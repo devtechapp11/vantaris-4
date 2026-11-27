@@ -9,7 +9,7 @@ import { usePlans } from '../app/usePlans';
 import { haptic } from '../app/prefs';
 import { Item, NavBar, Page, Sheet } from '../components/chrome';
 import { Skeleton, TIER_LABEL, Spinner } from '../components/bits';
-import PlanCard, { BillingToggle, DrawCheck } from '../components/PlanCard';
+import PlanCard, { BillingToggle, DrawCheck, yearlySaving } from '../components/PlanCard';
 import Mascot from '../components/Mascot';
 import { group } from '../design/motion';
 import { spring, stagger } from '../design/tokens';
@@ -107,7 +107,7 @@ export default function Plans() {
           </div>
           <Mascot mood="levelup" size={150} className="plans-vale" label="Vale adjusting a tie, ready for the next level" />
         </Item>
-        <Item className="center"><BillingToggle cycle={cycle} onChange={setCycle} /></Item>
+        <Item className="center"><BillingToggle cycle={cycle} onChange={setCycle} saving={yearlySaving(data?.plans)} /></Item>
 
         {linkFirst && (
           <Item className="plans-link">
