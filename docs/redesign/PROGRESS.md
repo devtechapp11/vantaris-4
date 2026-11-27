@@ -125,11 +125,49 @@ production deploy.
 - **`/app`** is an alias of the Path (Path tab active).
 - QA shots: `design/qa/p6` (375, 768, 1440 × motion and reduced motion). Playwright's full-page capture resizes the viewport, so it can show the Continue pill where a real viewport doesn't; that was checked separately.
 
+## Phase 7 — Onboarding `/start` ✅
+
+- **State machine**: `src/onboarding/machine.ts` (the brief's A8, persisted in sessionStorage) and `firstDeal.ts` (A9). The old `/onboarding` screen is removed; it now redirects to `/start`.
+- **Steps** (`src/screens/Start.tsx`)
+  1. Awaken: bare Vale rises out of the dark (2.6 s, 0.9 s under reduced motion, a tap skips).
+  2. First deal: `FIRST_DEAL`. On CHECK: `signInAnonymously()` if there is no session, then `submit-answer` (key seeded on the server).
+     - Right answer: Midas Touch from the tap point, `correct`, a haptic, Vale delighted, then the ticket « DEAL #0001 · VALUATION · $80M · CLOSED » with the credited XP, and the Deal Brief.
+     - Fallback while the function isn't deployed: the deal is graded against the ticket's public value (it is shown afterwards anyway), and the XP goes through the existing capped `credit_demo_xp`. If guest desks are off, the deal still plays, without XP.
+  3. Ambition: « Who's playing? » (one tap, then it moves on), then « Which desk are you aiming for? », with each desk written at its own width (62 → 125 %).
+  4. Commitment: 5, 10 or 15 min, then « Commit to my goal ». Vale stamps a metal seal (`stamp`, a haptic).
+  5. Lesson 1: the V4 lesson on « The three statements », inline. « High school » and « Just curious » calibrate the local lesson to difficulty 1, University 2, Finance 3; the server path keeps its own skill rating.
+  6. Save (guests only): « Save your desk » with the real XP total, then Continue with Google (`linkIdentity`), Use email (`updateUser`, with a confirmation email), or Later.
+     - Conflict (the identity already has an account): « Sign in to my existing account »; the guest progress is not merged, and the screen says so.
+  - Then the Path, with one closable plans card (« See plans » / « Not now »), once.
+- **Routing**: `/start` stays mounted while the guest session and the profile load, so it never redirects mid-flow. Signed-out visitors and accounts that haven't onboarded reach it too.
+- **Removed**: Vale's once-per-session splash on the app's home. It held the screen for 1.5 s, which breaks the 0.5 s rule (CTA in the first render).
+- **Guests**
+  - Upgrading requires saving the desk first: Plans shows the save panel instead of the checkout.
+  - The migration `20261127130000_v4_anonymous_guards.sql` (not applied) wraps `get_leaderboard` so guests get `LINK_REQUIRED`. The live body is renamed and kept, not rewritten.
+  - Guests are limited to 3 lessons a day in `begin_lesson` (Phase 5 migration).
+- **Daily goal**: kept on the device (`vt.goal.minutes`), for the in-app reminders of Phase 11. `profiles.goal` only accepts career goals (`ib`, `pe`…), so it isn't overloaded.
+- QA: the full flow was played in Playwright at 375 and 1440 (landing CTA excluded: the landing is Phase 8), with 0 errors. The first deal is on screen at about 3.7 s. Shots: `design/qa/p7`.
+
 ## Decisions to confirm (defaults applied)
 
+- [DÉCISION DEV] Guest progress is not merged into an existing account when Google or the email already has one; the screen says so clearly.
+- [DÉCISION DEV] DPDP (minors, India): nothing beyond the existing; Dev decides with a lawyer before the public launch (obligations from 14 May 2027). No birth date, phone or school is collected.
 - [DÉCISION DEV] Outfits are procedural. Plan B, if they read as toys: Blender, then GLB with Draco, under 300 KB per outfit, loaded lazily.
 
 ## Manual actions for Dev
 
 - Apply `supabase/migrations/20261127120000_v4_lessons_server.sql`, deploy `generate-exercise` and `submit-answer`, then build with `VITE_LESSON_SERVER=1`. Until then, lessons are graded on the device and credited by `credit_lesson_xp`.
+- Supabase Auth:
+  - enable anonymous sign-ins;
+  - enable manual linking (needed for `linkIdentity`);
+  - enable CAPTCHA (Cloudflare Turnstile) for anonymous sign-ins;
+  - check Google OAuth's redirect URL for the domain.
+- Apply `20261127130000_v4_anonymous_guards.sql` (guests can't list the league).
+- Billing (not touched, per the rule on payments): in `supabase/functions/billing`, `create-subscription` should refuse guests:
+  ```ts
+  const { anonymous } = await authed(req);
+  if (anonymous) throw new HttpError(403, 'LINK_REQUIRED', 'Save your desk first.');
+  ```
+  The client already blocks it.
+- Lessons credited by `credit_lesson_xp` (the local mode, before `VITE_LESSON_SERVER=1`) have no guest cap: add `if public._is_anonymous() and (lessons today) >= 3 then return 0`.
 - The existing problem combo (`combo_multiplier`: ×5 from 10 in a row) differs from V4 lessons (×5 from 8). It was left unchanged.

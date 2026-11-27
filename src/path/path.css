@@ -276,3 +276,11 @@
 .pp--col .pp-text { max-width: 100%; }
 .pp--col .pp-go { flex-wrap: wrap; max-width: 100%; }
 .pp--col .vale-say--inline { max-width: 100%; width: auto; white-space: normal; box-sizing: border-box; }
+
+/* One closable plans card, the day of onboarding only */
+.plans-card { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3) var(--sp-5); padding: var(--sp-4) var(--sp-5); padding-right: 52px; border-radius: var(--radius-md); border: 1px solid var(--line); background: color-mix(in srgb, var(--void-2) 85%, transparent); }
+.plans-card-copy { flex: 1 1 220px; min-width: 0; }
+.plans-card-title { margin: 0; font-weight: 700; }
+.plans-card-sub { margin: 4px 0 0; color: var(--fg-2); font-size: var(--fs-sm); }
+.plans-card-actions { display: flex; gap: var(--sp-2); }
+.plans-card-x { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 999px; border: 0; background: transparent; color: var(--fg-2); cursor: pointer; }

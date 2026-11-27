@@ -21,7 +21,6 @@ import MetalBurst from './fx/MetalBurst';
 import { useSfxUnlock } from './lib/sfx/useSfx';
 import PromotionCeremony from './exercise/PromotionCeremony';
 import DemoCredit from './exercise/DemoCredit';
-import ValeSplashHook from './components/vale/ValeSplashHook';
 import { LEGAL_ORDER } from './content/legal';
 import { track } from './lib/analytics';
 
@@ -30,7 +29,7 @@ import { track } from './lib/analytics';
 const Landing = lazy(loaders.landing);
 const AuthScreen = lazy(loaders.auth);
 const ResetPassword = lazy(() => loaders.auth().then((m) => ({ default: m.ResetPassword })));
-const Onboarding = lazy(loaders.onboarding);
+const Start = lazy(loaders.start);
 const Path = lazy(loaders.home);
 const Learn = lazy(loaders.learn);
 const Lesson = lazy(loaders.lesson);
@@ -70,29 +69,30 @@ export default function App() {
           <MetalBurst />
           <PromotionCeremony />
           <DemoCredit />
-          <Splash />
         </AppProvider>
       </MotionConfig>
     </Router>
   );
 }
 
-/** Vale's once-per-session splash, only inside the signed-in app. */
-function Splash() {
-  const { session, me } = useApp();
-  return <ValeSplashHook enabled={Boolean(session && me?.profile?.onboarded)} />;
-}
-
 // Screens that show the tab bar on phones (the tabs plus the two desk screens).
 const TAB_PATHS = new Set([...TABS.map((t) => t.to), '/app', '/practice']);
 // Focus screens: no sidebar, no tabs, nothing between the player and the question.
-const isFocus = (path) => path.startsWith('/learn/') || path.startsWith('/lesson/');
+/** An onboarding run is under way in this tab (the machine persists in sessionStorage). */
+const inFlight = () => {
+  try {
+    return Boolean(sessionStorage.getItem('vt.onboarding.v1'));
+  } catch {
+    return false;
+  }
+};
+const isFocus = (path) => path === '/start' || path.startsWith('/learn/') || path.startsWith('/lesson/');
 // Sign in, sign up and forgot password are one screen: switching between them
 // is a shared-layout animation, not a page transition.
 const AUTH_PATHS = new Set(['/signin', '/signup', '/forgot']);
 const routeKey = (path) => (AUTH_PATHS.has(path) ? 'auth' : path === '/welcome' ? '/' : path);
 // App screens that need an account: signed-out visitors go to sign in, not to a 404.
-const APP_PATHS = ['/app', '/learn/:node', '/lesson/:node', '/blitz', '/practice', '/practice/:id', '/ranking', '/profile', '/plans', '/onboarding'];
+const APP_PATHS = ['/app', '/learn/:node', '/lesson/:node', '/blitz', '/practice', '/practice/:id', '/ranking', '/profile', '/plans'];
 const legalRoutes = LEGAL_ORDER.map((slug) => <Route key={slug} path={`/${slug}`} element={<Legal />} />);
 
 function Gate() {
@@ -135,7 +135,17 @@ function Gate() {
   }
 
   let routes;
-  if (location.pathname === '/reset-password') {
+  // /start creates the guest session on the first answer: it must not unmount
+  // while the session and the profile load, nor redirect mid-flow.
+  const starting = location.pathname === '/start' && !(me?.profile?.onboarded && !inFlight());
+  if (starting) {
+    routes = (
+      <>
+        <Route path="/start" element={<Start />} />
+        {legalRoutes}
+      </>
+    );
+  } else if (location.pathname === '/reset-password') {
     routes = <Route path="/reset-password" element={<ResetPassword />} />;
   } else if (!session) {
     routes = (
@@ -145,6 +155,7 @@ function Gate() {
         <Route path="/signin" element={<AuthScreen />} />
         <Route path="/signup" element={<AuthScreen />} />
         <Route path="/forgot" element={<AuthScreen />} />
+        <Route path="/start" element={<Start />} />
         {legalRoutes}
         {APP_PATHS.map((path) => <Route key={path} path={path} element={<Navigate to="/signin" replace />} />)}
         <Route path="*" element={<NotFound />} />
@@ -155,9 +166,9 @@ function Gate() {
   } else if (!me.profile.onboarded) {
     routes = (
       <>
-        <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/start" element={<Start />} />
         {legalRoutes}
-        <Route path="*" element={<Navigate to="/onboarding" replace />} />
+        <Route path="*" element={<Navigate to="/start" replace />} />
       </>
     );
   } else {
@@ -174,7 +185,7 @@ function Gate() {
         <Route path="/practice/:id" element={<Problem />} />
         <Route path="/plans" element={<Plans />} />
         {legalRoutes}
-        {['/welcome', '/signin', '/signup', '/forgot', '/onboarding'].map((path) => <Route key={path} path={path} element={<Navigate to="/" replace />} />)}
+        {['/welcome', '/signin', '/signup', '/forgot', '/onboarding', '/start'].map((path) => <Route key={path} path={path} element={<Navigate to="/" replace />} />)}
         <Route path="*" element={<NotFound />} />
       </>
     );

@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { hasWebGL } from '../app/useDevice';
-import { deskOf } from '../vale/outfits/outfitRegistry';
+import { deskOf, type Desk } from '../vale/outfits/outfitRegistry';
 import '../vale/vale3d.css';
 
 const ValeMini = lazy(() => import('../vale/ValeMini'));
@@ -16,8 +16,9 @@ const weak = () => {
  * first (the path never waits for 3D); the 3D canvas loads once the page is
  * idle, on capable devices with WebGL.
  */
-export default function ValeSeat({ level, reduced, size = 140 }: { level: string; reduced: boolean; size?: number }) {
-  const desk = deskOf(level);
+export default function ValeSeat({ level, reduced, size = 140, outfit }: { level?: string; reduced: boolean; size?: number; outfit?: Desk | null }) {
+  // outfit: null = bare Vale (before the player has a desk).
+  const desk = outfit === undefined ? deskOf(level ?? 'Analyst') : outfit;
   const [can3d] = useState(() => typeof window !== 'undefined' && hasWebGL() && !weak());
   const [armed, setArmed] = useState(false);
   const [ready, setReady] = useState(false);
@@ -30,7 +31,7 @@ export default function ValeSeat({ level, reduced, size = 140 }: { level: string
   }, [can3d]);
   return (
     <span className="vale-seat" style={{ width: size, height: size }} aria-hidden="true">
-      <img className={`vale-seat-poster ${ready ? 'is-gone' : ''}`} src={`/vale/poster-${desk}.webp`} alt="" width={size} height={size} decoding="async" onError={(e) => { e.currentTarget.hidden = true; }} />
+      <img className={`vale-seat-poster ${ready ? 'is-gone' : ''}`} src={desk ? `/vale/poster-${desk}.webp` : '/vale-poster.avif'} alt="" width={size} height={size} decoding="async" onError={(e) => { e.currentTarget.hidden = true; }} />
       {can3d && armed && (
         <Suspense fallback={null}>
           <ValeMini desk={desk} reduced={reduced} onReady={() => setReady(true)} />

@@ -20,6 +20,7 @@ import './Plans.css';
 import { track } from '../lib/analytics';
 import ThermalReceipt from '../components/receipt/ThermalReceipt';
 import '../components/fx/glass.css';
+import SaveDesk from '../onboarding/SaveDesk';
 import { useMeta } from '../app/useMeta';
 
 const LEVEL_SCOPE = { Analyst: 'Analyst', Associate: 'Up to Associate', VP: 'Up to VP', MD: 'All four, up to MD' };
@@ -48,8 +49,14 @@ export default function Plans() {
   const current = me?.tier?.id ?? 'free';
   const hasPlan = current !== 'free';
 
+  // A guest desk links an account before paying: the receipt and the plan need a reachable owner.
+  const [linkFirst, setLinkFirst] = useState(false);
   const start = async (plan) => {
     if (stage) return;
+    if (await api.isAnonymous?.().catch(() => false)) {
+      setLinkFirst(true);
+      return;
+    }
     setStage({ planId: plan.id, step: 'starting' });
     track('upgrade_click', { plan: plan.tier, interval: plan.interval, source: 'plans' });
     try {
@@ -102,6 +109,12 @@ export default function Plans() {
         </Item>
         <Item className="center"><BillingToggle cycle={cycle} onChange={setCycle} /></Item>
 
+        {linkFirst && (
+          <Item className="plans-link">
+            <p className="t-body"><b>Save your desk first.</b> Plans attach to an account, so your progress and your receipt stay yours.</p>
+            <SaveDesk onSaved={() => {}} onContinue={() => setLinkFirst(false)} />
+          </Item>
+        )}
         {error && <div className="alert" role="alert">{error.message}</div>}
         {!data ? (
           <div className="plans-grid">{[0, 1, 2].map((i) => <Skeleton key={i} height={480} />)}</div>

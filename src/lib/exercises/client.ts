@@ -27,7 +27,7 @@ const uuid = () =>
 export const newAttemptId = uuid;
 
 type Api = {
-  startLesson?: (skill: string) => Promise<{ sessionId: string; items: ExercisePublic[]; midasDay?: boolean } | null>;
+  startLesson?: (skill: string, difficulty?: number) => Promise<{ sessionId: string; items: ExercisePublic[]; midasDay?: boolean } | null>;
   submitLessonAnswer?: (req: unknown) => Promise<SubmitResponse>;
   finishLesson?: (id: string) => Promise<{ streak?: number } | null>;
   saveLesson: (o: { node: string; stars: number; firstTry: number; missed: string[]; cleared: string[] }) => Promise<unknown>;
@@ -35,13 +35,13 @@ type Api = {
 };
 const a = api as unknown as Api;
 
-export async function startLesson(skill: string): Promise<LessonStart> {
+export async function startLesson(skill: string, difficulty = 2): Promise<LessonStart> {
   if (SERVER) {
-    const res = await a.startLesson?.(skill);
+    const res = await a.startLesson?.(skill, difficulty);
     if (res?.sessionId) return { sessionId: res.sessionId, items: res.items, server: true, midasDay: Boolean(res.midasDay) };
   }
   const sessionId = uuid();
-  const items = buildLesson(skill, Math.floor(Math.random() * 2 ** 31));
+  const items = buildLesson(skill, Math.floor(Math.random() * 2 ** 31), difficulty);
   local.set(sessionId, { skill, items, run: 0, answered: new Map(), right: 0, best: 0 });
   return { sessionId, items: items.map((b) => b.pub), server: false, midasDay: false };
 }

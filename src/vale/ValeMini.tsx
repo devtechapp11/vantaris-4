@@ -63,7 +63,7 @@ function Pulse() {
  * Vale beside the active node: one small canvas (140 px), dpr ≤ 1.5, the
  * low-detail body, the player's desk outfit. Tap: he hops (no Midas here).
  */
-export default function ValeMini({ desk, reduced, onReady }: { desk: Desk; reduced: boolean; onReady?: () => void }) {
+export default function ValeMini({ desk, reduced, onReady }: { desk: Desk | null; reduced: boolean; onReady?: () => void }) {
   const [ready, setReady] = useState(false);
   useEffect(() => {
     valeOutfit.set(desk);

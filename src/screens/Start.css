@@ -1,0 +1,84 @@
+/* /start — one question per screen, centred, the CTA always in reach. Tokens only. */
+.st {
+  position: relative; min-height: 100dvh; display: grid; place-items: center;
+  padding: calc(var(--safe-top) + var(--sp-8)) var(--gutter-r) calc(var(--safe-bottom) + var(--sp-8)) var(--gutter);
+  background: var(--void);
+}
+.st-step { width: 100%; max-width: 520px; display: flex; flex-direction: column; align-items: center; gap: var(--sp-6); text-align: center; }
+.st--lesson { padding: 0; place-items: stretch; }
+.st--lesson .st-step { max-width: none; }
+.st-lesson { width: 100%; text-align: left; }
+.st-h1 { margin: 0; font: 700 clamp(26px, 6vw, 32px)/1.15 var(--font-sans); letter-spacing: -0.01em; text-wrap: balance; }
+.st-p { margin: 0; color: var(--fg-2); font-size: var(--fs-md); line-height: 1.5; }
+.st-note { margin: 0; color: var(--fg-2); font-size: var(--fs-sm); }
+.st-kicker { margin: 0; font: 500 12px/1 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-2); }
+.st-cta { width: 100%; }
+.st-exit { position: absolute; top: calc(var(--safe-top) + var(--sp-4)); left: var(--gutter); width: 44px; height: 44px; display: grid; place-items: center; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--fg-2); cursor: pointer; }
+
+/* 1 · Awaken: out of the dark */
+.st-awaken { display: grid; place-items: center; padding: 0; border: 0; background: transparent; cursor: pointer; animation: st-wake 1.6s var(--ease-out, ease) both; }
+.st-awaken.is-still { animation-duration: 300ms; }
+@keyframes st-wake { from { opacity: 0; filter: brightness(0.2); transform: translateY(12px); } }
+
+/* 2 · First deal */
+.st-deal { width: 100%; display: flex; flex-direction: column; gap: var(--sp-5); text-align: left; }
+.st-deal .st-kicker { text-align: center; }
+.st-after { display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); }
+.st-verdict { display: flex; align-items: center; gap: var(--sp-2); margin: 0; font-weight: 700; color: var(--fg); }
+.st-brief { margin: 0; color: var(--fg-2); font-size: var(--fs-sm); line-height: 1.5; text-align: center; }
+
+/* 3 · Ambition */
+.st-choice { width: 100%; display: flex; flex-direction: column; gap: var(--sp-6); }
+.st-options { display: grid; gap: var(--sp-3); }
+.st-option {
+  min-height: 56px; padding: var(--sp-3) var(--sp-5); border-radius: var(--radius-md); border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--void-2) 80%, transparent); color: var(--fg); font: 600 var(--fs-md)/1.2 var(--font-sans); cursor: pointer;
+  transition: border-color var(--dur-fast), transform var(--dur-fast);
+}
+.st-option:hover { border-color: var(--line-strong); }
+.st-option:active { transform: scale(0.99); }
+.st-options--desk .st-option { font-weight: 800; font-size: clamp(18px, 4.6vw, 22px); letter-spacing: 0.02em; }
+
+/* 4 · Commitment and the seal */
+.st-commit { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--sp-5); }
+.st-goals { width: 100%; display: grid; gap: var(--sp-3); }
+.st-goal {
+  position: relative; display: flex; align-items: baseline; gap: var(--sp-3); min-height: 56px; padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--radius-md); border: 1px solid var(--line); background: color-mix(in srgb, var(--void-2) 80%, transparent);
+  color: var(--fg); font: inherit; text-align: left; cursor: pointer;
+}
+.st-goal.is-on { border-color: var(--chrome-400); background: var(--steel-800); }
+.st-goal-min { font-weight: 600; min-width: 64px; }
+.st-goal-label { color: var(--fg-2); }
+.st-goal-tick { position: absolute; right: var(--sp-4); top: 50%; translate: 0 -50%; color: var(--chrome-200); }
+.st-seal-wrap { position: relative; width: 100%; }
+.st-seal {
+  position: absolute; left: 50%; top: -18px; translate: -50% -100%; rotate: -8deg; pointer-events: none;
+  padding: 10px 16px; border-radius: 10px; border: 2px solid var(--chrome-300);
+  background: var(--metal-brushed); -webkit-background-clip: padding-box; background-clip: padding-box;
+  font: 600 14px/1 var(--font-mono); letter-spacing: 0.12em; color: var(--void);
+  box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--void) 80%, transparent);
+  animation: st-stamp 420ms cubic-bezier(.2, 1.4, .4, 1) both;
+}
+.st-seal.is-still { animation: none; }
+@keyframes st-stamp { from { scale: 2.2; opacity: 0; } 60% { opacity: 1; } }
+
+/* 6 · Save */
+.st-save { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); }
+.sd { width: 100%; display: flex; flex-direction: column; gap: var(--sp-3); }
+.sd-btn { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
+.sd-later { align-self: center; }
+.sd-form { display: flex; flex-direction: column; gap: var(--sp-3); text-align: left; }
+.sd-label { font: 500 12px/1 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-2); }
+.sd-input {
+  min-height: 52px; padding: 0 var(--sp-4); border-radius: var(--radius-md); border: 1px solid var(--line-strong);
+  background: var(--void-2); color: var(--fg); font: inherit; font-size: var(--fs-md);
+}
+.sd-input:focus-visible { outline: 2px solid var(--chrome-300); outline-offset: 2px; }
+.sd-note { margin: 0; color: var(--fg-2); line-height: 1.5; }
+.sd-error { margin: 0; color: var(--loss); font-size: var(--fs-sm); }
+
+@media (prefers-reduced-motion: reduce) { .st-awaken, .st-seal { animation: none; } }
+/* The bare still has its own dark ground: feather it into the void. */
+.st .vale-seat-poster { -webkit-mask-image: radial-gradient(closest-side, #000 62%, transparent); mask-image: radial-gradient(closest-side, #000 62%, transparent); }
+.st-seal { white-space: nowrap; }

@@ -24,6 +24,8 @@ type Props = {
   onExit: () => void;
   /** After the results: the XP really credited. */
   onDone: (xp: number) => void;
+  /** 1–3: onboarding calibrates it from « Who's playing? ». */
+  difficulty?: number;
 };
 
 type Value = string | null | (string | null)[] | number | { mistakes: number; ms: number };
@@ -46,7 +48,7 @@ const starsFor = (right: number, total: number) => (right === total ? 3 : right 
  * Feedback matrix: visual + sound + haptics + Vale, in sync.
  * Keys: 1–4 pick, Enter checks / continues, Escape leaves.
  */
-export default function LessonShell({ skill, title, onExit, onDone }: Props) {
+export default function LessonShell({ skill, title, onExit, onDone, difficulty }: Props) {
   const reduce = useReducedMotion();
   const [start, setStart] = useState<LessonStart | null>(null);
   const [failed, setFailed] = useState(false);
@@ -63,7 +65,7 @@ export default function LessonShell({ skill, title, onExit, onDone }: Props) {
 
   useEffect(() => {
     let live = true;
-    startLesson(skill).then((s) => {
+    startLesson(skill, difficulty).then((s) => {
       if (!live) return;
       setStart(s);
       setValue(initial(s.items[0]));

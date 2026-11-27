@@ -3,7 +3,7 @@
 export const loaders = {
   landing: () => import('../screens/Landing'),
   auth: () => import('../screens/Auth'),
-  onboarding: () => import('../screens/Onboarding'),
+  start: () => import('../screens/Start'),
   home: () => import('../screens/Path'),
   learn: () => import('../screens/Learn'),
   lesson: () => import('../screens/Lesson'),
@@ -28,6 +28,7 @@ const BY_PATH = [
   [/^\/profile$/, 'profile'],
   [/^\/plans$/, 'plans'],
   [/^\/(signin|signup|forgot)$/, 'auth'],
+  [/^\/start$/, 'start'],
   [/^\/(terms|privacy|refund|cookies|disclaimer|acceptable-use|subscription-terms|contact)$/, 'legal'],
 ];
 

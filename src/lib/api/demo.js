@@ -298,6 +298,27 @@ export const api = {
     save();
     emit('SIGNED_OUT');
   },
+  async signInAnonymously() {
+    await wait(250);
+    state = { ...blank(), account: { email: null, password: null, display_name: 'Analyst' }, signedIn: true, anonymous: true };
+    requireUser();
+    save();
+    emit('SIGNED_IN');
+  },
+  async isAnonymous() {
+    return Boolean(state.anonymous);
+  },
+  async linkGoogle() {
+    await wait(200);
+    throw new ApiError('UNAVAILABLE', 'Google sign-in is not available in the preview. Use email.');
+  },
+  async linkEmail(email) {
+    await wait(300);
+    requireUser();
+    state.account.email = String(email).trim().slice(0, 120);
+    state.anonymous = false;
+    save();
+  },
   async sendPasswordReset() { await wait(400); },
   async resendConfirmation() { await wait(300); },
   async updatePassword(password) {
@@ -472,6 +493,7 @@ export const api = {
   // The preview grades V4 lessons on the device (src/lib/exercises/client.ts).
   async startLesson() { return null; },
   async submitLessonAnswer() { return null; },
+  async submitFirstDeal() { return null; },
   async finishLesson() { return null; },
   async submitExercise() { return null; },
   async saveBlitz(score) {

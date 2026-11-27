@@ -107,6 +107,25 @@ export const api = {
     const { error } = await supabase.auth.updateUser({ password });
     if (error) throw fromAuth(error);
   },
+  // Guest desks (onboarding): the same user id survives linking, so the XP stays.
+  async signInAnonymously() {
+    const { error } = await supabase.auth.signInAnonymously();
+    if (error) throw fromAuth(error);
+  },
+  async isAnonymous() {
+    const { data } = await supabase.auth.getSession();
+    return Boolean(data.session?.user?.is_anonymous);
+  },
+  async linkGoogle() {
+    const { error } = await supabase.auth.linkIdentity({ provider: 'google', options: { redirectTo: redirectTo('/') } });
+    if (error?.code === 'identity_already_exists') throw new ApiError('IDENTITY_TAKEN', 'This Google account already has a desk.');
+    if (error) throw fromAuth(error);
+  },
+  async linkEmail(email) {
+    const { error } = await supabase.auth.updateUser({ email }, { emailRedirectTo: redirectTo('/') });
+    if (error?.code === 'email_exists') throw new ApiError('IDENTITY_TAKEN', 'This email already has a desk.');
+    if (error) throw fromAuth(error);
+  },
 
   // ----- game -----
   getMe: () => rpc('get_me'),
@@ -146,8 +165,9 @@ export const api = {
   nextExercise: (skill) => softInvoke('generate-exercise', { skill }),
   submitExercise: (id, choice) => softInvoke('submit-answer', { exercise_id: id, choice }),
   // V4 lessons graded on the server (null until the functions are deployed).
-  startLesson: (skill) => softInvoke('generate-exercise', { mode: 'lesson', skill }),
+  startLesson: (skill, difficulty) => softInvoke('generate-exercise', { mode: 'lesson', skill, difficulty }),
   submitLessonAnswer: (req) => invoke('submit-answer', req),
+  submitFirstDeal: (req) => softInvoke('submit-answer', req),
   finishLesson: (sessionId) => softInvoke('submit-answer', { finish: sessionId }),
   saveBlitz: (score) => rpc('save_blitz', { p_score: Math.max(0, Math.min(5000, Math.round(score))) }),
 
