@@ -24,3 +24,18 @@ Deno.test('an over-long brief is rejected', () => {
   const scenario = `Cash of ${ex.numbers[0]} next year, ${ex.numbers[1]} required return, ${ex.numbers[2]} growth after that.`;
   assertEquals(acceptNarrative({ scenario, brief: { ...brief, rule: 'x'.repeat(200) } }, ex), null);
 });
+
+// ---------- V4 lessons ----------
+const { lessonItems } = await import('../generate-exercise/index.ts');
+
+Deno.test('a lesson keeps the engine wording when the writer fails twice, and has a non-MCQ', async () => {
+  let calls = 0;
+  const items = await lessonItems('dcf', 11, 2, async () => {
+    calls += 1;
+    return null;
+  });
+  assertEquals(items.length, 5);
+  assert(items.some((b) => b.pub.kind !== 'mcq'));
+  assert(calls <= 2 * items.filter((b) => b.pub.kind === 'mcq').length);
+  for (const b of items) assert(!JSON.stringify(b.pub).includes('"correct"'));
+});

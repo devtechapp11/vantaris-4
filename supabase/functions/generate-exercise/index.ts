@@ -11,6 +11,8 @@ import { HttpError, authed, body, corsHeaders, fail, json } from '../_shared/htt
 import { makeExercise, mentionsAll, templatesFor, type Exercise } from '../_shared/templates.ts';
 import { DealBriefSchema } from '../_shared/dealBrief.ts';
 import { START, pickDifficulty } from '../_shared/elo.ts';
+import { buildLesson, type Built } from '../_shared/lesson.ts';
+import { ExercisePublic } from '../_shared/exercise-schema.ts';
 
 const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
 const SKILLS = ['statements', 'dcf', 'comps', 'precedents', 'lbo', 'ma', 'restructuring', 'structuring'];
@@ -72,12 +74,57 @@ async function narrate(ex: Exercise): Promise<z.infer<typeof Narrative> | null> 
   }
 }
 
+/**
+ * Lesson mode: five items from the engine, keys stored server-side, public
+ * payloads returned. Multiple-choice wording may be re-told by Gemini; the
+ * result must still pass the shared contract, with two tries at most,
+ * otherwise the engine's own wording is kept.
+ */
+export async function lessonItems(skill: string, seed: number, difficulty: number, tell: (ex: Exercise) => Promise<z.infer<typeof Narrative> | null> = narrate): Promise<Built[]> {
+  const built = buildLesson(skill, seed, difficulty);
+  return Promise.all(built.map(async (b) => {
+    if (b.pub.kind !== 'mcq') return b;
+    const ex = makeExercise(b.src.template, b.src.seed, b.src.difficulty);
+    for (let i = 0; i < 2; i++) {
+      const story = await tell(ex);
+      if (!story) continue;
+      const pub = ExercisePublic.safeParse({ ...b.pub, prompt: `${story.scenario} ${ex.question}`.slice(0, 400) });
+      if (pub.success) return { ...b, pub: pub.data };
+    }
+    return b;
+  }));
+}
+
+async function startLesson(req: Request, db: SupabaseLike, user: string, anonymous: boolean, skill: string) {
+  const { data: gate, error } = await db.rpc('begin_generation', { p_user: user });
+  if (error) throw error;
+  const difficulty = pickDifficulty(Number(gate?.rating?.[skill] ?? START));
+  const seed = crypto.getRandomValues(new Uint32Array(1))[0];
+  const { data: opened, error: openError } = await db.rpc('begin_lesson', { p_user: user, p_skill: skill, p_seed: seed, p_anonymous: anonymous });
+  if (openError) throw openError;
+  if (!opened?.allowed) throw new HttpError(429, 'ANON_LIMIT', 'Save your desk to keep playing today.');
+  const items = await lessonItems(skill, seed, difficulty);
+  const { error: insertError } = await db.from('lesson_items').insert(items.map((b, position) => ({
+    session_id: opened.session_id, exercise_id: b.pub.id, position, pub: b.pub, key: b.key, brief: b.brief, base_xp: b.base,
+  })));
+  if (insertError) throw insertError;
+  return json(req, 200, { sessionId: opened.session_id, midasDay: Boolean(opened.midas_day), items: items.map((b) => b.pub) });
+}
+
+// deno-lint-ignore no-explicit-any
+type SupabaseLike = any;
+
 export async function handle(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders(req) });
   if (req.method !== 'POST') return json(req, 405, { error: 'METHOD_NOT_ALLOWED' });
   try {
-    const { db, user } = await authed(req);
+    const { db, user, anonymous } = await authed(req);
     const input = await body(req);
+    if (input.mode === 'lesson') {
+      const lessonSkill = typeof input.skill === 'string' && SKILLS.includes(input.skill) ? input.skill : null;
+      if (!lessonSkill) throw new HttpError(400, 'BAD_REQUEST', 'Unknown skill');
+      return await startLesson(req, db, user, anonymous, lessonSkill);
+    }
     const skill = typeof input.skill === 'string' && SKILLS.includes(input.skill) ? input.skill : null;
     if (!skill) throw new HttpError(400, 'BAD_REQUEST', 'Unknown skill');
     const templates = templatesFor(skill);

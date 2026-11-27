@@ -68,10 +68,43 @@ production deploy.
   - It fails on any page or console error and on horizontal overflow.
   - `design/qa/` is git-ignored.
 
+## Phase 5 — Exercise engine (4 formats) and server validation ✅
+
+- **Shared contract**
+  - `src/lib/exercises/schema.ts` (the brief's A6), copied by `scripts/sync-shared.mjs` to `supabase/functions/_shared/exercise-schema.ts`. The repo's convention is a generated copy with the zod import rewritten, not a `deno.json` mapping.
+  - `src/lib/exercises/lesson.ts`, synced too: `buildLesson(skill, seed)` gives five items from the deterministic finance engine:
+    - three multiple-choice questions, one formula build, one valuation slider, so at least one item is never multiple choice;
+    - keys can be recomputed on the server from (template, seed);
+    - the slider's target is the engine's exact answer, and its track is off-centre so the middle is never the answer;
+    - a formula uses only its own blocks plus two decoys; a bracketed group is one block, and subscripts are plain digits because the fonts have no subscript glyphs.
+  - Also `grade()`, `xpFor()`, `comboAfter()` and `isMilestone()`.
+- **Migration `supabase/migrations/20261127120000_v4_lessons_server.sql`** (not applied)
+  - Tables: `lesson_sessions`, `lesson_items` (keys, no player policy), `lesson_answers` (`attempt_id` primary key, unique on session + exercise).
+  - RPCs (service role only): `begin_lesson` (anonymous players get 3 lessons a day), `record_lesson_answer` (idempotent, combo over the session, the brief's multipliers ×2 / ×3 / ×5 at 3 / 5 / 8 in a row, XP shares the 400-a-day lesson cap), `finish_lesson` (streak on the local date, earned freezes).
+  - `_is_anonymous()` reads the JWT claim.
+- **Edge Functions** (not deployed)
+  - `generate-exercise` gains `mode: 'lesson'`: it stores the keys and returns only public payloads. Gemini may re-tell multiple-choice wording (two tries); the result must pass the shared contract, otherwise the engine's wording is kept.
+  - `submit-answer` gains `{ sessionId, exerciseId, answer, attemptId }`, which returns a `SubmitResponse` (revealId, stars, dealBrief, midasState), and `{ finish: sessionId }`. The onboarding first deal's key is seeded on the server (`onb-first-deal`).
+  - `authed()` now also returns `anonymous`.
+- **Client** (`src/lib/exercises/client.ts`)
+  - `VITE_LESSON_SERVER=1` switches to server grading once the functions are deployed.
+  - Without it, which is the default today, the same lesson is built and graded on the device, and the XP is credited once at the end by the existing `credit_lesson_xp`. The screen shows only what is really credited: 10 per right answer, and the ticket prints the server's credited amount.
+- **Components** (`src/exercise/engine/`): `McqCard` (keys 1–4), `FormulaBuilder` (tap or drag, snap click), `PairMatch` (per-pair feedback), `ValuationSlider` (live value, tick and tap haptic), and `LessonShell`:
+  - segmented progress; a combo badge from 2× (chrome from 3×);
+  - CHECK with a 150 ms lock-in, a shimmer after 600 ms, and Retry after 8 s with the same `attemptId`;
+  - a feedback sheet (Deal Brief in one line, then Continue), announced through `aria-live`;
+  - the last exercise uses « Hold to close the deal » (700 ms);
+  - results: stars docking one by one, then a thermal ticket stamped CLOSED;
+  - keys: 1–4, Enter, Escape.
+- **Feedback matrix**: Midas Touch from the tap point, `plink` or `combo(m)`, haptic cues, MetalBurst from ×3, `valeBus` delight or wow, Midas State at ×5. A miss shakes the card 6 px twice, rings the right option and sends Vale's gaze to it.
+- **Route `/lesson/:node`** (focus screen). The existing `/learn/:node` keeps its content and gains the Midas edge on its options.
+- **Tests**: 22 unit tests (multipliers, stars, every lesson valid with a non-MCQ, deterministic rebuild, grading, an off-centre slider) and 18 Deno tests (a lesson keeps the engine wording when the writer fails twice). `submit-answer`'s idempotency is enforced in SQL (`attempt_id` primary key); the repo has no harness that runs plpgsql here, so it is listed for Dev's `npm run test:sql`.
+
 ## Decisions to confirm (defaults applied)
 
 - [DÉCISION DEV] Outfits are procedural. Plan B, if they read as toys: Blender, then GLB with Draco, under 300 KB per outfit, loaded lazily.
 
 ## Manual actions for Dev
 
-- (filled in as phases land)
+- Apply `supabase/migrations/20261127120000_v4_lessons_server.sql`, deploy `generate-exercise` and `submit-answer`, then build with `VITE_LESSON_SERVER=1`. Until then, lessons are graded on the device and credited by `credit_lesson_xp`.
+- The existing problem combo (`combo_multiplier`: ×5 from 10 in a row) differs from V4 lessons (×5 from 8). It was left unchanged.

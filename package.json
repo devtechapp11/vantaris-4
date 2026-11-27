@@ -18,7 +18,7 @@
     "typecheck": "tsc --noEmit",
     "check:palette": "node scripts/check-palette.mjs",
     "prebuild": "node scripts/check-palette.mjs",
-    "test": "node scripts/sync-shared.mjs --check && node --test src/lib/finance/*.test.ts src/pedagogy/*.test.ts",
+    "test": "node scripts/sync-shared.mjs --check && node --test src/lib/finance/*.test.ts src/pedagogy/*.test.ts src/lib/exercises/*.test.ts",
     "postbuild": "node scripts/check-dist.mjs",
     "check:dist": "node scripts/check-dist.mjs",
     "build:qa": "QA_BASE=/ vite build --mode demo --outDir dist-qa",

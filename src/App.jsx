@@ -33,6 +33,7 @@ const ResetPassword = lazy(() => loaders.auth().then((m) => ({ default: m.ResetP
 const Onboarding = lazy(loaders.onboarding);
 const Path = lazy(loaders.home);
 const Learn = lazy(loaders.learn);
+const Lesson = lazy(loaders.lesson);
 const Blitz = lazy(loaders.blitz);
 const Practice = lazy(loaders.practice);
 const Problem = lazy(loaders.problem);
@@ -51,7 +52,7 @@ const DevVale = DEV_PAGES ? lazy(() => import('./dev/DevVale')) : null;
 const Router = IS_DEMO ? MemoryRouter : BrowserRouter;
 // The preview build keeps its route in memory; a direct address to a known
 // screen (QA captures, /dev/*) still opens there.
-const DIRECT = /^\/(dev\/|start$|app$|learn\/|blitz$|practice|ranking$|profile$|plans$|signin$|signup$)/;
+const DIRECT = /^\/(dev\/|start$|app$|learn\/|lesson\/|blitz$|practice|ranking$|profile$|plans$|signin$|signup$)/;
 const routerProps = IS_DEMO && typeof location !== 'undefined' && DIRECT.test(location.pathname) ? { initialEntries: [location.pathname] } : {};
 
 export default function App() {
@@ -85,13 +86,13 @@ function Splash() {
 // Screens that show the tab bar on phones (the tabs plus the two desk screens).
 const TAB_PATHS = new Set([...TABS.map((t) => t.to), '/practice']);
 // Focus screens: no sidebar, no tabs, nothing between the player and the question.
-const isFocus = (path) => path.startsWith('/learn/');
+const isFocus = (path) => path.startsWith('/learn/') || path.startsWith('/lesson/');
 // Sign in, sign up and forgot password are one screen: switching between them
 // is a shared-layout animation, not a page transition.
 const AUTH_PATHS = new Set(['/signin', '/signup', '/forgot']);
 const routeKey = (path) => (AUTH_PATHS.has(path) ? 'auth' : path === '/welcome' ? '/' : path);
 // App screens that need an account: signed-out visitors go to sign in, not to a 404.
-const APP_PATHS = ['/learn/:node', '/blitz', '/practice', '/practice/:id', '/ranking', '/profile', '/plans', '/onboarding'];
+const APP_PATHS = ['/learn/:node', '/lesson/:node', '/blitz', '/practice', '/practice/:id', '/ranking', '/profile', '/plans', '/onboarding'];
 const legalRoutes = LEGAL_ORDER.map((slug) => <Route key={slug} path={`/${slug}`} element={<Legal />} />);
 
 function Gate() {
@@ -164,6 +165,7 @@ function Gate() {
       <>
         <Route path="/" element={<Path />} />
         <Route path="/learn/:node" element={<Learn />} />
+        <Route path="/lesson/:node" element={<Lesson />} />
         <Route path="/blitz" element={<Blitz />} />
         <Route path="/practice" element={<Practice />} />
         <Route path="/ranking" element={<Ranking />} />

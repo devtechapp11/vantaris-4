@@ -44,13 +44,13 @@ export function json(req: Request, status: number, body: unknown): Response {
 }
 
 /** The service client and the signed-in player, or a 401. */
-export async function authed(req: Request): Promise<{ db: SupabaseClient; user: string }> {
+export async function authed(req: Request): Promise<{ db: SupabaseClient; user: string; anonymous: boolean }> {
   const db = createClient(secret('SUPABASE_URL'), serviceKey(), { auth: { persistSession: false, autoRefreshToken: false } });
   const token = req.headers.get('authorization')?.match(/^Bearer\s+(.+)$/i)?.[1];
   if (!token) throw new HttpError(401, 'UNAUTHENTICATED', 'Sign in to continue');
   const { data, error } = await db.auth.getUser(token);
   if (error || !data?.user) throw new HttpError(401, 'UNAUTHENTICATED', 'Your session has expired. Sign in again.');
-  return { db, user: data.user.id };
+  return { db, user: data.user.id, anonymous: Boolean((data.user as { is_anonymous?: boolean }).is_anonymous) };
 }
 
 export async function body(req: Request, max = 4096): Promise<Record<string, unknown>> {

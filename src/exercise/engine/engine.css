@@ -1,0 +1,93 @@
+/* The V4 lesson loop: one exercise, one CHECK, a feedback sheet. Tokens only. */
+.xl {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--sp-6);
+  max-width: 640px;
+  margin: 0 auto;
+  padding: calc(var(--safe-top) + var(--sp-4)) var(--gutter-r) calc(var(--safe-bottom) + var(--sp-4)) var(--gutter);
+}
+.xl--center { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-6); text-align: center; }
+.xl-note { margin: 0; color: var(--fg-2); font-size: var(--fs-sm); }
+
+.xl-top { display: flex; align-items: center; gap: var(--sp-4); min-height: 48px; }
+.xl-close { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--fg-2); cursor: pointer; }
+.xl-close:hover { color: var(--fg); }
+.xl-progress { flex: 1; display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.xl-progress li { flex: 1; height: 6px; border-radius: 3px; background: var(--steel-800); transition: background-color var(--dur-base); }
+.xl-progress li.is-now { background: var(--steel-700); }
+.xl-progress li.is-done { background: var(--chrome-button); }
+.xl-combo { font: 600 15px/1 var(--font-mono); font-variant-numeric: tabular-nums; padding: 8px 10px; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--chrome-200); }
+.xl-combo.is-chrome { background: var(--chrome-button); color: var(--void); border-color: transparent; }
+
+.xl-stage { display: flex; flex-direction: column; justify-content: center; }
+.xq { display: flex; flex-direction: column; gap: var(--sp-5); border-radius: var(--radius-md); }
+.xq-prompt { margin: 0; font-size: var(--fs-lg); line-height: 1.45; color: var(--fg); text-wrap: pretty; }
+
+/* Multiple choice */
+.xq-choices { display: grid; gap: var(--sp-3); }
+.xq-choice {
+  display: flex; align-items: center; gap: var(--sp-3);
+  min-height: 56px; padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-md); border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--void-2) 80%, transparent);
+  color: var(--fg); text-align: left; font: inherit; font-size: var(--fs-md); cursor: pointer;
+  transition: border-color var(--dur-fast), transform var(--dur-fast);
+}
+.xq-choice:hover:not(:disabled) { border-color: var(--line-strong); }
+.xq-choice.is-chosen { border-color: var(--chrome-400); background: var(--steel-800); }
+.xq-choice.is-right { border-color: var(--gain); box-shadow: 0 0 0 2px color-mix(in srgb, var(--gain) 45%, transparent); }
+.xq-choice.is-wrong { border-color: var(--loss); }
+.xq-key { flex: none; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 6px; border: 1px solid var(--line); font: 500 12px/1 var(--font-mono); color: var(--fg-2); }
+.xq-label { font-variant-numeric: tabular-nums; }
+
+/* Formula builder */
+.xf-slots { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: 0; padding: 0; list-style: none; }
+.xf-slot { min-width: 64px; min-height: 48px; padding: 0 var(--sp-3); border-radius: var(--radius-sm); border: 1px dashed var(--steel-500); background: transparent; color: var(--fg); font: 500 15px/1 var(--font-mono); cursor: pointer; transition: border-color var(--dur-fast), background-color var(--dur-fast); }
+.xf-slot.is-filled { border-style: solid; border-color: var(--chrome-400); background: var(--steel-800); animation: xf-snap 180ms cubic-bezier(.2, 1.6, .4, 1); }
+.xf-bank { display: flex; flex-wrap: wrap; gap: var(--sp-2); padding-top: var(--sp-4); border-top: 1px solid var(--line); }
+.xf-token { min-height: 48px; padding: 0 var(--sp-4); border-radius: var(--radius-sm); border: 1px solid var(--line-strong); background: var(--void-2); color: var(--fg); font: 500 15px/1 var(--font-mono); cursor: grab; touch-action: none; transition: opacity var(--dur-fast); }
+.xf-token:disabled { opacity: 0.25; cursor: default; }
+@keyframes xf-snap { from { transform: scale(1.08); } }
+
+/* Pairs */
+.xp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+.xp-col { display: grid; gap: var(--sp-2); align-content: start; }
+.xp-item { min-height: 52px; padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--void-2); color: var(--fg); font: inherit; font-size: var(--fs-sm); text-align: left; cursor: pointer; }
+.xp-item[aria-pressed='true'] { border-color: var(--chrome-400); }
+.xp-item.is-done { border-color: var(--gain); opacity: 0.55; }
+.xp-item.is-miss { border-color: var(--loss); animation: xp-shake 300ms; }
+@keyframes xp-shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+/* Valuation slider */
+.xs-value { display: block; font: 600 clamp(32px, 7vw, 48px)/1 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--chrome-200); }
+.xs-range { width: 100%; height: 44px; accent-color: var(--chrome-300); cursor: pointer; }
+.xs-scale { display: flex; justify-content: space-between; font: 500 12px/1 var(--font-mono); color: var(--fg-3, var(--steel-500)); }
+
+/* Footer: CHECK, the closing signature, the feedback sheet */
+.xl-foot { position: sticky; bottom: 0; padding-bottom: var(--sp-2); }
+.xl-cta { width: 100%; }
+.xl-check { transition: transform 150ms var(--ease-out, ease); }
+.xl-check.is-locking { transform: translateY(1px) scale(0.99); }
+.xl-check.is-waiting { background-size: 200% 100%; animation: xl-wait 1.2s linear infinite; }
+@keyframes xl-wait { to { background-position: -200% 0; } }
+.xl-sheet { display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-4); border-radius: var(--radius-md); border: 1px solid var(--line); background: var(--void-2); }
+.xl-sheet.is-right { border-color: color-mix(in srgb, var(--gain) 55%, var(--line)); }
+.xl-sheet.is-wrong { border-color: color-mix(in srgb, var(--loss) 55%, var(--line)); }
+.xl-verdict { display: flex; align-items: center; gap: var(--sp-2); margin: 0; font-weight: 700; }
+.xl-verdict-icon { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 999px; background: var(--steel-800); }
+.is-right .xl-verdict-icon { color: var(--gain); }
+.is-wrong .xl-verdict-icon { color: var(--loss); }
+.xl-xp { margin-left: auto; font: 600 14px/1 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--chrome-200); }
+.xl-brief { margin: 0; color: var(--fg-2); font-size: var(--fs-sm); line-height: 1.5; }
+
+/* Results */
+.xl-title { margin: 0; font-family: var(--font-sans); font-weight: 800; font-stretch: 125%; text-transform: uppercase; font-size: clamp(28px, 6vw, 44px); }
+.xl-stars { display: flex; gap: var(--sp-3); }
+.xl-star svg { fill: var(--steel-800); stroke: var(--steel-700); stroke-width: 1; }
+.xl-star.is-on svg { fill: var(--chrome-300); stroke: var(--chrome-100); }
+
+@media (prefers-reduced-motion: reduce) {
+  .xf-slot.is-filled, .xp-item.is-miss, .xl-check.is-waiting { animation: none; }
+}

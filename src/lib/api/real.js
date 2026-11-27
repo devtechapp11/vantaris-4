@@ -145,6 +145,10 @@ export const api = {
   creditDemo: (xp) => softRpc('credit_demo_xp', { p_xp: Math.max(0, Math.round(xp ?? 0)) }),
   nextExercise: (skill) => softInvoke('generate-exercise', { skill }),
   submitExercise: (id, choice) => softInvoke('submit-answer', { exercise_id: id, choice }),
+  // V4 lessons graded on the server (null until the functions are deployed).
+  startLesson: (skill) => softInvoke('generate-exercise', { mode: 'lesson', skill }),
+  submitLessonAnswer: (req) => invoke('submit-answer', req),
+  finishLesson: (sessionId) => softInvoke('submit-answer', { finish: sessionId }),
   saveBlitz: (score) => rpc('save_blitz', { p_score: Math.max(0, Math.min(5000, Math.round(score))) }),
 
   // Public (no sign-in needed): landing page and sign-up screen.

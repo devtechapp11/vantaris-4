@@ -6,6 +6,7 @@
 import { HttpError, authed, body, corsHeaders, fail, json } from '../_shared/http.ts';
 import { makeExercise } from '../_shared/templates.ts';
 import { START, update } from '../_shared/elo.ts';
+import { finishLesson, submitLessonAnswer } from './lesson.ts';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -15,6 +16,9 @@ export async function handle(req: Request): Promise<Response> {
   try {
     const { db, user } = await authed(req);
     const input = await body(req, 1024);
+    // V4 lessons: { sessionId, exerciseId, answer, attemptId } or { finish: sessionId }.
+    if (typeof input.attemptId === 'string') return await submitLessonAnswer(req, db, user, input);
+    if (input.finish !== undefined) return await finishLesson(req, db, user, input.finish);
     const id = typeof input.exercise_id === 'string' && UUID.test(input.exercise_id) ? input.exercise_id : null;
     const choice = Number.isInteger(input.choice) && (input.choice as number) >= 0 && (input.choice as number) <= 3 ? (input.choice as number) : null;
     if (!id || choice === null) throw new HttpError(400, 'BAD_REQUEST', 'exercise_id and choice (0–3) are required');

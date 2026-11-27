@@ -469,6 +469,10 @@ export const api = {
     return { credited: amount, me: me() };
   },
   async nextExercise() { return null; },
+  // The preview grades V4 lessons on the device (src/lib/exercises/client.ts).
+  async startLesson() { return null; },
+  async submitLessonAnswer() { return null; },
+  async finishLesson() { return null; },
   async submitExercise() { return null; },
   async saveBlitz(score) {
     await wait(150);

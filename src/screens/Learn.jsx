@@ -8,6 +8,7 @@ import { sfx, comboOf } from '../lib/sfx/engine';
 import { haptics, HAPTIC } from '../lib/haptics';
 import { fieldBus } from '../fx/field/fieldBus';
 import { metalBurst } from '../fx/MetalBurst';
+import { midasTouch } from '../lib/midas/midasTouch';
 import { CHAPTERS, chapterOf, chapterOfConcept, starsFor } from '../content/path';
 import { LESSONS, TEMPLATES, answerText, grade, makeQuestion } from '../content/lessons';
 import { drawPairs } from '../content/pairs';
@@ -69,6 +70,13 @@ function plan(node, me, state) {
 }
 
 const inertia = { type: 'spring', stiffness: 110, damping: 17, mass: 1.1 };
+
+// The last touch point: the Midas edge starts where the player tapped.
+const lastPointer = { current: null };
+if (typeof window !== 'undefined') {
+  addEventListener('pointerdown', (e) => { lastPointer.current = { x: e.clientX, y: e.clientY }; }, { passive: true, capture: true });
+  addEventListener('keydown', () => { lastPointer.current = null; }, { passive: true, capture: true });
+}
 
 /** A fresh session every time the route is entered, even from the same URL. */
 export default function LearnRoute() {
@@ -177,6 +185,11 @@ function Learn() {
       haptics.fire(HAPTIC.correct);
       fieldBus.pulse(el);
       metalBurst.burst(el, 'correct');
+      // Midas Touch: the right option's edge turns Prism Chrome from where it was touched.
+      requestAnimationFrame(() => {
+        const opt = document.querySelector('.learn-body [data-state="answer"]');
+        if (opt) midasTouch(opt, lastPointer.current?.x, lastPointer.current?.y);
+      });
       valeBus.react('delight');
       setGain({ amount: xp, key: Date.now() });
       if (tier > comboOf(tally.run)) {
@@ -515,7 +528,7 @@ function ChoiceQ({ q, value, onChange, verdict }) {
             role="radio"
             aria-checked={value === i}
             aria-keyshortcuts={KEYS[i]}
-            className={`option metal ${done ? '' : 'metal--live'}`}
+            className={`option metal midas-surface ${done ? '' : 'metal--live'}`}
             data-state={state}
             disabled={done}
             onClick={() => { onChange(i); pick(); }}
