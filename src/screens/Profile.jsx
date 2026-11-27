@@ -20,6 +20,7 @@ import { BRAND, IS_DEMO } from '../lib/config';
 import { longDate, money, number, relative } from '../lib/format';
 import './Profile.css';
 import VaultShelves from '../rituals/VaultShelves';
+import PitchDeckShare from '../rituals/PitchDeckShare';
 import { useMeta } from '../app/useMeta';
 
 const SETTINGS = [
@@ -107,6 +108,7 @@ export default function Profile() {
             <div className="section-head"><h2 id="vault">Wall Street Vault</h2><span className="t-foot fig-mono">{me.path?.total ?? 0}★</span></div>
             <Vault stars={me.path?.stars} review={me.review} />
             <VaultShelves stars={me.path?.stars} />
+            <PitchDeckShare facts={{ level: profile.level, streak: profile.streak, accuracy: profile.accuracy ?? null, points: profile.points, name: profile.display_name }} />
           </Item>
         </>
       ) : tab === 'progress' ? (

@@ -84,3 +84,8 @@
 .flap-cell--sym::after { display: none; }
 .xl-flap { font-size: clamp(28px, 6vw, 40px); }
 .myrun-flap { font-size: clamp(34px, 8vw, 52px); }
+
+/* Pitch-deck share */
+.deck-share { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); }
+.deck-name { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--fg-2); font-size: var(--fs-sm); cursor: pointer; }
+.deck-note { margin: 0; width: 100%; color: var(--fg-2); font-size: var(--fs-sm); }
