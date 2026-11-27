@@ -18,6 +18,7 @@ import ValuationSlider from './ValuationSlider';
 import OpeningBell, { bellDue } from '../../rituals/OpeningBell';
 import Signature from '../../rituals/Signature';
 import Redline, { type Miss } from '../../rituals/Redline';
+import Seal from '../../rituals/Seal';
 import './engine.css';
 
 type Props = {
@@ -231,6 +232,7 @@ export default function LessonShell({ skill, title, onExit, onDone, difficulty }
           stamp={credited == null ? null : 'CLOSED'}
           onPrinted={() => credited != null && sfx.stamp()}
         />
+        {stars === 3 && credited != null && <Seal skill={skill} stamp />}
         <button type="button" className="btn btn--primary btn--lg" disabled={credited == null} onClick={() => onDone(credited ?? 0)} autoFocus>Continue</button>
       </main>
     );
