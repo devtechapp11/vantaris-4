@@ -20,6 +20,7 @@ import Signature from '../../rituals/Signature';
 import Redline, { type Miss } from '../../rituals/Redline';
 import Seal from '../../rituals/Seal';
 import { recordTicket } from '../../rituals/vault';
+import SplitFlap from '../../rituals/SplitFlap';
 import './engine.css';
 
 type Props = {
@@ -223,6 +224,7 @@ export default function LessonShell({ skill, title, onExit, onDone, difficulty }
             </motion.span>
           ))}
         </div>
+        {credited != null && <SplitFlap className="xl-flap" value={`+${credited} XP`} label={`${credited} XP credited`} />}
         <ThermalReceipt
           heading="DEAL TICKET"
           meta={title}

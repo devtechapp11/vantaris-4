@@ -13,9 +13,9 @@ import { duration, ease, spring, stagger } from '../design/tokens';
 import { number } from '../lib/format';
 import { CAREER } from '../lib/career';
 import './Ranking.css';
-import DotMatrixNumber from '../components/viz/DotMatrixNumber';
 import DotMatrixChart from '../components/viz/DotMatrixChart';
 import '../components/fx/glass.css';
+import SplitFlap from '../rituals/SplitFlap';
 import { useMeta } from '../app/useMeta';
 
 const SCOPES = [
@@ -114,7 +114,7 @@ function MyRun({ data, scope, points }) {
       <div className="myrun-top">
         <div className="stack-4">
           <p className="glass__eyebrow">Your rank · {when}</p>
-          <DotMatrixNumber value={mine?.rank ? `#${mine.rank}` : '—'} label={mine?.rank ? `Rank ${mine.rank}` : 'Not ranked yet'} dot={6} />
+          <SplitFlap className="myrun-flap" value={mine?.rank ? `#${mine.rank}` : '—'} label={mine?.rank ? `Rank ${mine.rank}` : 'Not ranked yet'} />
         </div>
         <p className="myrun-gap fig-mono">{gap != null ? `${number(gap)} XP to the seat above` : mine?.rank === 1 ? 'Top seat' : 'Close a deal to take a seat'}</p>
       </div>
