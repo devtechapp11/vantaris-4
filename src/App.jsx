@@ -21,6 +21,7 @@ import CookieBanner from './components/CookieBanner';
 import MetalBurst from './fx/MetalBurst';
 import { useSfxUnlock } from './lib/sfx/useSfx';
 import PromotionCeremony from './exercise/PromotionCeremony';
+import BreakNudge from './rituals/BreakNudge';
 import DemoCredit from './exercise/DemoCredit';
 import { LEGAL_ORDER } from './content/legal';
 import { track } from './lib/analytics';
@@ -70,6 +71,7 @@ export default function App() {
           <Toast />
           <MetalBurst />
           <PromotionCeremony />
+          <BreakNudge />
           <DemoCredit />
         </AppProvider>
       </MotionConfig>

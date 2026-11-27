@@ -89,3 +89,17 @@
 .deck-share { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); }
 .deck-name { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--fg-2); font-size: var(--fs-sm); cursor: pointer; }
 .deck-note { margin: 0; width: 100%; color: var(--fg-2); font-size: var(--fs-sm); }
+
+/* Vale yawns (45 min) */
+.yawn {
+  position: fixed; z-index: var(--z-overlay, 100); left: 50%; translate: -50% 0;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 88px); width: min(92vw, 420px);
+  display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-md); background: var(--steel-800); box-shadow: inset 0 0 0 1px var(--line), var(--shadow-lg, 0 12px 32px color-mix(in srgb, var(--obsidian) 60%, transparent));
+  animation: yawn-in 320ms ease both;
+}
+.yawn-vale { flex: none; border-radius: 50%; transform-origin: 50% 90%; animation: yawn 2.4s ease-in-out 600ms 2; }
+.yawn-text { margin: 0; flex: 1; font-size: var(--fs-sm); line-height: 1.4; }
+@keyframes yawn-in { from { opacity: 0; translate: -50% 12px; } }
+@keyframes yawn { 0%, 100% { scale: 1 1; rotate: 0deg; } 35% { scale: 0.94 1.1; rotate: -4deg; } 60% { scale: 0.96 1.08; rotate: 3deg; } }
+@media (prefers-reduced-motion: reduce) { .yawn, .yawn-vale { animation: none; } }
