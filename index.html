@@ -37,12 +37,11 @@
     <style>html,body{background:#05070B;color:#E4E8EE;margin:0}
       .prerender{display:none}
       html[data-prerender] .prerender{display:flex;min-height:100svh;box-sizing:border-box;align-items:flex-end;justify-content:center;padding:0 16px calc(env(safe-area-inset-bottom,0px) + 32px)}
-      .prerender-cue{margin:0}
     </style>
     <script src="/boot.js"></script>
   </head>
   <body>
-    <div id="root"><div class="prerender" aria-hidden="true"><p class="kicker prerender-cue">Move · Vale is awake</p></div></div>
+    <div id="root"><div class="prerender" aria-hidden="true"></div></div>
     <noscript>Vantaris needs JavaScript turned on.</noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>

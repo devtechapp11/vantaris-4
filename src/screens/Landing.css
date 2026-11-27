@@ -7,55 +7,97 @@ html.lenis, html.lenis body { height: auto; }
 .landing { background: var(--obsidian); min-height: 100dvh; }
 .landing main:focus { outline: none; }
 .landing > main, .landing > footer { position: relative; z-index: 1; }
+.lfoot { background: var(--obsidian); }
 
-/* ---------- Top bar: transparent over the hook, glass once you scroll ---------- */
-.lnav { position: fixed; top: 0; left: 0; right: 0; z-index: var(--z-nav); padding-top: var(--safe-top); transition: background-color var(--dur-base); }
+/* ---------- The stage: one fixed canvas behind every act ---------- */
+.lstage { position: fixed; inset: 0; z-index: 0; background: var(--obsidian); }
+.lstage .vale3d { position: absolute; inset: 0; opacity: 0; transition: opacity 600ms ease; }
+.lstage.is-ready .vale3d { opacity: 1; }
+.lstage .vale-poster img { width: 100%; height: 100%; object-fit: cover; }
+.lstage--still .vale-poster { opacity: 0.85; }
+
+/* ---------- Top bar: transparent over act 0, a frosted pill once you scroll ---------- */
+.lnav { position: fixed; top: 0; left: 0; right: 0; z-index: var(--z-nav); padding-top: var(--safe-top); pointer-events: none; }
 .lnav-inner { max-width: var(--col-wide); margin: 0 auto; height: 64px; padding: 0 var(--gutter-r) 0 var(--gutter); display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
+.lnav-inner > * { pointer-events: auto; }
 .lnav-brand { text-decoration: none; color: var(--fg); min-height: var(--tap); display: flex; align-items: center; }
-.lnav-links { display: flex; align-items: center; gap: var(--sp-1); }
-.lnav-links a { min-height: var(--tap); display: inline-flex; align-items: center; padding: 0 var(--sp-3); color: var(--fg-2); text-decoration: none; font-size: var(--fs-sm); font-weight: var(--fw-medium); border-radius: var(--r-sm); transition: color var(--dur-fast); }
+.lnav-links { display: flex; align-items: center; gap: var(--sp-1); padding: 4px; border-radius: 999px; transition: background-color var(--dur-base), box-shadow var(--dur-base); }
+.lnav.is-solid .lnav-links { background: color-mix(in srgb, var(--void-2) 70%, transparent); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: inset 0 0 0 1px var(--line); }
+.lnav-links a { min-height: var(--tap); display: inline-flex; align-items: center; padding: 0 var(--sp-3); color: var(--fg-2); text-decoration: none; font-size: var(--fs-sm); font-weight: var(--fw-medium); border-radius: 999px; transition: color var(--dur-fast); }
 .lnav-links a:hover { color: var(--fg); }
-.lnav-links a:last-child { color: var(--fg); }
-@media (max-width: 520px) { .lnav-links a:not(:last-child) { display: none; } }
+.lnav-sound { margin-left: var(--sp-1); }
+@media (max-width: 520px) { .lnav-links a[href="#membership"] { display: none; } }
 
-/* ---------- Acts: one idea per screen ---------- */
+/* ---------- Acts: real text over the stage; only controls take the pointer (a tap on Vale reaches the canvas) ---------- */
 .act {
-  min-height: 100svh;
+  position: relative; min-height: 100svh;
   display: flex; flex-direction: column; justify-content: center; align-items: center; gap: var(--sp-5);
   padding: calc(var(--safe-top) + 96px) var(--gutter-r) var(--sp-16) var(--gutter);
-  text-align: center;
+  text-align: center; pointer-events: none;
 }
+.act a, .act button, .act input, .act .plans-grid, .act .t-foot, .act .billing-row, .act .st-deal { pointer-events: auto; }
 .act-title {
   margin: 0; max-width: 18ch;
   font-family: var(--font-sans); font-stretch: 125%; font-weight: 800; text-transform: uppercase;
   font-size: clamp(34px, 7vw, 92px); line-height: 0.94; letter-spacing: -0.012em;
-  text-wrap: balance;
+  text-wrap: balance; text-shadow: 0 2px 30px color-mix(in srgb, var(--obsidian) 80%, transparent);
 }
+.act-title--hero { font-size: clamp(56px, 9vw, 148px); line-height: 0.9; letter-spacing: -0.02em; max-width: 12ch; }
 .act-title--sm { font-size: clamp(28px, 4.6vw, 56px); }
-/* « DO IT. »: the one word with a prism underline (1px of dispersed light) */
 .act-title-strong { display: inline-block; position: relative; padding-bottom: 0.08em; }
 .act-title-strong::after { content: ''; position: absolute; left: 4%; right: 4%; bottom: 0; height: 2px; background: var(--prism-edge); opacity: 0.9; }
-.act-line { margin: 0; max-width: 44ch; font-size: var(--fs-lg); line-height: var(--lh-body); color: var(--fg-2); text-wrap: pretty; }
+.act-line { margin: 0; max-width: 44ch; font-size: 17px; line-height: 26px; color: var(--fg-2); text-wrap: pretty; }
+.act-ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--sp-3); }
 
-/* Act 1 · Hook: Vale alone, a cue at the bottom */
-.act--hook { position: relative; justify-content: center; }
-.hook-vale { display: grid; place-items: center; }
-.hook-cue { position: absolute; left: 0; right: 0; bottom: calc(var(--safe-bottom) + var(--sp-8)); margin: 0; text-align: center; }
+/* Act 0 · no text, a « Scroll » hint after 2.5 s */
+.act--awaken { justify-content: flex-end; }
+.act-scroll { margin: 0; opacity: 0; transition: opacity 600ms ease; }
+.act-scroll.is-on { opacity: 1; }
 
-/* Act 3 · The deal: the card alone */
-.act--deal .dd { width: 100%; text-align: left; margin-top: var(--sp-4); }
-.act--deal .dd-tickets { width: 100%; max-width: 340px; text-align: left; }
+/* Act 1 · the title over the pool, below Vale */
+.act--hook { justify-content: flex-end; padding-bottom: calc(var(--safe-bottom) + var(--sp-10)); }
+.act--hook .act-title--hero { font-size: clamp(44px, min(9vw, 13svh), 148px); }
 
-/* Act 7 · The call */
-.act--final { min-height: 80svh; }
-.cta-wrap { margin-top: var(--sp-2); }
+/* Act 2 · the line above the fly-over */
+.act--promise { justify-content: flex-start; padding-top: calc(var(--safe-top) + 14svh); }
 
-/* ---------- Membership ---------- */
-.lsec { max-width: var(--col-wide); margin: 0 auto; padding: var(--sp-24) var(--gutter-r) var(--sp-16) var(--gutter); display: flex; flex-direction: column; align-items: center; gap: var(--sp-8); scroll-margin-top: 64px; }
-.lsec-head { display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); max-width: 640px; text-align: center; }
-.landing .plan-inner.metal { background: var(--surface-glass); -webkit-backdrop-filter: blur(var(--blur-xl)); backdrop-filter: blur(var(--blur-xl)); border-radius: var(--radius-md); }
+/* Act 3 · Vale on the left, the card on the right */
+.act--deal { align-items: flex-end; }
+.act-side { width: 100%; max-width: 460px; display: flex; flex-direction: column; gap: var(--sp-5); text-align: left; }
+.act--deal .act-title { max-width: none; }
+.act--deal .st-deal { padding: var(--sp-5); border-radius: var(--radius-md); background: color-mix(in srgb, var(--void-2) 82%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: inset 0 0 0 1px var(--line); }
+@media (max-width: 899px) { .act--deal { align-items: center; justify-content: flex-end; } }
+
+/* Act 4 · the dress code: four screens tall, the copy pinned */
+.act--dress { display: block; min-height: 400svh; padding: 0 var(--gutter-r) 0 var(--gutter); }
+.dress-pin { position: sticky; top: 0; height: 100svh; display: flex; flex-direction: column; justify-content: flex-start; gap: var(--sp-3); align-items: center; padding: calc(var(--safe-top) + 96px) 0 calc(var(--safe-bottom) + var(--sp-10)); text-align: center; }
+.dress-desk { margin: auto 0 0; font: 800 clamp(30px, 5.4vw, 64px)/1 var(--font-sans); letter-spacing: 0.01em; transition: font-stretch 600ms var(--ease-out, ease); }
+.dress-steps { display: flex; gap: var(--sp-2); margin: 0; padding: 0; list-style: none; }
+.dress-steps li { font: 500 12px/1 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-3, var(--steel-500)); padding: 6px 8px; border-radius: 999px; }
+.dress-steps li.is-on { color: var(--fg); box-shadow: inset 0 0 0 1px var(--line-strong); }
+.dress-hint { margin: 0; }
+.dress-flash { position: fixed; inset: 0; z-index: 2; pointer-events: none; background: var(--chrome-100); opacity: 0; animation: dress-flash 90ms linear; }
+@keyframes dress-flash { 0% { opacity: 0.18; } 100% { opacity: 0; } }
+@media (max-width: 640px) { .dress-steps li { font-size: 12px; padding: 6px 4px; } }
+
+/* Act 5 · the phone on the left, Vale on the right */
+.act--app { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: var(--sp-10); text-align: left; }
+.app-copy { display: flex; flex-direction: column; gap: var(--sp-4); max-width: 420px; }
+.app-copy .act-title { max-width: none; }
+.phone { margin: 0; width: min(300px, 72vw); aspect-ratio: 300 / 626; padding: 10px; border-radius: 44px; background: var(--metal-brushed); box-shadow: inset 0 0 0 1px var(--line-strong), 0 40px 80px -40px color-mix(in srgb, var(--obsidian) 90%, transparent); }
+.phone img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 34px; }
+@media (min-width: 900px) { .act--app { justify-content: flex-start; padding-left: max(var(--gutter), 8vw); } }
+
+/* Act 6 · membership */
+.act--membership { min-height: auto; padding-top: var(--sp-24); scroll-margin-top: 64px; }
 .billing-row { display: flex; justify-content: center; }
-.lsec .plans-grid { width: 100%; }
+.act--membership .plans-grid { width: 100%; max-width: var(--col-wide); text-align: left; }
+.landing .plan-inner.metal { background: var(--surface-glass); -webkit-backdrop-filter: blur(var(--blur-xl)); backdrop-filter: blur(var(--blur-xl)); border-radius: var(--radius-md); }
+
+/* Act 7 · the call, over the opening shot */
+.act--final { min-height: 90svh; justify-content: flex-end; padding-bottom: calc(var(--safe-bottom) + var(--sp-16)); }
+
+@media (prefers-reduced-motion: reduce) { .dress-flash { display: none; } .dress-desk { transition: none; } }
 
 /* ---------- Footer ---------- */
 .lfoot { border-top: var(--hairline) solid var(--line); }

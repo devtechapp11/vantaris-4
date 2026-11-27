@@ -83,6 +83,8 @@ export default defineConfig(({ mode, command }) => {
             if (id.includes('node_modules/@supabase')) return 'supabase';
             if (/node_modules\/(react|react-dom|react-router|scheduler)\//.test(id)) return 'react';
             if (id.includes('node_modules/motion') || id.includes('node_modules/framer-motion')) return 'motion';
+            // Post-processing is the landing's alone: left to the bundler, it lands in the landing's 3D chunk.
+            if (/node_modules\/(postprocessing|@react-three\/postprocessing)\//.test(id)) return undefined;
             // Three.js only ever loads through a dynamic import (lazy 3D scenes).
             if (/node_modules\/(three|@react-three|react-reconciler|its-fine|zustand|suspend-react|react-use-measure)\//.test(id)) return 'three';
             return undefined;

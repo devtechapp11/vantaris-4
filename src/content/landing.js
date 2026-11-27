@@ -1,19 +1,11 @@
-// Landing page copy: a pitch, one idea per screen. Titles ≤ 7 words, lines ≤ 20.
+// Landing copy (V4 brief §2.6): one idea per act, English UI.
 
-export const PITCH = {
-  hook: 'Move · Vale is awake',
-  hookTouch: 'Tap Vale',
-  promise: ['Don’t study finance.', 'Do it.'],
-  promiseLine: 'Real DCF, LBO and M&A deals, priced against the clock. Five minutes a day.',
-  deal: { title: 'Close a live deal.', line: 'Three deals, no sign-up. Save your desk and the XP comes with you.' },
-  membership: { title: 'Start free. Go Pro.', line: 'Three deals a week, free for as long as you like.' },
-  final: { title: 'Your desk is open.', cta: 'Start free' },
+export const ACTS = {
+  hook: { title: ["DON'T STUDY FINANCE.", 'DO IT.'], cta: 'Play your first deal', secondary: 'I have an account' },
+  promise: { title: 'Real deal logic. Five minutes a day.', line: 'DCF, LBO, M&A, comps and the three statements, as bite-sized deals you actually close.' },
+  deal: { title: 'Your first deal. 15 seconds.' },
+  dress: { title: 'Analyst to Managing Director.', hint: 'Touch Vale' },
+  app: { title: 'One button. Every day.', line: 'Open the app, hit Start. Streaks, combos and a desk that grows with you.' },
+  membership: { title: "Start free. Upgrade when you're winning." },
+  final: { title: 'Your desk is waiting.', cta: 'Play your first deal' },
 };
-
-// Points thresholds mirror level_for_points() in supabase/sql/schema.core.sql.
-export const LADDER = [
-  { level: 'Analyst', points: 0, line: 'Read the statements. Value the business.' },
-  { level: 'Associate', points: 251, line: 'Comps, precedents and your first LBO.' },
-  { level: 'VP', points: 501, line: 'Accretion, dilution and distressed capital.' },
-  { level: 'MD', points: 751, line: 'Structure the deal. Own the room.' },
-];

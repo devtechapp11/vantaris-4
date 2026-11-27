@@ -25,6 +25,10 @@ export const valeRig = {
   eyes: 1,
   /** Extra turn around the vertical axis, radians. */
   turn: 0,
+  /** What a tap does on the landing: a Midas Touch, or the Gold Standard demo (act 4). */
+  tapMode: 'touch' as 'touch' | 'gold',
+  /** Vale's screen x (−0.6…0.6), for the landing's stereo panner. */
+  pan: 0,
 };
 
 let blinkRequested = false;
@@ -106,11 +110,14 @@ export default function ValeModel({ reduced = false, lowPower = false, interacti
   const onTap = (e: ThreeEvent<PointerEvent>) => {
     if (!interactive) return;
     e.stopPropagation();
-    if (tapMidas) valeMidas.touch(e.point.clone());
+    if (tapMidas) {
+      if (valeRig.tapMode === 'gold') valeMidas.gold('demo');
+      else valeMidas.touch(e.point.clone());
+    }
     k.current.tap = performance.now();
     valeBus.correct(2);
     rippleBus.emit(root.current?.position.x ?? 0, 0, 0.8);
-    siteSound.play((s) => s.plink());
+    siteSound.play((s) => s.panned(valeRig.pan, (p) => p.plink()));
   };
 
   useFrame((state, dt) => {
@@ -207,6 +214,7 @@ export default function ValeModel({ reduced = false, lowPower = false, interacti
     u.uTime.value = reduced ? 0 : t;
 
     valeMidas.center.set(g.position.x, g.position.y + 0.1 * g.scale.y, g.position.z + 0.4);
+    valeRig.pan = MathUtils.clamp(tmp.x * 0.6, -0.6, 0.6);
 
     if (!s.ready) {
       s.ready = true;

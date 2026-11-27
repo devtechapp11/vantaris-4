@@ -1,0 +1,8 @@
+/* The first deal card (landing act 3 and /start). Tokens only. */
+.st-kicker { margin: 0; font: 500 12px/1 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-2); }
+.st-deal { width: 100%; display: flex; flex-direction: column; gap: var(--sp-5); text-align: left; }
+.st-deal .st-kicker { text-align: center; }
+.st-after { display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); }
+.st-verdict { display: flex; align-items: center; gap: var(--sp-2); margin: 0; font-weight: 700; color: var(--fg); }
+.st-brief { margin: 0; color: var(--fg-2); font-size: var(--fs-sm); line-height: 1.5; text-align: center; }
+

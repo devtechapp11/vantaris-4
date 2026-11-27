@@ -7,11 +7,20 @@ export const DESK_LABEL: Record<Desk, string> = { analyst: 'Analyst', associate:
 /** The `--w-<desk>` token: width is rank. */
 export const DESK_WIDTH: Record<Desk, string> = { analyst: '62%', associate: '85%', vp: '105%', md: '125%' };
 
+const LOAD = {
+  analyst: () => import('./Analyst'),
+  associate: () => import('./Associate'),
+  vp: () => import('./VP'),
+  md: () => import('./MD'),
+};
+/** Warm every outfit chunk ahead of the dress code (no flash of a bare Vale). */
+export const preloadOutfits = () => Promise.all(Object.values(LOAD).map((l) => l().catch(() => null)));
+
 export const OUTFITS = {
-  analyst: lazy(() => import('./Analyst')),
-  associate: lazy(() => import('./Associate')),
-  vp: lazy(() => import('./VP')),
-  md: lazy(() => import('./MD')),
+  analyst: lazy(LOAD.analyst),
+  associate: lazy(LOAD.associate),
+  vp: lazy(LOAD.vp),
+  md: lazy(LOAD.md),
 } satisfies Record<Desk, unknown>;
 
 /** The server's career level ('Analyst' | 'Associate' | 'VP' | 'MD') as a desk. */

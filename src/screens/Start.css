@@ -11,7 +11,6 @@
 .st-h1 { margin: 0; font: 700 clamp(26px, 6vw, 32px)/1.15 var(--font-sans); letter-spacing: -0.01em; text-wrap: balance; }
 .st-p { margin: 0; color: var(--fg-2); font-size: var(--fs-md); line-height: 1.5; }
 .st-note { margin: 0; color: var(--fg-2); font-size: var(--fs-sm); }
-.st-kicker { margin: 0; font: 500 12px/1 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-2); }
 .st-cta { width: 100%; }
 .st-exit { position: absolute; top: calc(var(--safe-top) + var(--sp-4)); left: var(--gutter); width: 44px; height: 44px; display: grid; place-items: center; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--fg-2); cursor: pointer; }
 
@@ -19,13 +18,6 @@
 .st-awaken { display: grid; place-items: center; padding: 0; border: 0; background: transparent; cursor: pointer; animation: st-wake 1.6s var(--ease-out, ease) both; }
 .st-awaken.is-still { animation-duration: 300ms; }
 @keyframes st-wake { from { opacity: 0; filter: brightness(0.2); transform: translateY(12px); } }
-
-/* 2 · First deal */
-.st-deal { width: 100%; display: flex; flex-direction: column; gap: var(--sp-5); text-align: left; }
-.st-deal .st-kicker { text-align: center; }
-.st-after { display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); }
-.st-verdict { display: flex; align-items: center; gap: var(--sp-2); margin: 0; font-weight: 700; color: var(--fg); }
-.st-brief { margin: 0; color: var(--fg-2); font-size: var(--fs-sm); line-height: 1.5; text-align: center; }
 
 /* 3 · Ambition */
 .st-choice { width: 100%; display: flex; flex-direction: column; gap: var(--sp-6); }

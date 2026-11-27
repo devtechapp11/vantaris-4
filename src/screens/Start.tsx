@@ -9,26 +9,18 @@ import { usePrefs } from '../app/prefs';
 import { timeZone } from '../lib/format';
 import { sfx } from '../lib/sfx/engine';
 import { haptic } from '../lib/haptics';
-import { midasTouch } from '../lib/midas/midasTouch';
 import { valeBus } from '../components/vale/valeBus';
-import ThermalReceipt from '../components/receipt/ThermalReceipt';
-import McqCard from '../exercise/engine/McqCard';
 import LessonShell from '../exercise/engine/LessonShell';
 import ValeSeat from '../path/ValeSeat';
 import SaveDesk from '../onboarding/SaveDesk';
 import { loadState, reduce, saveState, type Desk, type GoalMinutes, type OnboardingEvent, type OnboardingState, type Profile } from '../onboarding/machine';
-import { FIRST_DEAL, FIRST_DEAL_BRIEF, FIRST_DEAL_TICKET } from '../onboarding/firstDeal';
+import FirstDealCard, { PENDING_KEY, gradeFirstDeal } from '../onboarding/FirstDealCard';
 import { START_KEYS, put } from '../onboarding/keys';
 import { DESK_LABEL, DESK_WIDTH } from '../vale/outfits/outfitRegistry';
-import type { SubmitResponse } from '../lib/exercises/schema';
 import './Start.css';
 
 type Api = {
-  getSession: () => Promise<unknown>;
-  signInAnonymously: () => Promise<void>;
   isAnonymous: () => Promise<boolean>;
-  submitFirstDeal?: (req: unknown) => Promise<SubmitResponse | null>;
-  creditDemo: (xp: number) => Promise<{ credited: number } | null>;
   saveProfile: (o: Record<string, unknown>) => Promise<unknown>;
 };
 const a = api as unknown as Api;
@@ -48,7 +40,6 @@ const GOALS: { id: GoalMinutes; label: string }[] = [
 /** « High school » only calibrates the difficulty of the first lessons. */
 const DIFFICULTY: Record<Profile, number> = { school: 1, curious: 1, university: 2, finance: 3 };
 
-const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
 
 
 /**
@@ -67,6 +58,14 @@ export default function Start() {
   const prefs = usePrefs() as { reduceMotion?: boolean };
   const reduced = Boolean(useReducedMotion() || prefs.reduceMotion);
   const [s, setS] = useState<OnboardingState>(loadState);
+  // The landing's act 3 already played the deal: close it here, as a guest, for the real XP.
+  const [pending] = useState(() => {
+    try {
+      return sessionStorage.getItem(PENDING_KEY);
+    } catch {
+      return null;
+    }
+  });
   const send = useCallback((e: OnboardingEvent) => {
     setS((prev) => {
       const next = reduce(prev, e);
@@ -113,7 +112,11 @@ export default function Start() {
           transition={{ duration: reduced ? 0.15 : 0.32 }}
         >
           {s.step === 'awaken' && <Awaken reduced={reduced} onDone={() => send({ type: 'AWAKENED', now: Date.now() })} />}
-          {s.step === 'deal' && <FirstDeal reduced={reduced} onClosed={(xp) => send({ type: 'DEAL_CLOSED', xp })} />}
+          {s.step === 'deal' && (pending ? (
+            <ClosePending choice={pending} onClosed={(xp) => send({ type: 'DEAL_CLOSED', xp })} />
+          ) : (
+            <FirstDealCard reduced={reduced} guest onClosed={(xp) => send({ type: 'DEAL_CLOSED', xp })} />
+          ))}
           {s.step === 'aim' && !s.profile && (
             <Choice
               title="Who's playing?"
@@ -196,6 +199,29 @@ export default function Start() {
   );
 }
 
+/** The deal answered on the landing: sign in as a guest and close it on the server, then move on. */
+function ClosePending({ choice, onClosed }: { choice: string; onClosed: (xp: number) => void }) {
+  const done = useRef(onClosed);
+  useEffect(() => {
+    done.current = onClosed;
+  });
+  useEffect(() => {
+    let live = true;
+    gradeFirstDeal(choice, true).then((v) => {
+      try {
+        sessionStorage.removeItem(PENDING_KEY);
+      } catch {
+        /* nothing stored */
+      }
+      if (live) done.current(v.xp);
+    });
+    return () => {
+      live = false;
+    };
+  }, [choice]);
+  return <p className="st-note" role="status">Closing your first deal…</p>;
+}
+
 function AutoDone({ onDone }: { onDone: () => void }) {
   useEffect(() => onDone(), [onDone]);
   return null;
@@ -211,110 +237,6 @@ function Awaken({ reduced, onDone }: { reduced: boolean; onDone: () => void }) {
     <button type="button" className={`st-awaken ${reduced ? 'is-still' : ''}`} onClick={onDone} aria-label="Start">
       <ValeSeat outfit={null} reduced={reduced} size={typeof window !== 'undefined' && window.innerWidth >= 768 ? 320 : 220} />
     </button>
-  );
-}
-
-/** 2 · The first deal: fixed content, graded by the server (key seeded there). */
-function FirstDeal({ reduced, onClosed }: { reduced: boolean; onClosed: (xp: number) => void }) {
-  const [choice, setChoice] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [verdict, setVerdict] = useState<{ correct: boolean; revealId?: string; xp: number } | null>(null);
-  const card = useRef<HTMLDivElement>(null);
-  const point = useRef<{ x: number; y: number } | null>(null);
-  const attempt = useRef(uuid());
-  const session = useRef(uuid());
-
-  const check = async () => {
-    if (!choice || busy) return;
-    setBusy(true);
-    let res: SubmitResponse | null = null;
-    let signedIn = Boolean(await a.getSession().catch(() => null));
-    if (!signedIn) {
-      try {
-        await a.signInAnonymously();
-        signedIn = true;
-      } catch {
-        signedIn = false; // guest desks are off on this project: the deal still plays, without XP
-      }
-    }
-    if (signedIn) {
-      try {
-        res = (await a.submitFirstDeal?.({ sessionId: session.current, exerciseId: FIRST_DEAL.id, answer: { kind: 'mcq', choiceId: choice }, attemptId: attempt.current })) ?? null;
-      } catch {
-        res = null;
-      }
-    }
-    let v: { correct: boolean; revealId?: string; xp: number };
-    if (res) {
-      v = { correct: res.correct, revealId: res.revealId, xp: res.xpAwarded };
-    } else {
-      // Edge Function not deployed yet: the answer is the ticket's public value; XP goes through the capped demo credit.
-      const right = FIRST_DEAL.kind === 'mcq' ? FIRST_DEAL.choices.find((c) => c.label === FIRST_DEAL_TICKET.value)?.id : undefined;
-      const correct = choice === right;
-      const credit = correct && signedIn ? await a.creditDemo(10).catch(() => null) : null;
-      v = { correct, revealId: right, xp: credit?.credited ?? 0 };
-    }
-    setVerdict(v);
-    setBusy(false);
-    const el = card.current?.querySelector<HTMLElement>(`[data-choice-id="${choice}"]`);
-    if (v.correct) {
-      if (el) midasTouch(el, point.current?.x, point.current?.y);
-      sfx.correct(1);
-      haptic('correct');
-      valeBus.correct(1);
-    } else {
-      sfx.wrong();
-      haptic('wrong');
-      valeBus.wrong(card.current?.querySelector(`[data-choice-id="${v.revealId}"]`) ?? null);
-    }
-  };
-
-  useEffect(() => {
-    const key = (e: KeyboardEvent) => {
-      if (verdict) return;
-      const n = Number(e.key);
-      if (FIRST_DEAL.kind === 'mcq' && n >= 1 && n <= FIRST_DEAL.choices.length) {
-        point.current = null;
-        setChoice(FIRST_DEAL.choices[n - 1].id);
-      }
-      if (e.key === 'Enter' && choice) check();
-    };
-    addEventListener('keydown', key);
-    return () => removeEventListener('keydown', key);
-  });
-
-  if (FIRST_DEAL.kind !== 'mcq') return null;
-  return (
-    <div className="st-deal" onPointerDown={(e) => (point.current = { x: e.clientX, y: e.clientY })}>
-      <p className="st-kicker">Deal #{FIRST_DEAL_TICKET.number} · 15 seconds</p>
-      <McqCard ref={card} ex={FIRST_DEAL} value={choice} onChange={setChoice} verdict={verdict} />
-      {!verdict ? (
-        <button type="button" className="btn btn--primary btn--lg st-cta" disabled={!choice || busy} onClick={check}>
-          {busy ? 'Checking…' : 'Check'}
-        </button>
-      ) : (
-        <div className="st-after" aria-live="polite">
-          {verdict.correct ? (
-            <ThermalReceipt
-              heading={`DEAL #${FIRST_DEAL_TICKET.number}`}
-              meta={FIRST_DEAL_BRIEF.title}
-              lines={[
-                { label: 'Type', value: FIRST_DEAL_TICKET.type },
-                { label: 'Value', value: FIRST_DEAL_TICKET.value },
-                { label: 'XP credited', value: `+${verdict.xp}`, strong: true },
-              ]}
-              stamp={FIRST_DEAL_TICKET.status}
-              onPrinted={() => sfx.stamp()}
-              print={!reduced}
-            />
-          ) : (
-            <p className="st-verdict"><X size={16} aria-hidden="true" /> Not quite. The answer is {FIRST_DEAL_TICKET.value}.</p>
-          )}
-          <p className="st-brief"><b>{FIRST_DEAL_BRIEF.title}.</b> {FIRST_DEAL_BRIEF.takeaway}</p>
-          <button type="button" className="btn btn--primary btn--lg st-cta" onClick={() => onClosed(verdict.xp)} autoFocus>Keep going</button>
-        </div>
-      )}
-    </div>
   );
 }
 

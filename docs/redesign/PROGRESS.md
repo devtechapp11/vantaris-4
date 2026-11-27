@@ -148,6 +148,38 @@ production deploy.
 - **Daily goal**: kept on the device (`vt.goal.minutes`), for the in-app reminders of Phase 11. `profiles.goal` only accepts career goals (`ib`, `pe`…), so it isn't overloaded.
 - QA: the full flow was played in Playwright at 375 and 1440 (landing CTA excluded: the landing is Phase 8), with 0 errors. The first deal is on screen at about 3.7 s. Shots: `design/qa/p7`.
 
+## Phase 8 — Landing « pitch » in 8 acts ✅
+
+- **Stage**: one fixed canvas behind the acts (`src/landing/LandingStage.tsx`, lazy).
+  - `stage.ts` (the brief's A10): Lenis on the GSAP ticker, a ScrollTrigger per act, SplitText reveals word by word. Landing only.
+  - `CameraRig.tsx` (A11). Keyframes tuned on the captures:
+    - acts 1, 3, 4 and 5 adjusted;
+    - the camera holds still for the first 80 % of act 4;
+    - on portrait screens it steps back along the same line.
+  - `VelocityAberration` runs on capable screens only. Phones (`isLowPower`): DPR 1.25, a 256 px reflector, no post-processing.
+  - `@react-three/postprocessing` and `postprocessing` are left out of the shared `three` chunk, so they ship only in `LandingStage` (checked in `dist`).
+- **The act on screen** is decided by the DOM (an IntersectionObserver at the viewport's centre, `actBus`), because act 4 is four screens tall.
+  - On each act change: one ring on the pool.
+  - `whoosh` at act 2.
+  - In act 4, a tap on Vale plays the Gold Standard demo; everywhere else it plays a Midas Touch.
+- **Intro** (`Director.tsx`, act 0): a chrome drop (0–600 ms), the splash and three rings (600–1100), Vale rises from under the pool (1100–1900), his eyes light up and he blinks (1900–2300). Under reduced motion Vale is already standing. No text; the SOUND · OFF pill; « Scroll » after 2.5 s.
+- **Acts**: the §2.6 copy, all as real `h1`/`h2`/`p`.
+  - Act 1: CTAs « Play your first deal » → `/start` and « I have an account » → `/signin`; Vale glances at the title, then at the visitor.
+  - Act 3: the playable `FIRST_DEAL`, which is now a shared component (`src/onboarding/FirstDealCard.tsx`) with its own styles. It is graded on the page with no account. « Keep going » hands the answer to `/start`, which signs the guest in and closes it on the server, so the XP is real and there is no second awakening.
+  - Act 4: a sticky pin with a scrub. Each 25 % brings a 90 ms flash, the next outfit, the desk name animating `font-stretch`, and a short `promotion`. The outfits preload during act 3. « Touch Vale » appears only with 3D.
+  - Act 5: a phone showing a real capture of the Path (`public/landing/app-path.webp`, from the Phase 7 QA).
+  - Act 6: the 3 plans from the configuration, the BillingSwitch, and savings computed from the prices.
+  - Act 7: the opening shot again.
+- **Spatial sound**: `plink` (a tap, the drop), `whoosh` and `promotion` go through `sfx.panned(valeRig.pan)`, from Vale's screen x clamped to ±0.6. Everything stays behind the site's SOUND pill.
+- **Without WebGL**: Vale's poster and the same texts (checked with `--disable-webgl`).
+- **Removed**:
+  - the old demo deals (`src/landing/demo/DemoDeals`, `deals.ts`, `demo.css`);
+  - the old `PITCH` / `LADDER` copy;
+  - the hook cue in the pre-rendered shell, since act 0 has no text.
+
+  `demoScore.ts` stays because the app's `DemoCredit` still reads it.
+- QA: all 8 acts and the hand-off were walked through in Playwright at 1440 and 375, with motion, reduced motion and no WebGL: 0 errors.
+
 ## Decisions to confirm (defaults applied)
 
 - [DÉCISION DEV] Guest progress is not merged into an existing account when Google or the email already has one; the screen says so clearly.
