@@ -17,6 +17,7 @@ import PairMatch from './PairMatch';
 import ValuationSlider from './ValuationSlider';
 import OpeningBell, { bellDue } from '../../rituals/OpeningBell';
 import Signature from '../../rituals/Signature';
+import Redline, { type Miss } from '../../rituals/Redline';
 import './engine.css';
 
 type Props = {
@@ -57,7 +58,8 @@ export default function LessonShell({ skill, title, onExit, onDone, difficulty }
   const [i, setI] = useState(0);
   const [value, setValue] = useState<Value>(null);
   const [res, setRes] = useState<SubmitResponse | null>(null);
-  const [phase, setPhase] = useState<'answer' | 'locking' | 'waiting' | 'retry' | 'feedback' | 'results'>('answer');
+  const [phase, setPhase] = useState<'answer' | 'locking' | 'waiting' | 'retry' | 'feedback' | 'redline' | 'results'>('answer');
+  const [misses, setMisses] = useState<Miss[]>([]);
   const [results, setResults] = useState<{ right: number; xp: number; best: number }>({ right: 0, xp: 0, best: 0 });
   const [credited, setCredited] = useState<number | null>(null);
   const card = useRef<HTMLDivElement>(null);
@@ -80,7 +82,7 @@ export default function LessonShell({ skill, title, onExit, onDone, difficulty }
       live = false;
       valeMidas.state(false);
     };
-  }, [skill]);
+  }, [skill, difficulty]);
 
   const ex = start?.items[i] ?? null;
   const last = start ? i === start.items.length - 1 : false;
@@ -123,6 +125,7 @@ export default function LessonShell({ skill, title, onExit, onDone, difficulty }
         return;
       }
       setRes(r);
+      if (!r.correct) setMisses((m) => [...m, { ex, res: r }]);
       setResults((s) => ({ right: s.right + (r.correct ? 1 : 0), xp: s.xp + r.xpAwarded, best: Math.max(s.best, r.combo) }));
       setPhase('feedback');
       feedback(r);
@@ -143,11 +146,11 @@ export default function LessonShell({ skill, title, onExit, onDone, difficulty }
       return;
     }
     valeMidas.state(false);
-    setPhase('results');
+    setPhase(misses.length ? 'redline' : 'results');
     const total = start.items.length;
     const xp = await finish(start, skill, starsFor(results.right, total), results.right, results.xp);
     setCredited(xp);
-  }, [start, phase, last, i, skill, results]);
+  }, [start, phase, last, i, skill, results, misses.length]);
 
   // Keyboard: 1–4, Enter, Escape.
   useEffect(() => {
@@ -193,6 +196,8 @@ export default function LessonShell({ skill, title, onExit, onDone, difficulty }
   if (!start || !ex) {
     return <main className="xl xl--center" id="main" aria-busy="true"><p className="kicker">Opening the deal room</p></main>;
   }
+
+  if (phase === 'redline') return <Redline misses={misses} onDone={() => setPhase('results')} />;
 
   if (phase === 'results') {
     const total = start.items.length;
