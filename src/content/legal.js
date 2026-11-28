@@ -1,3 +1,5 @@
+import { BRAND } from '../lib/config';
+
 // Legal pages. DRAFTS: every page must be reviewed by a qualified lawyer
 // (India, EU/France, UK and US) before launch. Text in [SQUARE BRACKETS] is a
 // placeholder for a fact or a business decision only the owner can supply;
@@ -7,10 +9,10 @@
 
 const ENTITY = '[LEGAL ENTITY NAME]';
 const ADDRESS = '[REGISTERED ADDRESS]';
-const EMAIL = '[CONTACT EMAIL]';
+const EMAIL = BRAND.support;
 const GRIEVANCE = '[GRIEVANCE OFFICER]';
 const LAW = '[GOVERNING LAW]';
-export const EFFECTIVE = '[EFFECTIVE DATE]';
+export const EFFECTIVE = '28 November 2026';
 
 export const LEGAL = {
   terms: {
@@ -78,18 +80,18 @@ export const LEGAL = {
         `If you believe a child has given us personal data without the required consent, contact ${EMAIL} and we will delete it.`,
       ] },
       { h: 'Who processes data for us', list: [
-        'Supabase: database, authentication and server functions (hosting region: [SUPABASE REGION]).',
+        'Supabase: database, authentication and server functions (hosting region: Singapore, ap-southeast-1).',
         'Vercel: website hosting and content delivery.',
         'Razorpay: payment processing and subscriptions (Razorpay is responsible for card and bank data under its own privacy policy and PCI-DSS).',
         'Google (Gemini API): writes the AI tutor’s replies and the wording of some practice exercises. Requests are sent only from our servers, never directly from your device, and contain the practice problem and the messages you type in the tutor, not your name, email address or payment details. We use Google’s paid API service, under whose terms Google does not use these requests or replies to train or improve its models. The numbers and the correct answer of every exercise are computed by our own code, not by the model.',
-        'Analytics provider, only with your consent: [ANALYTICS PROVIDER OR “NONE”].',
+        'Analytics provider: none. No analytics data is collected or sent today; if that changes, we will ask for your consent first and name the provider here.',
       ], p: ['Each processor acts on our instructions under a written contract. We may also disclose data where the law requires it.'] },
       { h: 'International transfers', p: ['Some processors store or process data outside your country. Where data leaves the EU, the UK or India, we rely on adequacy decisions, Standard Contractual Clauses (or the UK addendum) and the protections required by Indian law.'] },
       { h: 'How long we keep it', list: [
-        'Account and learning data: while your account is open, and deleted within [DELETION PERIOD, e.g. 30 days] after you delete your account.',
-        'Tutor messages: [TUTOR RETENTION PERIOD].',
+        'Account and learning data: while your account is open, and deleted as soon as you delete your account in Settings (any copy left in our providers’ backups is overwritten in their normal backup cycle).',
+        'Tutor messages: we do not store them. We keep only a usage count (date and problem) to apply your daily limit, while your account is open.',
         'Payment and invoice records: as long as tax and accounting law requires (for example, 8 years in India), without your name where possible.',
-        'Security logs: up to [LOG RETENTION PERIOD].',
+        'Security logs: up to 7 days, kept by our hosting providers.',
       ] },
       { h: 'Your rights', p: ['Depending on where you live, you can:'], list: [
         'access your data and get a copy in a portable format;',
@@ -120,7 +122,7 @@ export const LEGAL = {
       ] },
       { h: 'EU and UK consumers', p: ['You have a 14-day right to withdraw from a digital service contract. When you start a paid plan you ask us to begin straight away; if you withdraw within 14 days we refund the price minus the part of the period already provided, unless the law in your country says otherwise.'] },
       { h: 'How refunds are paid', p: ['Approved refunds go back to the original payment method through Razorpay. Banks usually take [5–7 BUSINESS DAYS] to show them.'] },
-      { h: 'How to ask', p: [`Email ${EMAIL} from your account email with the payment date. We reply within [RESPONSE TIME].`] },
+      { h: 'How to ask', p: [`Email ${EMAIL} from your account email with the payment date. We reply within 7 days.`] },
     ],
   },
 
@@ -135,7 +137,7 @@ export const LEGAL = {
         'Your cookie choice, so we don’t ask again.',
         'Payments: when you open checkout, Razorpay sets the cookies it needs to process the payment securely and prevent fraud.',
       ] },
-      { h: 'Analytics (only with your consent)', p: ['If you accept, we record anonymous product events such as “sign-up”, “started a deal”, “completed a deal” and “upgrade clicked”, with the page path. We do not use advertising cookies, do not build profiles across sites, and do not send your name or email. Provider: [ANALYTICS PROVIDER OR “NONE”].'] },
+      { h: 'Analytics (only with your consent)', p: ['If you accept, we record anonymous product events such as “sign-up”, “started a deal”, “completed a deal” and “upgrade clicked”, with the page path. We do not use advertising cookies, do not build profiles across sites, and do not send your name or email. Provider: none today; no analytics event leaves your device.'] },
       { h: 'Your choices', p: ['Use “Cookie settings” in the website footer or in Profile → Settings to change your choice at any time. You can also clear storage in your browser settings; you will be signed out.'] },
     ],
   },
@@ -180,14 +182,14 @@ export const LEGAL = {
     title: 'Subscription Terms',
     description: 'How Vantaris plans, renewals and payments work.',
     sections: [
-      { h: 'Plans', p: ['Vantaris has a free plan and three paid plans (Core, Pro and Elite), each billed monthly or yearly. The current features and prices are on the pricing page and the Plans screen. Prices are shown in Indian rupees and [INCLUDE / EXCLUDE] GST and other taxes as applicable.'] },
+      { h: 'Plans', p: ['Vantaris has a free plan and three paid plans (Core, Pro and Elite), each billed monthly or yearly. The current features and prices are on the pricing page and the Plans screen. Prices are shown in Indian rupees and include GST and other taxes as applicable: the amount shown is the amount you pay.'] },
       { h: 'Payment and automatic renewal', list: [
         'Payments are processed by Razorpay. Your subscription renews automatically at the end of each period at the then-current price until you cancel.',
         'For cards and UPI AutoPay, you authorise a recurring mandate. As Reserve Bank of India rules require, you will receive a pre-debit notification before each renewal and can manage or cancel the mandate with your bank or UPI app.',
         'If a renewal fails, Razorpay retries for a short period; your paid features may pause until payment succeeds.',
       ] },
       { h: 'Changing plans', p: ['You can switch plans from the Plans screen. [UPGRADE/DOWNGRADE RULE, e.g. “Upgrades start straight away and the price difference is charged pro rata; downgrades take effect at the next renewal.”]'] },
-      { h: 'Price changes', p: ['If we change the price of your plan, we will tell you at least [NOTICE PERIOD, e.g. 30 days] before it applies to you, and you can cancel before then.'] },
+      { h: 'Price changes', p: ['If we change the price of your plan, we will tell you at least 30 days before it applies to you, and you can cancel before then.'] },
       { h: 'Cancellation and refunds', p: ['Cancel any time from Profile → Settings → Plan. See the Refund and Cancellation Policy for refunds.'] },
       { h: 'Minors', p: ['If you are under 18, a parent or guardian must agree to the subscription and pay with their own payment method.'] },
       { h: 'Test mode', p: ['Payments labelled “test mode” in the app are simulations and no money is charged.'] },
@@ -199,7 +201,7 @@ export const LEGAL = {
     description: 'How to reach Vantaris and the Grievance Officer.',
     sections: [
       { h: 'Get in touch', p: [`Email: ${EMAIL}`, `Post: ${ENTITY}, ${ADDRESS}`] },
-      { h: 'Grievance Officer (India)', p: [`Under India’s Digital Personal Data Protection Act, 2023 and the Information Technology Act, 2000 and rules made under them, our Grievance Officer is ${GRIEVANCE}. Email: ${EMAIL}. We acknowledge grievances within [ACKNOWLEDGEMENT TIME] and resolve them within [RESOLUTION TIME], and always within the time limits the law sets. If you are not satisfied, you may complain to the Data Protection Board of India.`] },
+      { h: 'Grievance Officer (India)', p: [`Under India’s Digital Personal Data Protection Act, 2023 and the Information Technology Act, 2000 and rules made under them, our Grievance Officer is ${GRIEVANCE}. Email: ${EMAIL}. We acknowledge grievances within 24 hours and resolve them within 15 days, and always within the time limits the law sets. If you are not satisfied, you may complain to the Data Protection Board of India.`] },
       { h: 'Privacy requests (EU, UK, US)', p: [`Email ${EMAIL} with the subject “Privacy request”. We answer within one month (EU/UK) or 45 days (US states), and tell you if we need more time. You may also complain to the CNIL (France), your local EU authority, or the ICO (UK).`] },
       { h: 'Help with the app', p: ['For account, payment or practice questions, email us from the address on your account so we can find it quickly.'] },
     ],

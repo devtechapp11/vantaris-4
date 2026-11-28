@@ -248,6 +248,28 @@ New sounds: `sfx.openingBell`, `sfx.ding`, `sfx.flap`. Shots: `design/qa/p10`.
 - `grep -rn "499\|999\|1999\|1,999" src`: no amounts outside `src/lib/api/demo.js` (the demo backend). The other hits are radii (`999px`) and shader constants. Real prices come from `public.plans`.
 - The « Join 2,341 future dealmakers » on the auth screens is the demo backend's figure. In production it is the server's count, shown only above `SOCIAL_PROOF_MIN`.
 
+## Production release (28 Nov 2026, with Dev's written go-ahead)
+
+- **Supabase migrations** applied to production, version numbers aligned with the repo files:
+  - `phase6_server_xp`, `v4_lessons_server`, `v4_anonymous_guards`;
+  - `v4_service_role_grants`: since the zero-trust lockdown, `service_role` gets no default privileges, so the Edge Functions need explicit grants;
+  - `elite_perk_wording`.
+- **Edge Functions** deployed with the CLI: `generate-exercise`, `submit-answer`, and `billing` (v17, guests blocked from checkout with `LINK_REQUIRED`).
+- **Auth**: `config push` turned on only `enable_anonymous_sign_ins` and `enable_manual_linking`. The 19 undeclared remote settings (site_url, SMTP, MFA…) were left as they were.
+- **End-to-end test in production** with a temporary guest, deleted afterwards:
+  - the server lesson (5 items) never exposes the key;
+  - a replay of the same answer earns 0 XP;
+  - the streak moves when a lesson finishes;
+  - the league answers 403 to guests, and so does checkout.
+- **`VITE_LESSON_SERVER=1`** is in `.env.production`. It is public and read by every Vercel build. The Vercel CLI is not logged in on this Mac, so `vercel env add` was not possible.
+- **Perks**: Elite said « Unlimited coaching » while the server caps it at 300 a day. The wording is now « 300 messages a day », in the DB, the Plans table and the demo.
+- **Legal**: every factual placeholder is filled:
+  - email, region, analytics (none: the CSP allows no collector);
+  - retention (tutor messages are not stored);
+  - GST included, plus the timelines Dev approved.
+
+  Still to supply: legal entity name, registered address, Grievance Officer, governing law and courts.
+
 ## Decisions to confirm (defaults applied)
 
 - [DÉCISION DEV] Guest progress is not merged into an existing account when Google or the email already has one; the screen says so clearly.

@@ -17,7 +17,7 @@ const TIERS = [
   { id: 'pro', name: 'Pro', rank: 2, weekly_problem_limit: null, max_level: 'VP', full_walkthroughs: true, tutor_daily_limit: 40,
     tagline: 'Train with a coach at your side', features: ['Everything in Core', 'Vale, your AI coach: 40 messages a day', 'VP desks: M&A and restructuring'] },
   { id: 'elite', name: 'Elite', rank: 3, weekly_problem_limit: null, max_level: 'MD', full_walkthroughs: true, tutor_daily_limit: 300,
-    tagline: 'Walk in interview-ready', features: ['Everything in Pro', 'Unlimited coaching with Vale', 'MD desk: deal structuring', 'The Elite member card'] },
+    tagline: 'Walk in interview-ready', features: ['Everything in Pro', 'Vale, your AI coach: 300 messages a day', 'MD desk: deal structuring', 'The Elite member card'] },
 ];
 const PLANS = [
   { id: 'core_monthly', tier: 'core', interval: 'monthly', amount: 49900, currency: 'INR', sort: 1 },

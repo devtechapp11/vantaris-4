@@ -21,3 +21,10 @@ verify_jwt = false
 
 [functions.submit-answer]
 verify_jwt = false
+
+# V4 onboarding: guest desks (anonymous sign-ins), turned into accounts with
+# linkIdentity / updateUser (manual linking). Only these two Auth properties are
+# declared; config push leaves every undeclared remote property unchanged.
+[auth]
+enable_anonymous_sign_ins = true
+enable_manual_linking = true

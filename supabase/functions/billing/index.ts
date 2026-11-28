@@ -401,8 +401,12 @@ export async function handle(req: Request): Promise<Response> {
     if (authError || !auth?.user) throw new HttpError(401, 'UNAUTHENTICATED', 'Your session has expired. Sign in again.');
 
     const body = await readJson(req);
+    // A guest desk (anonymous sign-in) has no reachable owner for the receipt or the plan: link an account first.
+    const anonymous = Boolean((auth.user as { is_anonymous?: boolean }).is_anonymous);
     switch (body.action) {
-      case 'create-subscription': return json(req, 200, await createSubscription(db, auth.user, body));
+      case 'create-subscription':
+        if (anonymous) throw new HttpError(403, 'LINK_REQUIRED', 'Save your desk first.');
+        return json(req, 200, await createSubscription(db, auth.user, body));
       case 'verify-payment':      return json(req, 200, await verifyPayment(db, auth.user, body));
       case 'cancel-subscription': return json(req, 200, await cancelSubscription(db, auth.user));
       case 'delete-account':      return json(req, 200, await deleteAccount(db, auth.user, body));

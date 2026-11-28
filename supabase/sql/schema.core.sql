@@ -1363,7 +1363,7 @@ values
   ('pro',   'Pro',   2, null, 'VP',        true,  40,  'Train with a coach at your side',
      array['Everything in Core', 'Vale, your AI coach: 40 messages a day', 'VP desks: M&A and restructuring']),
   ('elite', 'Elite', 3, null, 'MD',        true,  300, 'Walk in interview-ready',
-     array['Everything in Pro', 'Unlimited coaching with Vale', 'MD desk: deal structuring', 'The Elite member card'])
+     array['Everything in Pro', 'Vale, your AI coach: 300 messages a day', 'MD desk: deal structuring', 'The Elite member card'])
 on conflict (id) do update set
   name = excluded.name, rank = excluded.rank, weekly_problem_limit = excluded.weekly_problem_limit,
   max_level = excluded.max_level, full_walkthroughs = excluded.full_walkthroughs,

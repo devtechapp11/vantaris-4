@@ -30,7 +30,7 @@ const ROWS = [
   ['Deals per week', (t) => (t.weekly_problem_limit == null ? 'Unlimited' : String(t.weekly_problem_limit))],
   ['Career modules', (t) => LEVEL_SCOPE[t.max_level] ?? t.max_level],
   ['Full step-by-step solutions', (t) => t.full_walkthroughs],
-  ['Vale, AI tutor', (t) => (t.tutor_daily_limit >= 300 ? 'Unlimited' : t.tutor_daily_limit > 0 ? `${t.tutor_daily_limit} / day` : false)],
+  ['Vale, AI tutor', (t) => (t.tutor_daily_limit > 0 ? `${t.tutor_daily_limit} / day` : false)],
   ['Leaderboard and streaks', () => true],
   ['Elite member card', (t) => t.id === 'elite'],
 ];
